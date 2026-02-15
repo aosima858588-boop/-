@@ -1469,27 +1469,62 @@
         </div>
 
         <!-- 卡片D2：交易历史 -->
+               <!-- 卡片D2：质押管理（替换原交易历史卡片） -->
         <div class="activity-card data-card" id="cardData2">
             <div class="card-header">
-                <div class="card-main">
-                    <div class="card-icon" style="color:var(--secondary);"><i class="fas fa-history"></i></div>
-                    <div class="card-text">
-                        <h3>交易历史</h3>
-                        <p>最近10笔链上交互</p>
+                <div class="card-main" style="align-items: baseline;">
+                    <div class="card-icon"><i class="fas fa-lock"></i></div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 0.8rem; color: var(--text-light);">当前总质押</span>
+                        <span style="font-size: 2.2rem; font-weight: 800; line-height: 1.2; color: var(--text-primary);">541,124,124 H</span>
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;">≈ $1,293,833</span>
                     </div>
                 </div>
                 <div class="card-status">
-                    <span class="status-badge" style="color:var(--secondary);">24h 8笔</span>
                     <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
                 </div>
             </div>
             <div class="card-content">
-                <div class="content-inner">
-                    <div class="history-row"><span>⚡ 卖出 ETH</span><span style="color:var(--success);">+$312</span></div>
-                    <div class="history-row"><span>💰 接收 USDT</span><span>$200</span></div>
-                    <div class="history-row"><span>🔄 兑换 DPH</span><span>500 DPH</span></div>
-                    <div class="history-row"><span>📈 Boost 交易</span><span>$1,200</span></div>
-                    <div class="history-row"><span>🔁 质押 H</span><span>3000 H</span></div>
+                <div class="content-inner" style="padding-top: 8px;">
+                    <!-- 质押收益提示 -->
+                    <div style="background: rgba(0,102,255,0.04); border-radius: 20px; padding: 16px; margin-bottom: 24px; text-align: center; backdrop-filter: blur(4px);">
+                        <i class="fas fa-seedling" style="color: var(--success); font-size: 1.4rem; margin-right: 8px;"></i>
+                        <span style="font-weight: 700;">质押 H 每天赚收益</span>
+                    </div>
+
+                    <!-- 收益统计两列 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                        <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); border-radius: 20px; padding: 18px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 6px;">待领取收益</div>
+                            <div style="font-size: 1.6rem; font-weight: 800; color: var(--success);">1,250 H</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); border-radius: 20px; padding: 18px; text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 6px;">已领取收益</div>
+                            <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">24,500 H</div>
+                        </div>
+                    </div>
+
+                    <!-- 质押操作区 -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size:0.8rem; color:var(--text-secondary);">输入质押数量</label>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px;">
+                            <input type="text" placeholder="0.0" value="10000" 
+                                   style="flex: 1; padding: 16px; border:2px solid rgba(0,102,255,0.1); border-radius:20px; font-size:0.95rem; background:rgba(255,255,255,0.5); backdrop-filter: blur(4px); color:var(--text-primary);" 
+                                   onclick="event.stopPropagation()">
+                            <span style="background: rgba(0,102,255,0.1); padding: 12px 18px; border-radius: 20px; font-weight: 700; color: var(--primary);">H</span>
+                        </div>
+                    </div>
+
+                    <!-- 智能质押按钮 -->
+                    <button style="width:100%; padding:18px; background:linear-gradient(135deg, var(--primary), var(--accent)); color:white; border:none; border-radius:30px; font-weight:800; font-size:1.1rem; margin-bottom: 16px; cursor:pointer;" 
+                            onclick="event.stopPropagation(); alert('质押成功！已跳转至仓位卡片。'); document.getElementById('cardData4').scrollIntoView({behavior:'smooth'});">
+                        <i class="fas fa-robot" style="margin-right: 8px;"></i>智能质押
+                    </button>
+
+                    <!-- 提示文字 -->
+                    <p style="color: var(--text-light); font-size: 0.8rem; text-align: center;">
+                        <i class="fas fa-info-circle"></i> 质押成功后自动跳转至“仓位分析”卡片
+                    </p>
                 </div>
             </div>
         </div>
