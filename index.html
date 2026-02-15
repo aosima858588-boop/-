@@ -1261,121 +1261,159 @@
         <div class="activity-card model-card" id="cardArch"><!-- 略 --></div>
 
         <!-- ========== 新增 5 张数据卡片 ========== -->
-        <!-- 卡片D1：资产总览 (用户描述的第一个卡片) -->
-      <!-- 卡片D1：我的钱包（替换原资产总览卡片） -->
-<div class="activity-card data-card" id="cardData1">
-  <div class="card-header">
-    <div class="card-main" style="align-items: baseline;">
-      <div class="card-icon"><i class="fas fa-wallet"></i></div>
-      <div style="display: flex; flex-direction: column;">
-        <span style="font-size: 0.8rem; color: var(--text-light);">我的钱包</span>
-        <span style="font-size: 2.2rem; font-weight: 800; line-height: 1.2; color: var(--text-primary);">$1098</span>
-        <span style="color: var(--success); font-size: 0.9rem;">+1.9% (1日)</span>
-      </div>
-    </div>
-    <div class="card-status">
-      <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
-    </div>
-  </div>
-  <div class="card-content">
-    <div class="content-inner" style="padding-top: 8px;">
-      <!-- 三个底部菜单按钮 -->
-      <div style="display: flex; gap: 8px; margin-bottom: 24px; background: rgba(0,102,255,0.04); padding: 6px; border-radius: 40px;">
-        <button class="tab-item data-tab active" data-tab="send" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px; transition:var(--transition);" onclick="switchDataTab(event, 'send')">发送</button>
-        <button class="tab-item data-tab" data-tab="receive" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px;" onclick="switchDataTab(event, 'receive')">接收</button>
-        <button class="tab-item data-tab" data-tab="bill" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px;" onclick="switchDataTab(event, 'bill')">账单</button>
-      </div>
-
-      <!-- 发送面板 -->
-      <div id="dataPanelSend" style="display: block;">
-        <div style="margin-bottom: 24px;">
-          <label style="font-size:0.8rem; color:var(--text-secondary);">对方地址</label>
-          <input type="text" placeholder="输入 0x... 或 ENS" style="width:100%; padding:16px; border:2px solid rgba(0,102,255,0.1); border-radius:20px; margin-top:6px; font-size:0.95rem; background:white;" value="0x1234...abcd" onclick="event.stopPropagation()">
-          <button style="margin-top:12px; width:100%; padding:16px; background:linear-gradient(135deg, var(--primary), var(--accent)); color:white; border:none; border-radius:20px; font-weight:800; font-size:1rem;" onclick="event.stopPropagation(); alert('模拟发送')">发送</button>
-        </div>
-        <div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-weight:700;">近期交易账单</span>
-            <span style="font-size:0.75rem; color:var(--text-light);">最近3笔</span>
+                <!-- 卡片D1：我的钱包（修正版，保持透明背景） -->
+        <div class="activity-card data-card" id="cardData1">
+          <div class="card-header">
+            <div class="card-main" style="align-items: baseline;">
+              <div class="card-icon"><i class="fas fa-wallet"></i></div>
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 0.8rem; color: var(--text-light);">我的钱包</span>
+                <span style="font-size: 2.2rem; font-weight: 800; line-height: 1.2; color: var(--text-primary);">$1098</span>
+                <span style="color: var(--success); font-size: 0.9rem;">+1.9% (1日)</span>
+              </div>
+            </div>
+            <div class="card-status">
+              <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+            </div>
           </div>
-          <div class="history-row"><span>→ 0x8f3...b2e</span><span style="color:var(--danger);">- $50</span></div>
-          <div class="history-row"><span>→ 0x3a9...c5d</span><span style="color:var(--danger);">- $120</span></div>
-          <div class="history-row"><span>→ 0xf2b...7a1</span><span style="color:var(--danger);">- $35</span></div>
-        </div>
-      </div>
+          <div class="card-content">
+            <div class="content-inner" style="padding-top: 8px;">
+              <!-- 三个底部菜单按钮（透明风格） -->
+              <div style="display: flex; gap: 8px; margin-bottom: 24px; background: rgba(0,102,255,0.04); padding: 6px; border-radius: 40px; backdrop-filter: blur(4px);">
+                <button class="tab-item data-tab active" data-tab="send" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px; transition:var(--transition); color:var(--text-secondary);" onclick="switchDataTab(event, 'send')">发送</button>
+                <button class="tab-item data-tab" data-tab="receive" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px; color:var(--text-secondary);" onclick="switchDataTab(event, 'receive')">接收</button>
+                <button class="tab-item data-tab" data-tab="bill" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px; color:var(--text-secondary);" onclick="switchDataTab(event, 'bill')">账单</button>
+              </div>
 
-      <!-- 接收面板 -->
-      <div id="dataPanelReceive" style="display: none;">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="width:160px; height:160px; background:rgba(0,102,255,0.04); margin:0 auto 16px; border-radius:20px; display:flex; align-items:center; justify-content:center; border:2px dashed rgba(0,102,255,0.2);">
-            <i class="fas fa-qrcode" style="font-size:4rem; color:var(--primary); opacity:0.5;"></i>
-            <span style="display:none;">二维码占位</span>
+              <!-- 发送面板（透明风格） -->
+              <div id="dataPanelSend" style="display: block;">
+                <div style="margin-bottom: 24px;">
+                  <label style="font-size:0.8rem; color:var(--text-secondary);">对方地址</label>
+                  <input type="text" placeholder="输入 0x... 或 ENS" 
+                         style="width:100%; padding:16px; border:2px solid rgba(0,102,255,0.1); border-radius:20px; margin-top:6px; font-size:0.95rem; background:rgba(255,255,255,0.5); backdrop-filter: blur(4px); color:var(--text-primary);" 
+                         value="0x1234...abcd" onclick="event.stopPropagation()">
+                  <button style="margin-top:12px; width:100%; padding:16px; background:linear-gradient(135deg, var(--primary), var(--accent)); color:white; border:none; border-radius:20px; font-weight:800; font-size:1rem; cursor:pointer;" onclick="event.stopPropagation(); alert('模拟发送')">发送</button>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <span style="font-weight:700; color:var(--text-primary);">近期交易账单</span>
+                    <span style="font-size:0.75rem; color:var(--text-light);">最近3笔</span>
+                  </div>
+                  <div class="history-row"><span style="color:var(--text-secondary);">→ 0x8f3...b2e</span><span style="color:var(--danger);">- $50</span></div>
+                  <div class="history-row"><span style="color:var(--text-secondary);">→ 0x3a9...c5d</span><span style="color:var(--danger);">- $120</span></div>
+                  <div class="history-row"><span style="color:var(--text-secondary);">→ 0xf2b...7a1</span><span style="color:var(--danger);">- $35</span></div>
+                </div>
+              </div>
+
+              <!-- 接收面板（透明风格） -->
+              <div id="dataPanelReceive" style="display: none;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                  <div style="width:160px; height:160px; background:rgba(255,255,255,0.2); backdrop-filter: blur(4px); margin:0 auto 16px; border-radius:20px; display:flex; align-items:center; justify-content:center; border:2px dashed rgba(0,102,255,0.2);">
+                    <i class="fas fa-qrcode" style="font-size:4rem; color:var(--primary); opacity:0.5;"></i>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.2); backdrop-filter: blur(4px); padding:12px 16px; border-radius:40px; display:inline-flex; align-items:center; gap:12px; margin-bottom:20px;">
+                    <code style="font-size:0.8rem; color:var(--text-primary);">0x1234...abcd</code>
+                    <button style="background:transparent; border:none; color:var(--primary);" onclick="event.stopPropagation(); navigator.clipboard?.writeText('0x1234...abcd')"><i class="fas fa-copy"></i> 复制</button>
+                  </div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                    <span style="font-weight:700; color:var(--text-primary);">近期接收账单</span>
+                    <span style="font-size:0.75rem; color:var(--text-light);">最近3笔</span>
+                  </div>
+                  <div class="history-row"><span style="color:var(--text-secondary);">← 0x7d4...e8f</span><span style="color:var(--success);">+ $200</span></div>
+                  <div class="history-row"><span style="color:var(--text-secondary);">← 0x9b2...c3a</span><span style="color:var(--success);">+ $85</span></div>
+                  <div class="history-row"><span style="color:var(--text-secondary);">← 0x5e1...f9c</span><span style="color:var(--success);">+ $312</span></div>
+                </div>
+              </div>
+
+              <!-- 账单面板（透明风格） -->
+              <div id="dataPanelBill" style="display: none;">
+                <div style="margin-bottom:12px;"><span style="font-weight:700; color:var(--text-primary);">全部交易记录</span></div>
+                <div class="history-row"><span style="color:var(--text-secondary);">发送 → 0x8f3...b2e</span><span style="color:var(--danger);">- $50</span></div>
+                <div class="history-row"><span style="color:var(--text-secondary);">接收 ← 0x7d4...e8f</span><span style="color:var(--success);">+ $200</span></div>
+                <div class="history-row"><span style="color:var(--text-secondary);">发送 → 0x3a9...c5d</span><span style="color:var(--danger);">- $120</span></div>
+                <div class="history-row"><span style="color:var(--text-secondary);">接收 ← 0x9b2...c3a</span><span style="color:var(--success);">+ $85</span></div>
+                <div class="history-row"><span style="color:var(--text-secondary);">发送 → 0xf2b...7a1</span><span style="color:var(--danger);">- $35</span></div>
+                <div class="history-row"><span style="color:var(--text-secondary);">接收 ← 0x5e1...f9c</span><span style="color:var(--success);">+ $312</span></div>
+              </div>
+            </div>
           </div>
-          <div style="background:rgba(0,102,255,0.04); padding:12px 16px; border-radius:40px; display:inline-flex; align-items:center; gap:12px; margin-bottom:20px;">
-            <code style="font-size:0.8rem;">0x1234...abcd</code>
-            <button style="background:transparent; border:none; color:var(--primary);" onclick="event.stopPropagation(); navigator.clipboard?.writeText('0x1234...abcd')"><i class="fas fa-copy"></i> 复制</button>
-          </div>
         </div>
-        <div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-            <span style="font-weight:700;">近期接收账单</span>
-            <span style="font-size:0.75rem; color:var(--text-light);">最近3笔</span>
-          </div>
-          <div class="history-row"><span>← 0x7d4...e8f</span><span style="color:var(--success);">+ $200</span></div>
-          <div class="history-row"><span>← 0x9b2...c3a</span><span style="color:var(--success);">+ $85</span></div>
-          <div class="history-row"><span>← 0x5e1...f9c</span><span style="color:var(--success);">+ $312</span></div>
-        </div>
-      </div>
 
-      <!-- 账单面板 (可综合显示所有交易) -->
-      <div id="dataPanelBill" style="display: none;">
-        <div style="margin-bottom:12px;"><span style="font-weight:700;">全部交易记录</span></div>
-        <div class="history-row"><span>发送 → 0x8f3...b2e</span><span style="color:var(--danger);">- $50</span></div>
-        <div class="history-row"><span>接收 ← 0x7d4...e8f</span><span style="color:var(--success);">+ $200</span></div>
-        <div class="history-row"><span>发送 → 0x3a9...c5d</span><span style="color:var(--danger);">- $120</span></div>
-        <div class="history-row"><span>接收 ← 0x9b2...c3a</span><span style="color:var(--success);">+ $85</span></div>
-        <div class="history-row"><span>发送 → 0xf2b...7a1</span><span style="color:var(--danger);">- $35</span></div>
-        <div class="history-row"><span>接收 ← 0x5e1...f9c</span><span style="color:var(--success);">+ $312</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+        <!-- 添加面板切换函数（若全局已有可跳过） -->
+        <script>
+          function switchDataTab(event, tabName) {
+            event.stopPropagation();
+            const container = document.getElementById('cardData1');
+            const tabs = container.querySelectorAll('.data-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            // 高亮激活按钮样式
+            event.target.style.background = 'white';
+            event.target.style.color = 'var(--primary)';
+            tabs.forEach(t => {
+              if (t !== event.target) {
+                t.style.background = 'transparent';
+                t.style.color = 'var(--text-secondary)';
+              }
+            });
 
-<!-- 添加面板切换函数 -->
-<script>
-  function switchDataTab(event, tabName) {
-    event.stopPropagation();
-    const container = document.getElementById('cardData1');
-    const tabs = container.querySelectorAll('.data-tab');
-    tabs.forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
+            const panels = ['send', 'receive', 'bill'];
+            panels.forEach(p => {
+              const panel = document.getElementById('dataPanel' + p.charAt(0).toUpperCase() + p.slice(1));
+              if (panel) panel.style.display = p === tabName ? 'block' : 'none';
+            });
+          }
+        </script>
 
-    const panels = ['send', 'receive', 'bill'];
-    panels.forEach(p => {
-      const panel = document.getElementById('dataPanel' + p.charAt(0).toUpperCase() + p.slice(1));
-      if (panel) panel.style.display = p === tabName ? 'block' : 'none';
-    });
-  }
-</script>
-
-<!-- 额外样式保证复制按钮正常 -->
-<style>
-  .history-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 14px 0;
-    border-bottom: 1px dashed rgba(0,0,0,0.04);
-    font-size: 0.9rem;
-  }
-  .data-tab.active {
-    background: white !important;
-    color: var(--primary) !important;
-    box-shadow: 0 2px 8px rgba(0,102,255,0.12);
-  }
-  #cardData1 .card-main {
-    align-items: baseline;
-  }
-</style>
+        <!-- 额外样式保证背景透明且与整体融合 -->
+        <style>
+          /* 确保卡片内部元素背景透明/半透明 */
+          #cardData1 input,
+          #cardData1 .history-row,
+          #cardData1 .tab-item {
+            transition: var(--transition);
+          }
+          #cardData1 input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,255,0.1);
+            background: rgba(255,255,255,0.8);
+          }
+          .history-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.04);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+          }
+          .history-row:hover {
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding-left: 8px;
+            padding-right: 8px;
+          }
+          .data-tab.active {
+            background: white !important;
+            color: var(--primary) !important;
+            box-shadow: 0 2px 8px rgba(0,102,255,0.12);
+          }
+          #cardData1 .card-main {
+            align-items: baseline;
+          }
+          /* 保持卡片整体透明 */
+          .activity-card {
+            background: transparent;
+          }
+          /* 二维码区域适配 */
+          #cardData1 .fa-qrcode {
+            filter: drop-shadow(0 2px 4px rgba(0,102,255,0.2));
+          }
+        </style>
+            </div>
+            <div class="card-content">
                 <div class="content-inner">
                     <!-- 切换标签 (币种/DeFi/仓位) 静态展示，默认币种active -->
                     <div class="tab-switch">
