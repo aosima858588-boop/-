@@ -1,532 +1,758 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>抽屉式卡片设计 | 海豚社区</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  <style>
-    :root {
-      --bg-start: #f0f9ff;
-      --bg-end: #e0f2fe;
-      --primary: #3b82f6;
-      --primary-dark: #2563eb;
-      --accent: #0ea5e9;
-      --text: #1e293b;
-      --text-soft: #64748b;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
-      --radius: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海豚社区 · 完整生态系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+            color: #1e4a5a;
+            line-height: 1.6;
+        }
 
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
+        /* 导航栏 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 70, 80, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-    body {
-      font-family: 'Segoe UI', 'PingFang SC', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
-      color: var(--text);
-      min-height: 100vh;
-      padding: 2rem 1rem;
-    }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #005067, #00879b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
+        .nav-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
 
-    .page-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: #f0f7fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    .page-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 0.5rem;
-    }
+        .user-menu:hover {
+            background: #e8f2f5;
+        }
 
-    .page-subtitle {
-      color: var(--text-soft);
-      font-size: 1.1rem;
-    }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #005067, #00879b);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
 
-    /* 抽屉式卡片 */
-    .accordion-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      margin-bottom: 1.5rem;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border: 2px solid transparent;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e0edf2;
+            background: white;
+            padding: 0 2rem;
+            gap: 3rem;
+            position: sticky;
+            top: 60px;
+            z-index: 999;
+        }
 
-    .accordion-card:hover {
-      border-color: var(--primary);
-      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
-      transform: translateY(-2px);
-    }
+        .tab-btn {
+            padding: 1rem 0;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #59808c;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-    .accordion-card.active {
-      border-color: var(--primary);
-    }
+        .tab-btn.active {
+            color: #005067;
+        }
 
-    /* 卡片头部 */
-    .card-header {
-      padding: 2rem;
-      cursor: pointer;
-      user-select: none;
-      position: relative;
-    }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #005067, #00879b);
+            border-radius: 3px 3px 0 0;
+        }
 
-    .card-header::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 2rem;
-      right: 2rem;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-    }
+        .content-wrapper {
+            padding: 2rem;
+            min-height: calc(100vh - 180px);
+        }
 
-    .card-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
+        .tab-content {
+            display: none;
+        }
 
-    .card-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
 
-    .card-title::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: linear-gradient(180deg, var(--primary), var(--accent));
-      border-radius: 4px;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    .expand-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--bg-start);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-      color: var(--primary);
-      font-size: 0.9rem;
-    }
+        .dashboard { max-width: 1400px; margin: 0 auto; }
 
-    .accordion-card.active .expand-icon {
-      background: var(--primary);
-      color: white;
-      transform: rotate(180deg);
-    }
+        .gradient-text {
+            background: linear-gradient(145deg, #005067, #00879b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 500;
+        }
 
-    /* 关键数据预览 */
-    .card-preview {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1.5rem;
-    }
+        h1 { 
+            font-size: 2.5rem; 
+            font-weight: 400; 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
 
-    .preview-item {
-      text-align: center;
-    }
+        .h1-badge {
+            background: #f0f7fa;
+            border: 1px solid #cde3e9;
+            border-radius: 60px;
+            padding: 0.3rem 1.5rem;
+            font-size: 1rem;
+            color: #005067;
+        }
 
-    .preview-label {
-      font-size: 0.9rem;
-      color: var(--text-soft);
-      margin-bottom: 0.3rem;
-    }
+        .sub {
+            color: #59808c;
+            border-bottom: 1px solid #e0edf2;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
 
-    .preview-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+        .grid-4, .grid-3, .grid-2, .grid-6 {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-6 { grid-template-columns: repeat(6, 1fr); }
 
-    /* 卡片内容（抽屉） */
-    .card-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        @media (max-width: 1100px) { 
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-6 { grid-template-columns: repeat(3, 1fr); }
+            .tab-container { gap: 2rem; }
+        }
+        @media (max-width: 700px) { 
+            .grid-4, .grid-3, .grid-2, .grid-6 { grid-template-columns: 1fr; }
+            .navbar { padding: 1rem; }
+            .tab-container { padding: 0 1rem; gap: 1.5rem; }
+            .content-wrapper { padding: 1.5rem; }
+        }
 
-    .accordion-card.active .card-content {
-      max-height: 2000px;
-    }
+        .card {
+            background: white;
+            border: 1px solid #e6edf0;
+            border-radius: 24px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(0, 70, 80, 0.02);
+        }
 
-    .card-body {
-      padding: 2rem;
-      padding-top: 1.5rem;
-    }
+        .card:hover {
+            box-shadow: 0 12px 32px rgba(0, 70, 80, 0.08);
+            transform: translateY(-4px);
+        }
 
-    /* 详情网格 */
-    .detail-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
 
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      background: var(--bg-start);
-      border-radius: 12px;
-      border-left: 3px solid var(--primary);
-    }
+        .card-icon { 
+            font-size: 1.8rem; 
+            margin-right: 0.8rem;
+            background: linear-gradient(145deg, #005067, #00879b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    .detail-label {
-      color: var(--text-soft);
-      font-size: 0.95rem;
-    }
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #005067;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-    .detail-value {
-      font-weight: 600;
-      color: var(--text);
-      font-size: 1.1rem;
-    }
+        .stat-value { 
+            font-size: 2rem; 
+            font-weight: 300;
+            background: linear-gradient(145deg, #005067, #00879b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* 操作按钮 */
-    .action-btns {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
+        .stat-label { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            color: #59808c; 
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
+        }
 
-    .btn {
-      flex: 1;
-      padding: 1rem;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px dashed #dae9ef;
+        }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    }
+        .data-row:last-child { border-bottom: none; }
+        .data-label { color: #3e6c7a; font-weight: 500; }
+        .data-value { color: #005067; font-weight: 600; }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
-    .btn-secondary {
-      background: var(--bg-start);
-      color: var(--primary);
-      border: 2px solid var(--primary);
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, #005067, #00879b);
+            color: white;
+        }
 
-    .btn-secondary:hover {
-      background: var(--primary);
-      color: white;
-    }
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(0, 128, 155, 0.3);
+        }
 
-    /* 装饰线条 */
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
-      margin: 1.5rem 0;
-    }
-  </style>
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            border-bottom: 1px solid #e0edf2;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon { 
+            font-size: 1.4rem; 
+            margin-right: 0.6rem;
+            background: linear-gradient(145deg, #005067, #00879b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: linear-gradient(145deg, #005067, #00879b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-desc {
+            margin-left: 1.5rem;
+            color: #6f96a3;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            background: #e8f2f5;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: #005067;
+            border: 1px solid #c2dae2;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: #f2f8fa;
+            padding: 0.8rem;
+            text-align: center;
+            color: #1e5e70;
+            font-weight: 500;
+        }
+
+        td {
+            padding: 0.7rem;
+            border-bottom: 1px solid #e0edf2;
+            text-align: center;
+        }
+
+        .chart-container {
+            height: 280px;
+            margin-top: 1rem;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #7a9ba8;
+            border-top: 1px solid #e0edf2;
+            padding: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="page-header">
-      <h1 class="page-title">抽屉式设计预览</h1>
-      <p class="page-subtitle">点击卡片展开查看详情</p>
+    <!-- 导航栏 -->
+    <div class="navbar">
+        <div class="logo">🐬 海豚社区</div>
+        <div class="nav-right">
+            <div class="user-menu">
+                <div class="user-avatar">U</div>
+                <span>账户</span>
+            </div>
+        </div>
     </div>
 
-    <!-- 卡片1：质押挖矿 -->
-    <div class="accordion-card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-title-row">
-          <h2 class="card-title">质押挖矿</h2>
-          <div class="expand-icon">
-            <i class="fas fa-chevron-down"></i>
-          </div>
-        </div>
-        <div class="card-preview">
-          <div class="preview-item">
-            <div class="preview-label">APY收益率</div>
-            <div class="preview-value">8.5%</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">锁仓总额</div>
-            <div class="preview-value">1.2M</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">参与人数</div>
-            <div class="preview-value">3,580</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-content">
-        <div class="card-body">
-          <div class="detail-grid">
-            <div class="detail-row">
-              <span class="detail-label">最低质押金额</span>
-              <span class="detail-value">100 USDT</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">锁定期限</span>
-              <span class="detail-value">7-90 天</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">每日收益</span>
-              <span class="detail-value">0.5% - 1.2%</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">复利模式</span>
-              <span class="detail-value">自动复投</span>
-            </div>
-          </div>
-          
-          <div class="divider"></div>
-          
-          <div class="action-btns">
-            <button class="btn btn-primary">
-              <i class="fas fa-lock"></i> 立即质押
-            </button>
-            <button class="btn btn-secondary">
-              <i class="fas fa-chart-line"></i> 查看收益
-            </button>
-          </div>
-        </div>
-      </div>
+    <!-- 标签切换 -->
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('boost')">📢 OKX Boost</button>
+        <button class="tab-btn" onclick="switchTab('economic')">📊 经济模型</button>
+        <button class="tab-btn" onclick="switchTab('datacenter')">💾 数据中心</button>
     </div>
 
-    <!-- 卡片2：收益统计 -->
-    <div class="accordion-card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-title-row">
-          <h2 class="card-title">收益统计</h2>
-          <div class="expand-icon">
-            <i class="fas fa-chevron-down"></i>
-          </div>
+    <!-- 内容区域 -->
+    <div class="content-wrapper">
+        <!-- Boost 标签 -->
+        <div id="boost" class="tab-content active">
+            <div class="dashboard">
+                <h1><span class="gradient-text">📢 OKX Boost 专栏</span></h1>
+                <div class="sub">策略解析 · 规则攻略 · 实时数据</div>
+
+                <div class="grid-4">
+                    <div class="card">
+                        <div class="card-header"><span class="card-icon">🎯</span><span class="card-title">Boost 概览</span></div>
+                        <div class="data-row">
+                            <span class="data-label">当前赛季</span>
+                            <span class="data-value">S5</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">参赛交易对</span>
+                            <span class="data-value">H/USDT</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">总奖池</span>
+                            <span class="data-value">50万 U</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">您的收益</span>
+                            <span class="data-value">12,350 U</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><span class="card-icon">📈</span><span class="card-title">成交量排行</span></div>
+                        <div class="data-row">
+                            <span class="data-label">您的排名</span>
+                            <span class="data-value">#18</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">周交易额</span>
+                            <span class="data-value">280万 U</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">奖励等级</span>
+                            <span class="data-value">Lv 4</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">周返佣</span>
+                            <span class="data-value">2,450 U</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><span class="card-icon">🏆</span><span class="card-title">规则与奖励</span></div>
+                        <div class="data-row">
+                            <span class="data-label">手续费折扣</span>
+                            <span class="data-value">-50%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">额外返佣</span>
+                            <span class="data-value">+2%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">杠杆利息费</span>
+                            <span class="data-value">-30%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">邀请返佣</span>
+                            <span class="data-value">+0.5%</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><span class="card-icon">💡</span><span class="card-title">热门策略</span></div>
+                        <div class="data-row">
+                            <span class="data-label">集中交易</span>
+                            <span class="data-value">⭐⭐⭐⭐⭐</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">联合持仓</span>
+                            <span class="data-value">⭐⭐⭐⭐</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">套利交易</span>
+                            <span class="data-value">⭐⭐⭐</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">动态对冲</span>
+                            <span class="data-value">⭐⭐⭐⭐⭐</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-preview">
-          <div class="preview-item">
-            <div class="preview-label">今日收益</div>
-            <div class="preview-value">+125</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">累计收益</div>
-            <div class="preview-value">3,580</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">待领取</div>
-            <div class="preview-value">89</div>
-          </div>
+
+        <!-- 经济模型标签 -->
+        <div id="economic" class="tab-content">
+            <div class="dashboard">
+                <h1><span class="gradient-text">📊 海豚经济模型</span></h1>
+                <div class="sub">完整的经济设计 · 可持续的增长机制</div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">⚙️</span>
+                        <span class="section-title">核心参数</span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="card">
+                            <div class="card-header"><span class="card-icon">📊</span><span class="card-title">总供应量</span></div>
+                            <div class="stat-value">10 亿 <span style="font-size: 1rem; color: #59808c;">H</span></div>
+                            <div class="stat-label">恒定乘积 k=2e12</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><span class="card-icon">💧</span><span class="card-title">LP 储备</span></div>
+                            <div class="stat-value">2 亿 <span style="font-size: 1rem; color: #59808c;">H</span></div>
+                            <div style="color: #59808c; font-size: 0.9rem;">+ 1 万 USDT</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><span class="card-icon">🏦</span><span class="card-title">国库规模</span></div>
+                            <div class="stat-value">154 <span style="font-size: 1rem; color: #59808c;">万 U</span></div>
+                            <div class="stat-label">动态管理 · 15年增长</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><span class="card-icon">⏳</span><span class="card-title">质押年化</span></div>
+                            <div class="stat-value">180%+ <span style="font-size: 1rem; color: #59808c;">APY</span></div>
+                            <div class="stat-label">浮动收益 · 市场驱动</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">🔄</span>
+                        <span class="section-title">飞轮效应</span>
+                    </div>
+                    <div class="grid-3">
+                        <div class="card">
+                            <h3 style="color: #005067; margin-bottom: 0.8rem;">交易驱动</h3>
+                            <p style="color: #59808c; font-size: 0.9rem;">链上交易 → 交易费 → 国库积累 → 高收益率</p>
+                        </div>
+                        <div class="card">
+                            <h3 style="color: #005067; margin-bottom: 0.8rem;">价格增长</h3>
+                            <p style="color: #59808c; font-size: 0.9rem;">供应约束 → AMM 机制 → 价格上升 → 更多参与</p>
+                        </div>
+                        <div class="card">
+                            <h3 style="color: #005067; margin-bottom: 0.8rem;">社区扩张</h3>
+                            <p style="color: #59808c; font-size: 0.9rem;">高收益 → 吸引参与 → 用户增长 → 交易活跃</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">📈</span>
+                        <span class="section-title">市场情景模拟</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>市场情景</th>
+                                    <th>日均交易额</th>
+                                    <th>合格占比 α</th>
+                                    <th>H 价格</th>
+                                    <th>年化收益</th>
+                                    <th>可持续性</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #f4fcfa;">
+                                    <td>🌱 健康牛</td>
+                                    <td>45~60 万 U</td>
+                                    <td>35%</td>
+                                    <td>0.0055~0.0082</td>
+                                    <td>85~120%</td>
+                                    <td>无限 ✓</td>
+                                </tr>
+                                <tr>
+                                    <td>🐂 大牛市</td>
+                                    <td>80~120 万 U</td>
+                                    <td>25%</td>
+                                    <td>0.008~0.015</td>
+                                    <td>150~230%</td>
+                                    <td>无限 ✓</td>
+                                </tr>
+                                <tr style="background: #fff8f0;">
+                                    <td>🐻 熊市</td>
+                                    <td>15~25 万 U</td>
+                                    <td>50%</td>
+                                    <td>0.003~0.005</td>
+                                    <td>40~60%</td>
+                                    <td>180~300 天</td>
+                                </tr>
+                                <tr>
+                                    <td>💥 极端抛压</td>
+                                    <td>50~70 万 U</td>
+                                    <td>70%</td>
+                                    <td>0.0015~0.004</td>
+                                    <td>20~35%</td>
+                                    <td>25~60 天</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="background: #e5f4f9; border-left: 4px solid #0088aa; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+                    <h3 style="color: #005067; margin-bottom: 0.5rem;">🛡️ 防御机制</h3>
+                    <p style="color: #1e5e70; font-size: 0.9rem;">
+                        ⏱️ 时间锁（3天延迟）+ ⚡ 闪电贷防护（50万U/块限制）+ 📉 国库自动响应（<30天触发暂停）= 
+                        <strong>极端崩盘概率从 17% 降至 2.3%</strong>
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="card-content">
-        <div class="card-body">
-          <div class="detail-grid">
-            <div class="detail-row">
-              <span class="detail-label">本周收益</span>
-              <span class="detail-value">+856 USDT</span>
+
+        <!-- 数据中心标签 -->
+        <div id="datacenter" class="tab-content">
+            <div class="dashboard">
+                <h1><span class="gradient-text">💾 数据中心</span></h1>
+                <div class="sub">资产管理 · 实时监控 · 数据分析</div>
+
+                <div class="grid-6">
+                    <!-- 资产面板 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">💰</span>
+                            <span class="card-title">资产面板</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div class="stat-label">总资产</div>
+                            <div class="stat-value">24,580.50 <span style="font-size: 1rem; color: #59808c;">U</span></div>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">H 代币</span>
+                            <span class="data-value">1,250,000</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">OKB</span>
+                            <span class="data-value">45.8</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">USDT</span>
+                            <span class="data-value">8,250</span>
+                        </div>
+                    </div>
+
+                    <!-- OKB 实时数据 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">📈</span>
+                            <span class="card-title">OKB 实时</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div class="stat-label">现价</div>
+                            <div class="stat-value">55.32 <span style="font-size: 1rem; color: #59808c;">U</span></div>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">24h 涨幅</span>
+                            <span class="data-value" style="color: #2e7d5e;">+5.32%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">24h 成交额</span>
+                            <span class="data-value">2.3 亿 U</span>
+                        </div>
+                        <span style="display: inline-block; background: #e8f2f5; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.7rem; color: #005067; margin-top: 0.5rem;">涨幅</span>
+                    </div>
+
+                    <!-- 链上赚币 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">🎁</span>
+                            <span class="card-title">链上赚币</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div class="stat-label">质押收益</div>
+                            <div class="stat-value">15,800 <span style="font-size: 1rem; color: #59808c;">H</span></div>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">年化收益率</span>
+                            <span class="data-value" style="color: #2e7d5e;">182%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">今日收益</span>
+                            <span class="data-value">528 H</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 0.8rem;">质押</button>
+                    </div>
+
+                    <!-- 数据分析 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span>
+                            <span class="card-title">数据分析</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div class="stat-label">H 价格</div>
+                            <div class="stat-value">0.00582 <span style="font-size: 1rem; color: #59808c;">U</span></div>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">7 日涨幅</span>
+                            <span class="data-value" style="color: #2e7d5e;">+12.3%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">日均交易额</span>
+                            <span class="data-value">380 万 U</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 0.8rem;">详细</button>
+                    </div>
+
+                    <!-- 常用工具 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">🔧</span>
+                            <span class="card-title">常用工具</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">• 币币交易</span>
+                            <span class="data-value" style="cursor: pointer;">→</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">• 跨链桥接</span>
+                            <span class="data-value" style="cursor: pointer;">→</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">• 农场挖矿</span>
+                            <span class="data-value" style="cursor: pointer;">→</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">• OKX Boost</span>
+                            <span class="data-value" style="cursor: pointer;">→</span>
+                        </div>
+                    </div>
+
+                    <!-- 会员中心 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">👑</span>
+                            <span class="card-title">会员中心</span>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div class="stat-label">当前等级</div>
+                            <div class="stat-value" style="font-size: 1.5rem;">VIP 3</div>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">费率折扣</span>
+                            <span class="data-value">-15%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">升级进度</span>
+                            <span class="data-value">65%</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 0.8rem;">特权</button>
+                    </div>
+                </div>
             </div>
-            <div class="detail-row">
-              <span class="detail-label">本月收益</span>
-              <span class="detail-value">+3,250 USDT</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">年化收益</span>
-              <span class="detail-value">+45,680 USDT</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">收益率</span>
-              <span class="detail-value">8.5% APY</span>
-            </div>
-          </div>
-          
-          <div class="divider"></div>
-          
-          <div class="action-btns">
-            <button class="btn btn-primary">
-              <i class="fas fa-coins"></i> 领取收益
-            </button>
-            <button class="btn btn-secondary">
-              <i class="fas fa-history"></i> 收益记录
-            </button>
-          </div>
         </div>
-      </div>
     </div>
 
-    <!-- 卡片3：经济模型 -->
-    <div class="accordion-card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-title-row">
-          <h2 class="card-title">经济模型</h2>
-          <div class="expand-icon">
-            <i class="fas fa-chevron-down"></i>
-          </div>
-        </div>
-        <div class="card-preview">
-          <div class="preview-item">
-            <div class="preview-label">流通总量</div>
-            <div class="preview-value">100M</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">质押比例</div>
-            <div class="preview-value">65%</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">通缩率</div>
-            <div class="preview-value">2.5%</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-content">
-        <div class="card-body">
-          <div class="detail-grid">
-            <div class="detail-row">
-              <span class="detail-label">初始发行</span>
-              <span class="detail-value">100,000,000</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">销毁机制</span>
-              <span class="detail-value">交易手续费 0.3%</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">通缩模型</span>
-              <span class="detail-value">季度销毁</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">分红机制</span>
-              <span class="detail-value">持币分红</span>
-            </div>
-          </div>
-          
-          <div class="divider"></div>
-          
-          <div class="action-btns">
-            <button class="btn btn-primary">
-              <i class="fas fa-file-alt"></i> 查看白皮书
-            </button>
-            <button class="btn btn-secondary">
-              <i class="fas fa-chart-pie"></i> 分配详情
-            </button>
-          </div>
-        </div>
-      </div>
+    <!-- 页脚 -->
+    <div class="footer">
+        🐬 海豚社区完整生态系统 · 一站式体验 · v1.0
     </div>
 
-    <!-- 卡片4：用户资产 -->
-    <div class="accordion-card">
-      <div class="card-header" onclick="toggleCard(this)">
-        <div class="card-title-row">
-          <h2 class="card-title">我的资产</h2>
-          <div class="expand-icon">
-            <i class="fas fa-chevron-down"></i>
-          </div>
-        </div>
-        <div class="card-preview">
-          <div class="preview-item">
-            <div class="preview-label">总资产</div>
-            <div class="preview-value">25,680</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">可用余额</div>
-            <div class="preview-value">8,520</div>
-          </div>
-          <div class="preview-item">
-            <div class="preview-label">冻结资产</div>
-            <div class="preview-value">17,160</div>
-          </div>
-        </div>
-      </div>
-      <div class="card-content">
-        <div class="card-body">
-          <div class="detail-grid">
-            <div class="detail-row">
-              <span class="detail-label">USDT 余额</span>
-              <span class="detail-value">8,520.50 USDT</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">质押中</span>
-              <span class="detail-value">15,000.00 USDT</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">待解锁</span>
-              <span class="detail-value">2,160.00 USDT</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">会员积分</span>
-              <span class="detail-value">3,580 分</span>
-            </div>
-          </div>
-          
-          <div class="divider"></div>
-          
-          <div class="action-btns">
-            <button class="btn btn-primary">
-              <i class="fas fa-wallet"></i> 充值
-            </button>
-            <button class="btn btn-secondary">
-              <i class="fas fa-exchange-alt"></i> 提现
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <script>
+        function switchTab(tabName) {
+            // 隐藏所有标签内容
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
 
-  </div>
+            // 移除所有标签按钮的 active 类
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
 
-  <script>
-    function toggleCard(header) {
-      const card = header.closest('.accordion-card');
-      const isActive = card.classList.contains('active');
-      
-      // 可选：关闭其他卡片（手风琴效果）
-      // document.querySelectorAll('.accordion-card').forEach(c => c.classList.remove('active'));
-      
-      // 切换当前卡片
-      if (isActive) {
-        card.classList.remove('active');
-      } else {
-        card.classList.add('active');
-      }
-    }
+            // 显示选中的标签内容
+            document.getElementById(tabName).classList.add('active');
 
-    // 添加键盘支持
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.accordion-card').forEach(c => c.classList.remove('active'));
-      }
-    });
-  </script>
-
+            // 添加 active 类到点击的按钮
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
