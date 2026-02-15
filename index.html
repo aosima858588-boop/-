@@ -2,24 +2,27 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>海豚社区 · 经济模型（我的钱包）</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>海豚社区 · 数据看板</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #0066ff;
-            --primary-light: rgba(0, 102, 255, 0.15);
+            --primary-light: rgba(0, 102, 255, 0.12);
+            --primary-lighter: rgba(0, 102, 255, 0.05);
             --primary-dark: #0052cc;
             --secondary: #8b5cf6;
             --accent: #00c6ff;
+            --gold: #ffcc00;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --text-primary: #1a2639;
-            --text-secondary: #4a5f7a;
-            --glass-bg: rgba(255, 255, 255, 0.3);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --card-shadow: 0 15px 35px -12px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.5) inset;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --bg-gradient: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-shadow: 0 5px 20px rgba(0, 102, 255, 0.08);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -31,24 +34,27 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
-            background: linear-gradient(145deg, #f5f9ff 0%, #eef3fe 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'SF Pro Display', sans-serif;
+            background: var(--bg-gradient);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 8px;
+            padding: 16px;
             position: relative;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* 顶部流动H字母 */
         .h-letter-container {
             position: relative;
             width: 100%;
-            height: 100px;
-            margin-bottom: 16px;
+            height: 120px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .flowing-h {
@@ -65,8 +71,8 @@
         }
 
         .h-svg {
-            width: 160px;
-            height: 160px;
+            width: 200px;
+            height: 200px;
             filter: drop-shadow(0 5px 15px rgba(0, 102, 255, 0.1));
         }
 
@@ -89,7 +95,7 @@
 
         .h-interactive {
             position: absolute;
-            font-size: 80px;
+            font-size: 100px;
             font-weight: 900;
             color: transparent;
             background: linear-gradient(45deg, var(--primary), var(--accent));
@@ -107,97 +113,717 @@
             50% { filter: drop-shadow(0 0 25px rgba(0, 102, 255, 0.6)); transform: scale(1.05) rotate(1deg); }
         }
 
-        /* ===== 卡片通用样式 ===== */
+        /* 线条连接动画背景 */
+        .line-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .line {
+            position: absolute;
+            stroke-width: 2;
+            stroke: rgba(0, 102, 255, 0.2);
+            fill: none;
+            animation: lineDraw 12s linear infinite;
+        }
+
+        @keyframes lineDraw {
+            0% { stroke-dashoffset: 1000; opacity: 0.15; }
+            50% { opacity: 0.35; }
+            100% { stroke-dashoffset: 0; opacity: 0.15; }
+        }
+
+        /* 全局卡片边框加粗至3px */
         .activity-card {
-            border: none;
-            border-radius: 36px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: var(--card-shadow);
+            border: 3px solid rgba(0, 102, 255, 0.08);
+        }
+        .activity-card::before {
+            height: 3px;
+        }
+        .activity-card:hover {
+            border-color: rgba(0, 102, 255, 0.2);
+        }
+        .activity-card.active {
+            border-color: rgba(0, 102, 255, 0.3);
+        }
+        .activity-card.active::before {
+            opacity: 1;
+            animation: linePulse 2s infinite;
+        }
+
+        .action-btn {
+            border-width: 3px;
+        }
+        .action-btn.active {
+            border-width: 3px;
+        }
+        .btn-icon {
+            border-width: 3px;
+        }
+        .status-badge {
+            border-width: 3px;
+        }
+        .card-expand {
+            border-width: 3px;
+        }
+        .card-icon {
+            border-width: 3px;
+        }
+
+        /* 用户信息面板 */
+        .user-panel {
+            background: transparent;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+        }
+
+        .user-panel:hover { border: 1px solid rgba(0, 102, 255, 0.1); }
+        .user-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .user-panel:hover::before { opacity: 0.5; }
+        .user-panel.expanded { border: 1px solid rgba(0, 102, 255, 0.15); }
+        .user-panel.expanded::before { opacity: 1; animation: lineDraw 2s ease-out; }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-identity { flex: 1; }
+        .user-nickname {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+        .user-nickname span { opacity: 0; transition: var(--transition); }
+        .user-panel.expanded .user-nickname span { opacity: 1; }
+
+        .user-id {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: transparent;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .user-panel.expanded .user-id {
+            background: transparent;
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.1);
+        }
+
+        .user-rank {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b38f00;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            background: transparent;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 204, 0, 0.1);
+            width: fit-content;
+        }
+        .user-rank i { color: var(--gold); }
+
+        .expand-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            transition: var(--transition);
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        .expand-btn::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background: linear-gradient(45deg, var(--primary), transparent) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .user-panel:hover .expand-btn {
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.2);
+        }
+        .user-panel:hover .expand-btn::before { opacity: 0.5; }
+        .user-panel.expanded .expand-btn {
+            transform: rotate(180deg);
+            background: transparent;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .user-panel.expanded .expand-btn::before { opacity: 1; }
+
+        .user-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .details-grid {
+            padding-top: 20px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .user-panel.expanded .details-grid {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.1s;
+        }
+
+        .data-card {
+            background: transparent;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 102, 255, 0.05);
+        }
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .data-card:hover {
+            border-color: rgba(0, 102, 255, 0.15);
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .data-card:hover::before { opacity: 1; }
+
+        .data-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 4px;
+            font-family: 'SF Pro Display', sans-serif;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+        .data-value::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: var(--transition);
+        }
+        .data-card:hover .data-value::after { width: 50%; }
+        .data-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .data-card:nth-child(2) .data-value { color: var(--success); }
+        .data-card:nth-child(3) .data-value { color: var(--warning); }
+        .data-card:nth-child(4) .data-value { color: var(--secondary); }
+
+        /* 三个核心按钮 */
+        .action-buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 32px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .action-buttons::-webkit-scrollbar { display: none; }
+
+        .action-btn {
+            flex: 1;
+            background: transparent;
+            border: 3px solid rgba(0, 102, 255, 0.08);
+            border-radius: 22px;
+            padding: 32px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            min-height: 180px;
+        }
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .action-btn:hover {
+            border-color: rgba(0, 102, 255, 0.25);
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-6px);
+            box-shadow: 0 15px 30px rgba(0, 102, 255, 0.15);
+        }
+        .action-btn:hover::before { opacity: 1; }
+        .action-btn.active {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.2);
+        }
+        .action-btn.active::before {
+            opacity: 1;
+            animation: linePulse 2s infinite;
+        }
+
+        @keyframes linePulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+
+        .action-btn:nth-child(1).active { border-color: var(--primary); }
+        .action-btn:nth-child(1).active::before { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+        .action-btn:nth-child(2).active { border-color: var(--secondary); }
+        .action-btn:nth-child(2).active::before { background: linear-gradient(90deg, var(--secondary), #c084fc); }
+        .action-btn:nth-child(3).active { border-color: var(--warning); }
+        .action-btn:nth-child(3).active::before { background: linear-gradient(90deg, var(--warning), #f97316); }
+
+        .btn-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 22px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 2.2rem;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            border: 3px solid rgba(0, 102, 255, 0.1);
+        }
+        .btn-icon::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 22px;
+            border: 3px solid transparent;
+            background: linear-gradient(45deg, var(--primary), transparent) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .action-btn:hover .btn-icon {
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.2);
+            transform: scale(1.12);
+        }
+        .action-btn:hover .btn-icon::before { opacity: 0.7; }
+        .action-btn.active .btn-icon {
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.3);
+            transform: scale(1.12);
+        }
+        .action-btn.active .btn-icon::before {
+            opacity: 1;
+            animation: borderRotate 3s linear infinite;
+        }
+        @keyframes borderRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .action-btn:nth-child(2) .btn-icon {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.1);
+        }
+        .action-btn:nth-child(2) .btn-icon::before { background: linear-gradient(45deg, var(--secondary), transparent) border-box; }
+        .action-btn:nth-child(2):hover .btn-icon {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .action-btn:nth-child(2).active .btn-icon {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .action-btn:nth-child(3) .btn-icon {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.1);
+        }
+        .action-btn:nth-child(3) .btn-icon::before { background: linear-gradient(45deg, var(--warning), transparent) border-box; }
+        .action-btn:nth-child(3):hover .btn-icon {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+        .action-btn:nth-child(3).active .btn-icon {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-label {
+            font-weight: 900;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.01em;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .btn-label::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+        .action-btn:hover .btn-label { color: var(--text-primary); }
+        .action-btn:hover .btn-label::after { width: 90%; }
+        .action-btn.active .btn-label {
+            color: var(--primary);
+            font-weight: 900;
+            text-shadow: 0 2px 15px rgba(0, 102, 255, 0.25);
+        }
+        .action-btn.active .btn-label::after {
+            width: 100%;
+            animation: linePulse 2s infinite;
+        }
+        .action-btn:nth-child(2).active .btn-label {
+            color: var(--secondary);
+            text-shadow: 0 2px 15px rgba(139, 92, 246, 0.25);
+        }
+        .action-btn:nth-child(2).active .btn-label::after { background: linear-gradient(90deg, var(--secondary), #c084fc); }
+        .action-btn:nth-child(3).active .btn-label {
+            color: var(--warning);
+            text-shadow: 0 2px 15px rgba(245, 158, 11, 0.25);
+        }
+        .action-btn:nth-child(3).active .btn-label::after { background: linear-gradient(90deg, var(--warning), #f97316); }
+
+        /* 卡片容器 */
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .activity-card {
+            background: transparent;
+            border-radius: 20px;
             overflow: hidden;
             transition: var(--transition);
             position: relative;
             width: 100%;
-            margin-bottom: 20px;
         }
+        .activity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .activity-card:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .activity-card:hover::before { opacity: 1; }
         .activity-card.active {
-            background: rgba(255, 255, 255, 0.45);
-            box-shadow: 0 20px 40px -12px rgba(0,102,255,0.35), 0 0 0 2px rgba(255,255,255,0.8) inset;
+            background: rgba(255, 255, 255, 0.8);
         }
 
-        /* 卡片头部 */
         .card-header {
-            padding: 20px 22px;
+            padding: 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            border-bottom: 1px solid rgba(0,102,255,0.1);
-            min-height: 80px;
+            position: relative;
         }
-        .card-header-left {
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 24px;
+            right: 24px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 102, 255, 0.1), transparent);
+        }
+
+        .card-main {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 24px;
             flex: 1;
         }
         .card-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
+            width: 90px;
+            height: 90px;
+            border-radius: 22px;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary);
-            font-size: 2rem;
-            box-shadow: 0 6px 12px rgba(0,102,255,0.15);
+            font-size: 2.2rem;
             flex-shrink: 0;
+            transition: var(--transition);
+            border: 3px solid rgba(0, 102, 255, 0.1);
+            position: relative;
         }
-        .card-header-left.no-icon {
-            padding-left: 0;
+        .card-icon::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 22px;
+            border: 3px solid transparent;
+            background: linear-gradient(45deg, var(--primary), transparent) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: var(--transition);
         }
-        .card-title {
+        .activity-card:hover .card-icon {
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.2);
+            transform: scale(1.08);
+        }
+        .activity-card:hover .card-icon::before { opacity: 0.5; }
+        .activity-card.active .card-icon {
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.3);
+            transform: scale(1.08);
+        }
+        .activity-card.active .card-icon::before {
+            opacity: 1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        .card-icon.green {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.1);
+        }
+        .card-icon.green::before { background: linear-gradient(45deg, var(--success), transparent) border-box; }
+        .activity-card:hover .card-icon.green {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        .activity-card.active .card-icon.green {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .card-icon.purple {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.1);
+        }
+        .card-icon.purple::before { background: linear-gradient(45deg, var(--secondary), transparent) border-box; }
+        .activity-card:hover .card-icon.purple {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .activity-card.active .card-icon.purple {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .card-text h3 {
             font-size: 1.4rem;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-primary);
-            line-height: 1.3;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+            position: relative;
         }
-        .card-sub {
+        .card-text h3::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+        .activity-card:hover .card-text h3::after { width: 40%; }
+        .activity-card.active .card-text h3::after {
+            width: 60%;
+            animation: linePulse 2s infinite;
+        }
+        .card-text p {
             font-size: 0.95rem;
             color: var(--text-secondary);
-            margin-top: 6px;
-            font-weight: 500;
+            line-height: 1.6;
+            max-width: 90%;
         }
-        .card-expand-icon {
+
+        .card-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .status-badge {
+            background: transparent;
+            color: var(--primary);
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+            border: 3px solid rgba(0, 102, 255, 0.1);
+            transition: var(--transition);
+        }
+        .activity-card:hover .status-badge { border-color: rgba(0, 102, 255, 0.2); }
+        .activity-card.active .status-badge { border-color: rgba(0, 102, 255, 0.3); }
+
+        .status-badge.green {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.1);
+        }
+        .activity-card:hover .status-badge.green { border-color: rgba(16, 185, 129, 0.2); }
+        .activity-card.active .status-badge.green { border-color: rgba(16, 185, 129, 0.3); }
+
+        .status-badge.purple {
+            color: var(--secondary);
+            border-color: rgba(139, 92, 246, 0.1);
+        }
+        .status-badge.video {
+            color: #ff4d4d;
+            border-color: rgba(255, 77, 77, 0.2);
+        }
+
+        .card-expand {
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-size: 1.4rem;
-            box-shadow: 0 4px 8px rgba(0,102,255,0.1);
+            color: var(--text-light);
+            transition: var(--transition);
+            margin-left: 10px;
             flex-shrink: 0;
-            transition: transform 0.3s;
+            border: 3px solid rgba(0, 0, 0, 0.05);
+            position: relative;
         }
-        .activity-card.active .card-expand-icon {
-            transform: rotate(180deg);
+        .card-expand::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            background: linear-gradient(45deg, var(--primary), transparent) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: var(--transition);
         }
+        .activity-card:hover .card-expand {
+            color: var(--primary);
+            border-color: rgba(0, 102, 255, 0.2);
+            transform: scale(1.1);
+        }
+        .activity-card:hover .card-expand::before { opacity: 0.5; }
+        .activity-card.active .card-expand {
+            background: transparent;
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: rotate(180deg) scale(1.1);
+        }
+        .activity-card.active .card-expand::before { opacity: 1; }
 
-        /* 卡片内容（可折叠区域） */
         .card-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .content-inner {
-            padding: 0 22px 22px 22px;
+            padding: 0 24px;
             opacity: 0;
             transform: translateY(-10px);
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -206,343 +832,260 @@
             opacity: 1;
             transform: translateY(0);
             transition-delay: 0.1s;
+            padding-bottom: 24px;
         }
 
-        /* 用户信息面板 */
-        .user-panel {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 50px;
-            padding: 14px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 10px 20px -8px rgba(0,102,255,0.2), 0 0 0 1px rgba(255,255,255,0.6) inset;
-        }
-        .user-avatar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .user-avatar i {
-            font-size: 2.2rem;
+        .content-section { margin-top: 20px; }
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 800;
             color: var(--primary);
-            filter: drop-shadow(0 4px 6px rgba(0,102,255,0.2));
-        }
-        .user-nickname {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .user-id {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        .user-stats {
+            margin-bottom: 12px;
             display: flex;
-            gap: 12px;
-            font-size: 1rem;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.01em;
+            position: relative;
         }
-        .stat-item {
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(4px);
-            padding: 6px 14px;
-            border-radius: 40px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            font-weight: 500;
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        .section-title i { font-size: 0.9rem; }
+
+        .description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
         }
 
-        /* 三个核心按钮 */
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
+        .rules-list {
+            list-style: none;
+            margin-bottom: 20px;
         }
-        .action-btn {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.35);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 40px;
-            padding: 16px 0;
+        .rules-list li {
+            padding: 10px 0;
+            border-bottom: 2px dashed rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+        .rules-list li::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            transition: var(--transition);
+        }
+        .rules-list li:hover {
+            color: var(--text-primary);
+            padding-left: 5px;
+        }
+        .rules-list li:hover::before { width: 100%; }
+        .rules-list li:last-child { border-bottom: none; }
+        .rules-list li i {
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .rewards {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 18px;
+            margin-top: 18px;
+            border: 2px solid rgba(0, 102, 255, 0.1);
+            transition: var(--transition);
+        }
+        .rewards:hover {
+            border-color: rgba(0, 102, 255, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.03);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .reward-item:hover { transform: translateX(5px); }
+        .reward-item:last-child { border-bottom: none; }
+        .reward-value {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card-actions {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 8px 16px -8px rgba(0,102,255,0.2), 0 0 0 1px rgba(255,255,255,0.5) inset;
-            color: var(--text-primary);
+            gap: 14px;
+            margin-top: 20px;
         }
-        .action-btn i {
-            font-size: 1.8rem;
-            color: var(--primary);
-            transition: 0.2s;
-        }
-        .action-btn span {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .action-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            box-shadow: 0 12px 24px -8px rgba(0,102,255,0.5), 0 0 0 1px rgba(255,255,255,0.8) inset;
-            color: white;
-        }
-        .action-btn.active i {
-            color: white;
-        }
-        .action-btn:active {
-            transform: scale(0.97);
-        }
-
-        /* ===== 我的钱包专属样式 ===== */
-        .wallet-summary {
-            padding: 0 22px 22px 22px;
-        }
-        .wallet-amount {
-            font-size: 3.2rem;
+        .card-action-button {
+            padding: 18px 24px;
+            border-radius: 16px;
             font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1.2;
-            margin-bottom: 8px;
-        }
-        .wallet-change {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 24px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-align: center;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: -0.01em;
+            min-width: 240px;
+            margin: 0 auto;
         }
-        .wallet-change .positive {
-            color: var(--success);
+        .card-action-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: 2px solid transparent;
         }
-        .wallet-change .negative {
-            color: var(--danger);
+        .card-action-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 102, 255, 0.4);
         }
-        .period-badge {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 1rem;
-            font-weight: 600;
+        .card-action-secondary {
+            background: transparent;
             color: var(--primary);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 2px solid rgba(0, 102, 255, 0.3);
         }
-        .wallet-actions {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
+        .card-action-secondary:hover {
+            background: rgba(0, 102, 255, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-3px);
         }
-        .wallet-action-btn {
-            flex: 1;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            border: none;
-            border-radius: 40px;
-            padding: 16px 0;
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--primary);
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 8px 16px -6px rgba(0,102,255,0.2), 0 0 0 1px rgba(255,255,255,0.6) inset;
-            transition: 0.2s;
-        }
-        .wallet-action-btn:active {
-            transform: scale(0.96);
-            background: rgba(255,255,255,0.7);
-        }
-        .wallet-action-btn i {
-            margin-right: 8px;
-        }
+        .action-button-icon { font-size: 1.3rem; }
 
-        /* 币种列表样式 */
+        /* ========== 数据卡片定制样式 ========== */
+        .small-btn {
+            background: transparent;
+            border: 2px solid rgba(0, 102, 255, 0.15);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 8px 18px;
+            border-radius: 40px;
+            transition: var(--transition);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .small-btn:hover {
+            background: rgba(0, 102, 255, 0.05);
+            border-color: var(--primary);
+        }
         .tab-switch {
             display: flex;
-            gap: 20px;
-            margin: 0 22px 20px 22px;
-            border-bottom: 2px solid rgba(0,102,255,0.1);
-            padding-bottom: 10px;
+            gap: 8px;
+            background: rgba(0, 102, 255, 0.04);
+            padding: 6px;
+            border-radius: 40px;
+            margin-bottom: 24px;
         }
         .tab-item {
-            font-size: 1.1rem;
-            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 30px;
+            background: transparent;
             color: var(--text-secondary);
-            cursor: default;
-            padding: 6px 0;
-            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
         }
         .tab-item.active {
+            background: white;
             color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-        .asset-list {
-            padding: 0 22px 22px 22px;
+            box-shadow: 0 2px 8px rgba(0, 102, 255, 0.12);
         }
         .asset-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.08);
         }
         .asset-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
         .asset-icon {
             width: 48px;
             height: 48px;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
             border-radius: 16px;
+            background: rgba(0, 102, 255, 0.06);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
             color: var(--primary);
+            font-size: 1.6rem;
         }
         .asset-info {
-            display: flex;
-            flex-direction: column;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
         }
-        .asset-name {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .asset-balance {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+        .asset-info small {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-top: 2px;
         }
         .asset-right {
             text-align: right;
         }
         .asset-value {
-            font-weight: 600;
+            font-weight: 800;
+            color: var(--text-primary);
             font-size: 1.1rem;
-        }
-        .asset-price {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
         }
         .asset-change {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.8rem;
             color: var(--success);
+            font-weight: 600;
         }
-        .asset-change.negative {
-            color: var(--danger);
-        }
+        .asset-change.negative { color: var(--danger); }
 
-        /* 其他卡片内部样式 */
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 20px 0 10px;
-        }
-        .rules-list {
-            list-style: none;
-        }
-        .rules-list li {
-            padding: 10px 0;
-            border-bottom: 1px dashed rgba(0,0,0,0.05);
-            display: flex;
-            gap: 10px;
-            font-size: 1rem;
-            color: var(--text-secondary);
-        }
-        .rewards {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            border-radius: 24px;
-            padding: 14px;
-            margin: 10px 0;
-        }
-        .reward-item {
+        .history-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            font-size: 1rem;
+            padding: 14px 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.04);
+            font-size: 0.9rem;
         }
-        .card-actions {
-            margin-top: 20px;
-        }
-        .card-action-button {
+        .defi-pool {
+            background: rgba(0,102,255,0.02);
+            border-radius: 18px;
             padding: 16px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-align: center;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            border: none;
-            width: 100%;
-            cursor: pointer;
-            box-shadow: 0 12px 24px -8px rgba(0,102,255,0.4);
-        }
-        .card-action-button.secondary {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(4px);
-            color: var(--primary);
-            box-shadow: none;
-        }
-        .flywheel-node {
-            padding: 10px 0;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            gap: 12px;
-            font-size: 1rem;
-        }
-        .stake-table {
-            width: 100%;
-            font-size: 0.95rem;
-            background: rgba(255,255,255,0.3);
-            backdrop-filter: blur(4px);
-            border-radius: 24px;
-            overflow: hidden;
-        }
-        .stake-table td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(0,0,0,0.03);
-        }
-        .health-grid {
-            display: grid;
-            grid-template-columns: repeat(2,1fr);
-            gap: 12px;
-        }
-        .health-item {
-            background: rgba(255,255,255,0.4);
-            backdrop-filter: blur(4px);
-            border-radius: 20px;
-            padding: 16px;
-            text-align: center;
-        }
-
-        /* 响应式 */
-        @media (max-width: 480px) {
-            .wallet-amount {
-                font-size: 2.8rem;
-            }
-            .wallet-change {
-                font-size: 1.1rem;
-            }
-            .wallet-action-btn {
-                font-size: 1rem;
-                padding: 14px 0;
-            }
+            margin-bottom: 12px;
         }
     </style>
 </head>
 <body>
-    <!-- 顶部H字母 -->
+    <!-- 线条连接动画背景 (亮度已提升) -->
+    <div class="line-background" id="lineBackground"></div>
+
+    <!-- 顶部流动H字母 -->
     <div class="h-letter-container">
         <div class="flowing-h">
             <svg class="h-svg" viewBox="0 0 100 100">
@@ -552,428 +1095,625 @@
         <div class="h-interactive">H</div>
     </div>
 
-    <!-- 用户面板 -->
+    <!-- 用户信息面板 -->
     <div class="user-panel" id="userPanel">
-        <div class="user-avatar">
-            <i class="fas fa-dolphin"></i>
-            <div>
-                <div class="user-nickname">海豚用户212</div>
-                <div class="user-id">ID: 991 · 金牌会员</div>
+        <div class="user-info-header">
+            <div class="user-identity">
+                <div class="user-nickname">
+                    海豚用户212
+                    <span class="user-id">ID：991</span>
+                </div>
+                <div class="user-rank">
+                    <i class="fas fa-crown"></i>
+                    当前等级：金牌会员
+                </div>
+            </div>
+            <div class="expand-btn">
+                <i class="fas fa-chevron-down"></i>
             </div>
         </div>
-        <div class="user-stats" id="userStats">
-            <div class="stat-item">🏆 9</div>
-            <div class="stat-item">💰 $1.2k</div>
+        <div class="user-details" id="userDetails">
+            <div class="details-grid">
+                <div class="data-card">
+                    <div class="data-value" id="networthValue">918 DPH</div>
+                    <div class="data-label">身价</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-value" id="balanceValue">$1023</div>
+                    <div class="data-label">余额</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-value" id="volumeValue">$8827</div>
+                    <div class="data-label">贡献度</div>
+                </div>
+                <div class="data-card">
+                    <div class="data-value" id="rankValue">9</div>
+                    <div class="data-label">周排名</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- 核心按钮 -->
+    <!-- 三个核心按钮 -->
     <div class="action-buttons">
         <div class="action-btn active" id="btnBoost">
-            <i class="fas fa-rocket"></i>
-            <span>Boost</span>
+            <div class="btn-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <div class="btn-label">Boost</div>
         </div>
         <div class="action-btn" id="btnModel">
-            <i class="fas fa-cubes"></i>
-            <span>模型</span>
+            <div class="btn-icon">
+                <i class="fas fa-dolphin"></i>
+            </div>
+            <div class="btn-label">模型</div>
         </div>
         <div class="action-btn" id="btnData">
-            <i class="fas fa-database"></i>
-            <span>数据</span>
+            <div class="btn-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="btn-label">数据</div>
         </div>
     </div>
 
-    <!-- 卡片容器 -->
-    <div class="cards-container" id="cardsContainer">
+    <!-- ===== 卡片区域 ===== -->
+    <div class="cards-container">
 
-        <!-- ========== BOOST 卡片组 ========== -->
-        <div class="activity-card boost-card">
+        <!-- ========== BOOST 卡片组（原有，保持不变）========== -->
+        <!-- 卡片1：OKX Boost 专栏 -->
+        <div class="activity-card boost-card" id="cardBoostColumn">
             <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                    <div>
-                        <div class="card-title">OKX Boost 专栏</div>
-                        <div class="card-sub">简介·三大模式·数据</div>
+                <div class="card-main">
+                    <div class="card-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>OKX Boost 专栏</h3>
+                        <p>社区协同OKX Wallet共同打造的创新型收益增值活动</p>
                     </div>
                 </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="card-status">
+                    <span class="status-badge">🔥 进行中</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <div class="section-title"><i class="fas fa-info-circle"></i> 活动解析</div>
-                    <p>OKX Boost 是 OKX Wallet 2025年9月份推出的链上创新项目参与平台。</p>
-                    <div class="section-title"><i class="fas fa-list-check"></i> 三大核心模式</div>
-                    <ul class="rules-list">
-                        <li><i class="fas fa-rocket"></i> X Launch：交易即贡献，瓜分新代币</li>
-                        <li><i class="fas fa-gift"></i> Giveaway：简单任务得代币/白名单</li>
-                        <li><i class="fas fa-trophy"></i> 交易赛：限时竞赛，高额奖池</li>
-                    </ul>
-                    <div class="section-title"><i class="fas fa-chart-line"></i> Boost数据说明</div>
-                    <p>Boost交易量：十天内达到$500即可领空投；Boost余额：持有200U以上即可通过。</p>
+                    <!-- 原有内容略，保持完整 -->
+                    <div class="content-section"><div class="section-title"><i class="fas fa-info-circle"></i> 活动解析</div><p class="description">OKX Boost 是 OKX Wallet 2025年9月份正式推出的链上创新项目参与平台，旨在为优质区块链项目与真实用户搭建高效桥梁。</p></div>
+                    <div class="content-section"><div class="section-title"><i class="fas fa-list-check"></i> 三大核心模式</div><ul class="rules-list"><li><i class="fas fa-rocket"></i> <strong>X Launch：</strong>基于 OKX DEX 交易活跃度，用户可瓜分新项目代币奖池，是“交易即贡献”的公平分配机制。</li><li><i class="fas fa-gift"></i> <strong>Giveaway：</strong>完成关注社群、链上交互等简单任务，即可获得项目代币或白名单资格，适合 Web3 探索者。</li><li><i class="fas fa-trophy"></i> <strong>交易赛：</strong>针对热门项目的限时交易竞赛，排行榜前列用户共享高额奖池。</li></ul></div>
+                    <div class="card-actions"><button class="card-action-button card-action-primary"><i class="action-button-icon fas fa-play-circle"></i> 参与Boost活动</button><button class="card-action-button card-action-secondary"><i class="action-button-icon fas fa-share-alt"></i> 分享给好友</button></div>
                 </div>
             </div>
         </div>
-
-        <div class="activity-card boost-card">
+        <!-- 卡片2：Boost规则与奖励 -->
+        <div class="activity-card boost-card" id="cardBoostRule">
             <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon" style="color:var(--success);"><i class="fas fa-file-alt"></i></div>
-                    <div>
-                        <div class="card-title">Boost规则与奖励</div>
-                        <div class="card-sub">交易量·余额·分配</div>
+                <div class="card-main">
+                    <div class="card-icon green">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>Boost规则与奖励</h3>
+                        <p>了解Boost交易量与Boost余额的计算方式及奖励分配</p>
                     </div>
                 </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="card-status">
+                    <span class="status-badge green">📋 详细规则</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
             </div>
-            <div class="card-content">
+            <div class="card-content"><div class="content-inner"><!-- 内容略 --><div class="content-section"><div class="section-title"><i class="fas fa-calculator"></i> Boost交易量规则</div><p class="description">过去10天内用户在OKX DEX上的平均日交易额...</p></div></div></div>
+        </div>
+        <!-- 卡片3：社区策略解析 -->
+        <div class="activity-card boost-card" id="cardBoostStrategy">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon purple">
+                        <i class="fas fa-chess-board"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>社区策略解析</h3>
+                        <p>海豚社区如何参与OKX Boost的实战策略</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge purple">💡 策略分享</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content"><div class="content-inner"><!-- 略 --></div></div>
+        </div>
+        <!-- 卡片4：Boost留言板 -->
+        <div class="activity-card boost-card" id="cardBoostBoard">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>Boost留言板</h3>
+                        <p>社区成员交流互动，分享参与经验</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge">💬 20条留言</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content"><div class="content-inner"><!-- 略 --></div></div>
+        </div>
+
+        <!-- ========== 模型卡片组（原有，保持不变）========== -->
+        <div class="activity-card model-card" id="cardDolphinModel">
+            <div class="card-header"><div class="card-main"><div class="card-icon purple"><i class="fas fa-dolphin"></i></div><div class="card-text"><h3>海豚模式解析</h3><p>正向收益飞轮 · 链上价值循环系统</p></div></div><div class="card-status"><span class="status-badge purple">🐬 独家解析</span><div class="card-expand"><i class="fas fa-chevron-down"></i></div></div></div>
+            <div class="card-content"><div class="content-inner"><!-- 内容略 --></div></div>
+        </div>
+        <div class="activity-card model-card" id="cardModelCompare"><!-- 略 --></div>
+        <div class="activity-card model-card" id="cardArch"><!-- 略 --></div>
+
+        <!-- ========== 新增 5 张数据卡片 ========== -->
+        <!-- 卡片D1：资产总览 (用户描述的第一个卡片) -->
+      <!-- 卡片D1：我的钱包（替换原资产总览卡片） -->
+<div class="activity-card data-card" id="cardData1">
+  <div class="card-header">
+    <div class="card-main" style="align-items: baseline;">
+      <div class="card-icon"><i class="fas fa-wallet"></i></div>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 0.8rem; color: var(--text-light);">我的钱包</span>
+        <span style="font-size: 2.2rem; font-weight: 800; line-height: 1.2; color: var(--text-primary);">$1098</span>
+        <span style="color: var(--success); font-size: 0.9rem;">+1.9% (1日)</span>
+      </div>
+    </div>
+    <div class="card-status">
+      <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+    </div>
+  </div>
+  <div class="card-content">
+    <div class="content-inner" style="padding-top: 8px;">
+      <!-- 三个底部菜单按钮 -->
+      <div style="display: flex; gap: 8px; margin-bottom: 24px; background: rgba(0,102,255,0.04); padding: 6px; border-radius: 40px;">
+        <button class="tab-item data-tab active" data-tab="send" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px; transition:var(--transition);" onclick="switchDataTab(event, 'send')">发送</button>
+        <button class="tab-item data-tab" data-tab="receive" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px;" onclick="switchDataTab(event, 'receive')">接收</button>
+        <button class="tab-item data-tab" data-tab="bill" style="flex:1; border:none; background:transparent; font-weight:700; padding:12px 0; border-radius:40px;" onclick="switchDataTab(event, 'bill')">账单</button>
+      </div>
+
+      <!-- 发送面板 -->
+      <div id="dataPanelSend" style="display: block;">
+        <div style="margin-bottom: 24px;">
+          <label style="font-size:0.8rem; color:var(--text-secondary);">对方地址</label>
+          <input type="text" placeholder="输入 0x... 或 ENS" style="width:100%; padding:16px; border:2px solid rgba(0,102,255,0.1); border-radius:20px; margin-top:6px; font-size:0.95rem; background:white;" value="0x1234...abcd" onclick="event.stopPropagation()">
+          <button style="margin-top:12px; width:100%; padding:16px; background:linear-gradient(135deg, var(--primary), var(--accent)); color:white; border:none; border-radius:20px; font-weight:800; font-size:1rem;" onclick="event.stopPropagation(); alert('模拟发送')">发送</button>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-weight:700;">近期交易账单</span>
+            <span style="font-size:0.75rem; color:var(--text-light);">最近3笔</span>
+          </div>
+          <div class="history-row"><span>→ 0x8f3...b2e</span><span style="color:var(--danger);">- $50</span></div>
+          <div class="history-row"><span>→ 0x3a9...c5d</span><span style="color:var(--danger);">- $120</span></div>
+          <div class="history-row"><span>→ 0xf2b...7a1</span><span style="color:var(--danger);">- $35</span></div>
+        </div>
+      </div>
+
+      <!-- 接收面板 -->
+      <div id="dataPanelReceive" style="display: none;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="width:160px; height:160px; background:rgba(0,102,255,0.04); margin:0 auto 16px; border-radius:20px; display:flex; align-items:center; justify-content:center; border:2px dashed rgba(0,102,255,0.2);">
+            <i class="fas fa-qrcode" style="font-size:4rem; color:var(--primary); opacity:0.5;"></i>
+            <span style="display:none;">二维码占位</span>
+          </div>
+          <div style="background:rgba(0,102,255,0.04); padding:12px 16px; border-radius:40px; display:inline-flex; align-items:center; gap:12px; margin-bottom:20px;">
+            <code style="font-size:0.8rem;">0x1234...abcd</code>
+            <button style="background:transparent; border:none; color:var(--primary);" onclick="event.stopPropagation(); navigator.clipboard?.writeText('0x1234...abcd')"><i class="fas fa-copy"></i> 复制</button>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span style="font-weight:700;">近期接收账单</span>
+            <span style="font-size:0.75rem; color:var(--text-light);">最近3笔</span>
+          </div>
+          <div class="history-row"><span>← 0x7d4...e8f</span><span style="color:var(--success);">+ $200</span></div>
+          <div class="history-row"><span>← 0x9b2...c3a</span><span style="color:var(--success);">+ $85</span></div>
+          <div class="history-row"><span>← 0x5e1...f9c</span><span style="color:var(--success);">+ $312</span></div>
+        </div>
+      </div>
+
+      <!-- 账单面板 (可综合显示所有交易) -->
+      <div id="dataPanelBill" style="display: none;">
+        <div style="margin-bottom:12px;"><span style="font-weight:700;">全部交易记录</span></div>
+        <div class="history-row"><span>发送 → 0x8f3...b2e</span><span style="color:var(--danger);">- $50</span></div>
+        <div class="history-row"><span>接收 ← 0x7d4...e8f</span><span style="color:var(--success);">+ $200</span></div>
+        <div class="history-row"><span>发送 → 0x3a9...c5d</span><span style="color:var(--danger);">- $120</span></div>
+        <div class="history-row"><span>接收 ← 0x9b2...c3a</span><span style="color:var(--success);">+ $85</span></div>
+        <div class="history-row"><span>发送 → 0xf2b...7a1</span><span style="color:var(--danger);">- $35</span></div>
+        <div class="history-row"><span>接收 ← 0x5e1...f9c</span><span style="color:var(--success);">+ $312</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 添加面板切换函数 -->
+<script>
+  function switchDataTab(event, tabName) {
+    event.stopPropagation();
+    const container = document.getElementById('cardData1');
+    const tabs = container.querySelectorAll('.data-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const panels = ['send', 'receive', 'bill'];
+    panels.forEach(p => {
+      const panel = document.getElementById('dataPanel' + p.charAt(0).toUpperCase() + p.slice(1));
+      if (panel) panel.style.display = p === tabName ? 'block' : 'none';
+    });
+  }
+</script>
+
+<!-- 额外样式保证复制按钮正常 -->
+<style>
+  .history-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.04);
+    font-size: 0.9rem;
+  }
+  .data-tab.active {
+    background: white !important;
+    color: var(--primary) !important;
+    box-shadow: 0 2px 8px rgba(0,102,255,0.12);
+  }
+  #cardData1 .card-main {
+    align-items: baseline;
+  }
+</style>
                 <div class="content-inner">
-                    <div class="section-title"><i class="fas fa-calculator"></i> Boost交易量阶梯</div>
-                    <div class="rewards">
-                        <div class="reward-item"><span>$500+</span><span>空投资格</span></div>
-                        <div class="reward-item"><span>$1000+</span><span>权重x1.2</span></div>
-                    </div>
-                    <div class="section-title"><i class="fas fa-wallet"></i> Boost余额加成</div>
-                    <div class="rewards">
-                        <div class="reward-item"><span>$200+</span><span>资格通过</span></div>
-                        <div class="reward-item"><span>$1000+</span><span>+15%</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="activity-card boost-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon" style="color:var(--secondary);"><i class="fas fa-chess-board"></i></div>
-                    <div>
-                        <div class="card-title">社区策略解析</div>
-                        <div class="card-sub">四种参与Boost策略</div>
-                    </div>
-                </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            <div class="card-content">
-                <div class="content-inner">
-                    <div>1. 集中交易提升交易量</div>
-                    <div>2. 联合持仓Boost余额</div>
-                    <div>3. 任务共享与白名单</div>
-                    <div>4. 交易竞赛协同作战</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="activity-card boost-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon"><i class="fas fa-comments"></i></div>
-                    <div>
-                        <div class="card-title">Boost留言板</div>
-                        <div class="card-sub">20条留言</div>
-                    </div>
-                </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            <div class="card-content">
-                <div class="content-inner">
-                    <div class="comment-item">海豚船长: 刚领到空投！</div>
-                    <div class="comment-item">Web3探险家: 持仓300U OKB</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========== 模型卡片组 ========== -->
-        <div class="activity-card model-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon purple"><i class="fas fa-brain"></i></div>
-                    <div>
-                        <div class="card-title">海豚模式解析</div>
-                        <div class="card-sub">正向收益飞轮</div>
-                    </div>
-                </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            <div class="card-content">
-                <div class="content-inner">
-                    <div class="stats-grid">
-                        <div>总发行量 10亿 H</div>
-                        <div>初始价格 $0.00005</div>
-                        <div>质押池 3亿 H</div>
-                    </div>
-                    <div class="section-title">智能质押收益表</div>
-                    <table class="stake-table">
-                        <tr><td>1-7天</td><td>0.5%</td><td>182.5% APY</td></tr>
-                        <tr><td>8-15天</td><td>0.6%</td><td>219% APY</td></tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="activity-card model-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon" style="color:var(--secondary);"><i class="fas fa-balance-scale"></i></div>
-                    <div>
-                        <div class="card-title">经济模型横向对比</div>
-                        <div class="card-sub">海豚 vs 主流</div>
-                    </div>
-                </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            <div class="card-content">
-                <div class="content-inner">
-                    <div>公平发射 vs 预挖</div>
-                    <div>双收益飞轮 vs 单一代币</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="activity-card model-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <div class="card-icon" style="color:var(--accent);"><i class="fas fa-sitemap"></i></div>
-                    <div>
-                        <div class="card-title">完整经济架构</div>
-                        <div class="card-sub">双代币·飞轮</div>
-                    </div>
-                </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            <div class="card-content">
-                <div class="content-inner">
-                    <canvas id="flywheelCanvas" width="300" height="200" style="width:100%; height:200px; background:transparent;"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========== 数据卡片组 ========== -->
-        <!-- 卡片1：我的钱包（可折叠，默认显示摘要，点击头部或摘要空白处展开） -->
-        <div class="activity-card data-card" id="walletCard">
-            <div class="card-header">
-                <div class="card-header-left no-icon">
-                    <div class="card-title">我的钱包</div>
-                </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            <!-- 始终显示的摘要部分 -->
-            <div class="wallet-summary">
-                <div class="wallet-amount">$1,098</div>
-                <div class="wallet-change">
-                    <span class="positive">+$11 (+1.9%)</span>
-                    <span class="period-badge">1日</span>
-                </div>
-                <div class="wallet-actions">
-                    <button class="wallet-action-btn" id="walletSendBtn"><i class="fas fa-paper-plane"></i> 发送</button>
-                    <button class="wallet-action-btn" id="walletReceiveBtn"><i class="fas fa-arrow-down"></i> 接收</button>
-                </div>
-            </div>
-            <!-- 可折叠的详细内容 -->
-            <div class="card-content">
-                <div class="content-inner" style="padding-top: 0;">
+                    <!-- 切换标签 (币种/DeFi/仓位) 静态展示，默认币种active -->
                     <div class="tab-switch">
-                        <span class="tab-item active">币种</span>
-                        <span class="tab-item">DeFi</span>
-                        <span class="tab-item">仓位</span>
+                        <span class="tab-item active" onclick="event.stopPropagation()">币种</span>
+                        <span class="tab-item" onclick="event.stopPropagation()">DeFi</span>
+                        <span class="tab-item" onclick="event.stopPropagation()">仓位</span>
                     </div>
+                    <!-- 币种列表 -->
                     <div class="asset-list">
-                        <!-- USDT -->
                         <div class="asset-row">
                             <div class="asset-left">
-                                <div class="asset-icon"><i class="fas fa-dollar-sign"></i></div>
-                                <div class="asset-info">
-                                    <span class="asset-name">USDT</span>
-                                    <span class="asset-balance">100.00 USDT</span>
-                                </div>
+                                <div class="asset-icon"><i class="fas fa-coins" style="color:#26A17B;"></i></div>
+                                <div class="asset-info">USDT <small>100 USDT</small></div>
                             </div>
                             <div class="asset-right">
                                 <div class="asset-value">$100.00</div>
-                                <div><span class="asset-price">$1.00</span> <span class="asset-change">+1.3%</span></div>
+                                <div class="asset-change">+1.3%</div>
                             </div>
                         </div>
-                        <!-- BTC -->
                         <div class="asset-row">
                             <div class="asset-left">
-                                <div class="asset-icon"><i class="fab fa-bitcoin"></i></div>
-                                <div class="asset-info">
-                                    <span class="asset-name">BTC</span>
-                                    <span class="asset-balance">0.023 BTC</span>
-                                </div>
+                                <div class="asset-icon"><i class="fab fa-btc" style="color:#F7931A;"></i></div>
+                                <div class="asset-info">BTC <small>0.0015 BTC</small></div>
                             </div>
                             <div class="asset-right">
-                                <div class="asset-value">$1,234.50</div>
-                                <div><span class="asset-price">$53,456</span> <span class="asset-change">+2.3%</span></div>
+                                <div class="asset-value">$67.58</div>
+                                <div class="asset-change">+2.1%</div>
                             </div>
                         </div>
-                        <!-- 可添加更多币种 -->
+                        <div class="asset-row">
+                            <div class="asset-left">
+                                <div class="asset-icon"><i class="fab fa-ethereum" style="color:#627EEA;"></i></div>
+                                <div class="asset-info">ETH <small>0.12 ETH</small></div>
+                            </div>
+                            <div class="asset-right">
+                                <div class="asset-value">$216.34</div>
+                                <div class="asset-change negative">-0.5%</div>
+                            </div>
+                        </div>
+                        <div class="asset-row">
+                            <div class="asset-left">
+                                <div class="asset-icon"><i class="fas fa-water" style="color:#0066ff;"></i></div>
+                                <div class="asset-info">DPH <small>918 DPH</small></div>
+                            </div>
+                            <div class="asset-right">
+                                <div class="asset-value">$45.90</div>
+                                <div class="asset-change">+5.2%</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 其他数据卡片（可折叠） -->
-        <div class="activity-card data-card">
+        <!-- 卡片D2：交易历史 -->
+        <div class="activity-card data-card" id="cardData2">
             <div class="card-header">
-                <div class="card-header-left no-icon">
-                    <span class="card-title">DeFi 收益</span>
+                <div class="card-main">
+                    <div class="card-icon" style="color:var(--secondary);"><i class="fas fa-history"></i></div>
+                    <div class="card-text">
+                        <h3>交易历史</h3>
+                        <p>最近10笔链上交互</p>
+                    </div>
                 </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="card-status">
+                    <span class="status-badge" style="color:var(--secondary);">24h 8笔</span>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <div style="padding:10px 0;">Uniswap V3  +$23.40</div>
-                    <div style="padding:10px 0;">Aave 借贷  +$8.12</div>
+                    <div class="history-row"><span>⚡ 卖出 ETH</span><span style="color:var(--success);">+$312</span></div>
+                    <div class="history-row"><span>💰 接收 USDT</span><span>$200</span></div>
+                    <div class="history-row"><span>🔄 兑换 DPH</span><span>500 DPH</span></div>
+                    <div class="history-row"><span>📈 Boost 交易</span><span>$1,200</span></div>
+                    <div class="history-row"><span>🔁 质押 H</span><span>3000 H</span></div>
                 </div>
             </div>
         </div>
 
-        <div class="activity-card data-card">
+        <!-- 卡片D3：DeFi 汇总 -->
+        <div class="activity-card data-card" id="cardData3">
             <div class="card-header">
-                <div class="card-header-left no-icon">
-                    <span class="card-title">仓位管理</span>
+                <div class="card-main">
+                    <div class="card-icon green"><i class="fas fa-seedling"></i></div>
+                    <div class="card-text">
+                        <h3>DeFi 汇总</h3>
+                        <p>流动性 & 质押</p>
+                    </div>
                 </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="card-status">
+                    <span class="status-badge green">3个池子</span>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <div style="padding:10px 0;">BTC 永续 (2x)  $2,340</div>
-                    <div style="padding:10px 0;">ETH 质押杠杆  $1,200</div>
+                    <div class="defi-pool">
+                        <div style="display:flex; justify-content:space-between;"><span>H/USDT LP</span><span>$1,240</span></div>
+                        <div style="font-size:0.8rem; color:var(--success);">APR 68%</div>
+                    </div>
+                    <div class="defi-pool">
+                        <div style="display:flex; justify-content:space-between;"><span>单币质押 H</span><span>3,500 H</span></div>
+                        <div style="font-size:0.8rem; color:var(--success);">日收益 28 H</div>
+                    </div>
+                    <div class="defi-pool">
+                        <div style="display:flex; justify-content:space-between;"><span>OKX 借贷</span><span>$5,000</span></div>
+                        <div style="font-size:0.8rem; color:var(--warning);">利率 2.1%</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="activity-card data-card">
+        <!-- 卡片D4：仓位分析 -->
+        <div class="activity-card data-card" id="cardData4">
             <div class="card-header">
-                <div class="card-header-left no-icon">
-                    <span class="card-title">交易历史</span>
+                <div class="card-main">
+                    <div class="card-icon" style="color:var(--warning);"><i class="fas fa-chart-line"></i></div>
+                    <div class="card-text">
+                        <h3>仓位分析</h3>
+                        <p>风险 / 杠杆</p>
+                    </div>
                 </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="card-status">
+                    <span class="status-badge" style="color:var(--warning);">低风险</span>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <div style="padding:8px 0;">买入 ETH @ $1,980</div>
-                    <div style="padding:8px 0;">卖出 BTC @ $53,200</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:16px;"><span>总仓位价值</span><strong>$1,890</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:16px;"><span>杠杆倍数</span><strong>1.2x</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:16px;"><span>未实现盈亏</span><strong style="color:var(--success);">+$142</strong></div>
+                    <div style="background: rgba(0,102,255,0.04); padding:12px; border-radius:16px;">健康度: 92% (极佳)</div>
                 </div>
             </div>
         </div>
 
-        <div class="activity-card data-card">
+        <!-- 卡片D5：数据看板 / 积分统计 -->
+        <div class="activity-card data-card" id="cardData5">
             <div class="card-header">
-                <div class="card-header-left no-icon">
-                    <span class="card-title">推荐奖励</span>
+                <div class="card-main">
+                    <div class="card-icon"><i class="fas fa-star"></i></div>
+                    <div class="card-text">
+                        <h3>积分&成就</h3>
+                        <p>Boost积分 / 贡献度</p>
+                    </div>
                 </div>
-                <div class="card-expand-icon"><i class="fas fa-chevron-down"></i></div>
+                <div class="card-status">
+                    <span class="status-badge">🏆 3480分</span>
+                    <div class="card-expand"><i class="fas fa-chevron-down"></i></div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <div>已邀请 8 人，累计 $45.60</div>
-                    <div style="margin-top:10px;">今日预估 $2.30</div>
+                    <div class="stat-row" style="display:flex; justify-content:space-between; padding:12px 0;"><span>Boost 积分</span><strong>1,240</strong></div>
+                    <div class="stat-row" style="display:flex; justify-content:space-between; padding:12px 0;"><span>治理贡献</span><strong>580 DPH</strong></div>
+                    <div class="stat-row" style="display:flex; justify-content:space-between; padding:12px 0;"><span>邀请好友</span><strong>3 人</strong></div>
+                    <div class="stat-row" style="display:flex; justify-content:space-between; padding:12px 0;"><span>等级</span><strong>黄金 III</strong></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // H字母交互
-        const h = document.querySelector('.h-interactive');
-        if (h) {
-            h.addEventListener('click', function() {
-                this.style.transform = 'scale(1.2)';
-                setTimeout(() => this.style.transform = 'scale(1)', 200);
-            });
+        // 创建线条动画背景（亮度已提升至0.2）
+        function createLineBackground() {
+            const lineBackground = document.getElementById('lineBackground');
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 1000 1000");
+            svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+
+            for (let i = 0; i < 20; i++) {
+                const line = document.createElementNS(svgNS, "path");
+                const startX = Math.random() * 1000;
+                const startY = Math.random() * 1000;
+                const endX = Math.random() * 1000;
+                const endY = Math.random() * 1000;
+                const path = `M ${startX},${startY} C ${startX + 200},${startY + 100} ${endX - 200},${endY - 100} ${endX},${endY}`;
+
+                line.setAttribute("d", path);
+                line.setAttribute("class", "line");
+                line.setAttribute("stroke", `rgba(0, 102, 255, ${0.15 + Math.random() * 0.15})`);
+                line.setAttribute("stroke-dasharray", "10,5");
+                line.style.animationDelay = `${Math.random() * 5}s`;
+                line.style.animationDuration = `${10 + Math.random() * 10}s`;
+
+                svg.appendChild(line);
+            }
+            lineBackground.appendChild(svg);
         }
 
-        // 用户面板点击展开（演示）
-        const userPanel = document.getElementById('userPanel');
-        userPanel.addEventListener('click', function() {
-            alert('用户详情面板 (可展开更多数据)');
+        // H字母交互
+        const hInteractive = document.querySelector('.h-interactive');
+        hInteractive.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.2) rotate(5deg)';
+            this.style.filter = 'drop-shadow(0 0 30px rgba(0, 102, 255, 0.8))';
+            this.style.animation = 'none';
+        });
+        hInteractive.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) rotate(0deg)';
+            this.style.filter = 'drop-shadow(0 0 20px rgba(0, 102, 255, 0.3))';
+            this.style.animation = 'hGlow 3s ease-in-out infinite';
+        });
+        hInteractive.addEventListener('click', function() {
+            this.style.transform = 'scale(1.3) rotate(-5deg)';
+            this.style.filter = 'drop-shadow(0 0 40px rgba(0, 102, 255, 1))';
+            this.style.color = 'transparent';
+            this.style.background = 'linear-gradient(45deg, #00c6ff, #0066ff)';
+            this.style.webkitBackgroundClip = 'text';
+            this.style.backgroundClip = 'text';
+
+            setTimeout(() => {
+                this.style.transform = 'scale(1) rotate(0deg)';
+                this.style.filter = 'drop-shadow(0 0 20px rgba(0, 102, 255, 0.3))';
+                this.style.animation = 'hGlow 3s ease-in-out infinite';
+            }, 300);
         });
 
-        // 统一卡片折叠逻辑：点击头部或我的钱包的摘要区域（排除按钮）触发折叠
-        document.querySelectorAll('.activity-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                // 排除点击在按钮、可交互元素、以及资产列表区域
-                if (e.target.closest('button, .wallet-action-btn, .action-btn-mini, .paste-btn, .copy-btn, select, .tab-item, .asset-row')) {
-                    return;
+        createLineBackground();
+
+        // 用户面板展开/收起
+        const userPanel = document.getElementById('userPanel');
+        const userDetails = document.getElementById('userDetails');
+        userPanel.addEventListener('click', function() {
+            const isExpanded = this.classList.contains('expanded');
+            if (!isExpanded) {
+                this.classList.add('expanded');
+                userDetails.style.maxHeight = userDetails.scrollHeight + 'px';
+            } else {
+                this.classList.remove('expanded');
+                userDetails.style.maxHeight = '0';
+            }
+        });
+
+        // ===== 核心按钮联动逻辑（Boost / 模型 / 数据）=====
+        const actionButtons = document.querySelectorAll('.action-btn');
+        const boostCards = document.querySelectorAll('.boost-card');
+        const modelCards = document.querySelectorAll('.model-card');
+        const dataCards = document.querySelectorAll('.data-card');
+
+        function filterCards(mode) {
+            if (mode === 'boost') {
+                boostCards.forEach(c => c.style.display = 'block');
+                modelCards.forEach(c => c.style.display = 'none');
+                dataCards.forEach(c => c.style.display = 'none');
+            } else if (mode === 'model') {
+                boostCards.forEach(c => c.style.display = 'none');
+                modelCards.forEach(c => c.style.display = 'block');
+                dataCards.forEach(c => c.style.display = 'none');
+            } else if (mode === 'data') {
+                boostCards.forEach(c => c.style.display = 'none');
+                modelCards.forEach(c => c.style.display = 'none');
+                dataCards.forEach(c => c.style.display = 'block');
+            }
+        }
+
+        // 默认激活Boost按钮
+        filterCards('boost');
+
+        actionButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                actionButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const btnId = this.id;
+                if (btnId === 'btnBoost') {
+                    filterCards('boost');
+                } else if (btnId === 'btnModel') {
+                    filterCards('model');
+                } else if (btnId === 'btnData') {
+                    filterCards('data');
+                    // 移除原来的alert
                 }
-                // 如果点击在卡片头部或我的钱包的摘要区域，则触发折叠
-                if (e.target.closest('.card-header') || e.target.closest('.wallet-summary')) {
-                    const content = this.querySelector('.card-content');
-                    const icon = this.querySelector('.card-expand-icon i');
-                    if (this.classList.contains('active')) {
-                        this.classList.remove('active');
-                        content.style.maxHeight = '0';
-                        if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-                    } else {
-                        this.classList.add('active');
-                        const inner = this.querySelector('.content-inner');
-                        content.style.maxHeight = (inner ? inner.scrollHeight : 200) + 50 + 'px';
-                        if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            });
+        });
+
+        // ===== 卡片展开/收起（通用）=====
+        const allCards = document.querySelectorAll('.activity-card');
+        allCards.forEach(card => {
+            const header = card.querySelector('.card-header');
+            const content = card.querySelector('.card-content');
+            const inner = card.querySelector('.content-inner');
+
+            header.addEventListener('click', function(e) {
+                if (e.target.closest('button') || e.target.closest('.small-btn') || e.target.closest('.tab-item')) return;
+                const isActive = card.classList.contains('active');
+                if (isActive) {
+                    card.classList.remove('active');
+                    content.style.maxHeight = '0';
+                } else {
+                    card.classList.add('active');
+                    if (inner) {
+                        content.style.maxHeight = inner.scrollHeight + 'px';
                     }
                 }
             });
         });
 
-        // 核心按钮切换卡片组
-        const btnBoost = document.getElementById('btnBoost');
-        const btnModel = document.getElementById('btnModel');
-        const btnData = document.getElementById('btnData');
-        const allCards = document.querySelectorAll('.activity-card');
-
-        function filterCards(type) {
-            allCards.forEach(card => {
-                if (type === 'boost') {
-                    card.style.display = card.classList.contains('boost-card') ? 'block' : 'none';
-                } else if (type === 'model') {
-                    card.style.display = card.classList.contains('model-card') ? 'block' : 'none';
-                } else if (type === 'data') {
-                    card.style.display = card.classList.contains('data-card') ? 'block' : 'none';
-                }
-            });
-        }
-
-        filterCards('boost');
-        btnBoost.classList.add('active');
-        btnModel.classList.remove('active');
-        btnData.classList.remove('active');
-
-        btnBoost.addEventListener('click', function() {
-            btnBoost.classList.add('active');
-            btnModel.classList.remove('active');
-            btnData.classList.remove('active');
-            filterCards('boost');
-        });
-        btnModel.addEventListener('click', function() {
-            btnModel.classList.add('active');
-            btnBoost.classList.remove('active');
-            btnData.classList.remove('active');
-            filterCards('model');
-        });
-        btnData.addEventListener('click', function() {
-            btnData.classList.add('active');
-            btnBoost.classList.remove('active');
-            btnModel.classList.remove('active');
-            filterCards('data');
+        // 阻止按钮冒泡
+        document.querySelectorAll('.small-btn, .tab-item, .card-action-button, .comment-send-btn').forEach(btn => {
+            btn.addEventListener('click', e => e.stopPropagation());
         });
 
-        // 我的钱包按钮交互（示例）
-        document.getElementById('walletSendBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            alert('发送功能开发中');
-        });
-        document.getElementById('walletReceiveBtn')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            alert('接收功能开发中');
-        });
+        // 模拟数据动态变化（用户身价等）
+        const networthValue = document.getElementById('networthValue');
+        const balanceValue = document.getElementById('balanceValue');
+        const volumeValue = document.getElementById('volumeValue');
+        const rankValue = document.getElementById('rankValue');
 
-        // 飞轮画布简单绘制
-        const canvas = document.getElementById('flywheelCanvas');
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = 'rgba(0,102,255,0.1)';
-            ctx.beginPath();
-            ctx.arc(150, 100, 80, 0, 2 * Math.PI);
-            ctx.fill();
-        }
+        let networth = 918, balance = 1023, volume = 8827, rank = 9;
+        setInterval(() => {
+            networth += Math.floor(Math.random() * 3) + 1;
+            networthValue.textContent = `${networth} DPH`;
+            balance += Math.floor(Math.random() * 10) - 3;
+            if (balance < 0) balance = 0;
+            balanceValue.textContent = `$${balance}`;
+            volume += Math.floor(Math.random() * 20);
+            volumeValue.textContent = `$${volume}`;
+            if (Math.random() > 0.7) {
+                rank += Math.random() > 0.5 ? -1 : 1;
+                if (rank < 1) rank = 1;
+                if (rank > 100) rank = 100;
+                rankValue.textContent = `${rank}`;
+            }
+            networthValue.style.transform = 'scale(1.1)';
+            networthValue.style.color = '#00c6ff';
+            setTimeout(() => {
+                networthValue.style.transform = 'scale(1)';
+                networthValue.style.color = '#0066ff';
+            }, 300);
+        }, 30000);
+
+        // 保留原模拟器变量占位（避免报错）
+        window.updateAll = function() {};
     </script>
 </body>
 </html>
