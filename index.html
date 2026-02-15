@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>海豚社区 · 数据看板</title>
+    <meta name="description" content="海豚社区 - 动态流光边框 · 数据看板 · 群组聊天">
+    <meta name="theme-color" content="#0066ff">
+    <title>海豚社区 · 全览版</title>
+    <!-- 预加载字体 -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ===== 全局变量 ===== */
         :root {
             --primary: #0066ff;
             --primary-light: rgba(0, 102, 255, 0.12);
@@ -17,15 +22,16 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --text-primary: #1a1e2b;        /* 加深主文本 */
-            --text-secondary: #4b5565;       /* 次文本更深 */
-            --text-light: #6b7280;            /* 辅助文本 */
-            --card-bg-warm: #f8fafc;          /* 更柔和的卡片底色 */
+            --text-primary: #1a1e2b;
+            --text-secondary: #4b5565;
+            --text-light: #6b7280;
+            --card-bg-warm: #f8fafc;
             --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 102, 255, 0.04);
             --card-shadow-hover: 0 12px 32px rgba(0, 102, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* ===== 基础重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -43,11 +49,174 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            font-size: 16px;                  /* 基础字体 */
-            line-height: 1.5;                  /* 舒适行高 */
+            font-size: 16px;
+            line-height: 1.5;
         }
 
-        /* 顶部流动H字母 */
+        /* ===== 左侧菜单按钮 ===== */
+        .menu-button {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            width: 44px;
+            height: 44px;
+            background: var(--card-bg-warm);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            z-index: 100;
+            transition: var(--transition);
+            border: 2px solid rgba(0,102,255,0.1);
+        }
+        .menu-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--card-shadow-hover);
+            border-color: rgba(0,102,255,0.2);
+        }
+
+        /* ===== 侧边栏遮罩 ===== */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== 侧边栏 ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -80%;
+            width: 80%;
+            max-width: 320px;
+            height: 100%;
+            background: white;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            z-index: 201;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            border-radius: 0 24px 24px 0;
+            overflow: hidden;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .sidebar-close {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .sidebar-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 20px;
+            background: var(--card-bg-warm);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .chat-item:hover {
+            background: white;
+            border-color: rgba(0,102,255,0.1);
+            transform: translateX(4px);
+            box-shadow: var(--card-shadow);
+        }
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .chat-info {
+            flex: 1;
+        }
+        .chat-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-time {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+        .chat-preview {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 160px;
+        }
+        .chat-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+
+        /* ===== 顶部流动H字母 ===== */
         .h-letter-container {
             position: relative;
             width: 100%;
@@ -57,6 +226,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            margin-left: 40px; /* 给菜单按钮留空间 */
         }
 
         .flowing-h {
@@ -115,12 +285,7 @@
             50% { filter: drop-shadow(0 0 25px rgba(0, 102, 255, 0.6)); transform: scale(1.05) rotate(1deg); }
         }
 
-        /* 线条背景已移除 */
-        .line-background {
-            display: none;
-        }
-
-        /* ===== 全局卡片边框 ===== */
+        /* ===== 全局卡片边框 & 动态流光 ===== */
         .activity-card {
             border: 3px solid rgba(0, 102, 255, 0.06);
             position: relative;
@@ -157,7 +322,6 @@
             animation: linePulse 2s infinite;
         }
 
-        /* ===== 动态流光边框 ===== */
         .activity-card::after {
             content: '';
             position: absolute;
@@ -198,6 +362,7 @@
             inherits: false;
             initial-value: 0deg;
         }
+        @keyframes linePulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
 
         /* 按钮边框同步 */
         .action-btn {
@@ -219,7 +384,7 @@
             border-width: 3px;
         }
 
-        /* 用户信息面板 */
+        /* ===== 用户信息面板 ===== */
         .user-panel {
             background: var(--card-bg-warm);
             border-radius: 28px;
@@ -432,7 +597,7 @@
             letter-spacing: 0.03em;
         }
 
-        /* 三个核心按钮 */
+        /* ===== 三个核心按钮 ===== */
         .action-buttons {
             display: flex;
             flex-direction: row;
@@ -479,8 +644,6 @@
         .action-btn.active::before {
             display: none;
         }
-
-        @keyframes linePulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
 
         .btn-icon {
             width: 80px;
@@ -600,7 +763,7 @@
         }
         .action-btn:nth-child(3).active .btn-label::after { background: linear-gradient(90deg, var(--warning), #f97316); }
 
-        /* 卡片容器 */
+        /* ===== 卡片容器 ===== */
         .cards-container {
             display: flex;
             flex-direction: column;
@@ -638,9 +801,11 @@
             background: white;
         }
 
+        /* 卡片头部 */
         .card-header {
-            padding: 20px 20px 16px 20px;
+            padding: 20px 20px 12px 20px;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
@@ -793,9 +958,6 @@
             color: var(--success);
             border-color: rgba(16, 185, 129, 0.1);
         }
-        .activity-card:hover .status-badge.green { border-color: rgba(16, 185, 129, 0.2); }
-        .activity-card.active .status-badge.green { border-color: rgba(16, 185, 129, 0.25); }
-
         .status-badge.purple {
             color: var(--secondary);
             border-color: rgba(139, 92, 246, 0.1);
@@ -851,6 +1013,55 @@
         }
         .activity-card.active .card-expand::before { opacity: 1; }
 
+        /* 快速统计区域（数据卡片头部） */
+        .quick-stats {
+            width: 100%;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(0,102,255,0.1);
+            font-size: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        .quick-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .quick-stat-label {
+            font-weight: 500;
+        }
+        .quick-stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .quick-stat-value.primary { color: var(--primary); }
+        .quick-stat-value.success { color: var(--success); }
+        .quick-progress {
+            flex: 1;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quick-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .quick-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 28.45%;
+        }
+
+        /* 卡片内容区域 */
         .card-content {
             max-height: 0;
             overflow: hidden;
@@ -904,7 +1115,548 @@
             margin-bottom: 16px;
         }
 
-        /* ===== 数据卡片专用样式 ===== */
+        .rules-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .rules-list li {
+            padding: 12px 0;
+            border-bottom: 2px dashed rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            position: relative;
+        }
+        .rules-list li::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            transition: var(--transition);
+        }
+        .rules-list li:hover {
+            color: var(--text-primary);
+            padding-left: 5px;
+        }
+        .rules-list li:hover::before { width: 100%; }
+        .rules-list li:last-child { border-bottom: none; }
+        .rules-list li i {
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .rewards {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 18px;
+            margin-top: 18px;
+            border: 2px solid rgba(0, 102, 255, 0.1);
+            transition: var(--transition);
+        }
+        .rewards:hover {
+            border-color: rgba(0, 102, 255, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: var(--card-shadow);
+        }
+        .reward-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.03);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        .reward-item:hover { transform: translateX(5px); }
+        .reward-item:last-child { border-bottom: none; }
+        .reward-value {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .card-action-button {
+            padding: 16px 20px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: -0.01em;
+            min-width: 200px;
+            margin: 0 auto;
+            box-shadow: var(--card-shadow);
+        }
+        .card-action-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: 2px solid transparent;
+        }
+        .card-action-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .card-action-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid rgba(0, 102, 255, 0.3);
+        }
+        .card-action-secondary:hover {
+            background: rgba(0, 102, 255, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .action-button-icon { font-size: 1.2rem; }
+
+        .flywheel-node {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.08);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .flywheel-node strong {
+            color: var(--primary);
+            font-weight: 700;
+            min-width: 100px;
+        }
+        .flywheel-node:last-child { border-bottom: none; }
+
+        .video-full-frame {
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #0a0f1a;
+            margin: 0;
+            padding: 0;
+        }
+        .video-full-frame iframe {
+            display: block;
+            width: 100%;
+            height: 60vh;
+            min-height: 500px;
+            border: none;
+            vertical-align: bottom;
+        }
+
+        .comment-item {
+            padding: 16px;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.08);
+            transition: var(--transition);
+        }
+        .comment-item:hover {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .comment-avatar {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        .comment-author {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .comment-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-left: auto;
+        }
+        .comment-content {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 0.95rem;
+            padding-left: 6px;
+        }
+        .comment-input-area {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            align-items: center;
+        }
+        .comment-input {
+            flex: 1;
+            padding: 16px 18px;
+            border: 2px solid rgba(0, 102, 255, 0.1);
+            border-radius: 40px;
+            font-size: 0.95rem;
+            background: white;
+            transition: var(--transition);
+        }
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
+        }
+        .comment-send-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .comment-send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        /* ===== 经济模型专用样式 ===== */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px;
+        }
+        @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 700px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+            background: var(--card-bg-warm);
+            border-radius: 24px; padding: 16px 12px;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .stat-card:hover {
+            background: white; box-shadow: var(--card-shadow); transform: translateY(-2px);
+        }
+        .stat-label {
+            display: flex; align-items: center; gap: 6px; color: var(--text-secondary);
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;
+        }
+        .stat-label i { font-size: 0.8rem; color: var(--primary); }
+        .stat-number {
+            font-size: 1.4rem; font-weight: 700; color: var(--text-primary);
+            line-height: 1.2; margin-bottom: 4px; letter-spacing: -0.5px;
+        }
+        .stat-trend { font-size: 0.65rem; color: var(--text-light); }
+
+        .sim-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px;
+        }
+        @media (max-width: 900px) { .sim-row { grid-template-columns: 1fr; } }
+        .param-panel, .earning-panel {
+            background: var(--card-bg-warm);
+            border-radius: 32px; padding: 20px;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .param-panel:hover, .earning-panel:hover {
+            background: white; box-shadow: var(--card-shadow-hover);
+        }
+        .param-group { margin-bottom: 20px; }
+        .param-label {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 0.85rem;
+        }
+        .param-label span:last-child {
+            color: var(--primary); font-weight: 700; background: white; padding: 4px 16px;
+            border-radius: 40px; font-size: 0.8rem; border: 1px solid rgba(0,102,255,0.1);
+        }
+        .slider {
+            width: 100%; height: 8px; background: rgba(0,0,0,0.04); border-radius: 20px;
+            -webkit-appearance: none; appearance: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 24px; height: 24px;
+            background: white; border: 2px solid var(--primary); border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,102,255,0.2); cursor: pointer;
+        }
+        .number-input {
+            border: 1px solid rgba(0,102,255,0.1); border-radius: 40px; padding: 8px 16px;
+            font-size: 0.9rem; font-weight: 600; color: var(--text-primary); background: white;
+            width: 110px; text-align: right; outline: none; transition: var(--transition);
+        }
+        .number-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,102,255,0.1); }
+
+        .earning-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;
+        }
+        .earning-item {
+            background: var(--card-bg-warm);
+            border-radius: 24px; padding: 16px;
+            transition: var(--transition);
+        }
+        .earning-item:hover {
+            background: white; transform: translateY(-2px); box-shadow: var(--card-shadow);
+        }
+        .earning-item .label {
+            display: flex; align-items: center; gap: 6px; color: var(--text-secondary);
+            font-size: 0.75rem; margin-bottom: 10px;
+        }
+        .earning-item .value {
+            font-size: 1.5rem; font-weight: 700; color: var(--text-primary);
+            line-height: 1; letter-spacing: -0.5px;
+        }
+        .total-value {
+            grid-column: span 2; background: rgba(0,102,255,0.04); border-radius: 24px;
+            padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+            transition: var(--transition);
+        }
+        .total-value:hover { background: white; box-shadow: var(--card-shadow); }
+        .total-value span:last-child { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+
+        .kline-card {
+            background: var(--card-bg-warm);
+            border-radius: 32px; padding: 20px; margin-top: 20px;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .kline-card:hover {
+            background: white; box-shadow: var(--card-shadow-hover);
+        }
+        .kline-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+        }
+        .kline-title { display: flex; align-items: center; gap: 12px; }
+        .kline-title i { font-size: 1.5rem; color: var(--primary); }
+        .kline-title h4 { font-size: 1.1rem; font-weight: 700; }
+        .price-range {
+            background: rgba(0,102,255,0.04); border-radius: 40px; padding: 8px 20px;
+            display: flex; align-items: center; gap: 16px; font-size: 0.85rem;
+        }
+        .price-range strong { color: var(--primary); font-size: 1rem; }
+        .kline-container { width: 100%; height: 200px; position: relative; margin-top: 8px; }
+        canvas {
+            width: 100%; height: 100%; display: block; border-radius: 24px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--card-bg-warm);
+            border-radius: 24px;
+            overflow: hidden;
+            font-size: 0.9rem;
+            box-shadow: var(--card-shadow);
+        }
+        .compare-table th {
+            background: rgba(0,102,255,0.06);
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 2px solid rgba(0,102,255,0.1);
+        }
+        .compare-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(0,102,255,0.05);
+            vertical-align: top;
+        }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table tr:hover td { background: rgba(255,255,255,0.5); }
+        .dolphin-tag {
+            background: rgba(0,102,255,0.08);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .competitor-tag {
+            background: rgba(239,68,68,0.06);
+            color: #b91c1c;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .dual-token { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        @media (max-width: 700px) { .dual-token { grid-template-columns: 1fr; } }
+        .token-card {
+            background: var(--card-bg-warm);
+            border-radius: 32px; padding: 24px;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .token-card:hover {
+            background: white; box-shadow: var(--card-shadow-hover);
+        }
+        .token-icon { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+        .token-icon i { font-size: 2rem; }
+        .token-icon h4 { font-size: 1.2rem; font-weight: 700; }
+
+        .flywheel-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 18px;
+        }
+        @media (max-width: 800px) { .flywheel-grid { grid-template-columns: repeat(2, 1fr); } }
+        .flywheel-node-card {
+            background: var(--card-bg-warm);
+            border-radius: 28px; padding: 20px;
+            border: 1px solid transparent; transition: var(--transition); text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .flywheel-node-card:hover {
+            background: white; border-color: rgba(0,102,255,0.2);
+            transform: translateY(-2px); box-shadow: var(--card-shadow);
+        }
+        .node-number {
+            background: var(--primary); color: white; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; border-radius: 16px;
+            font-weight: 700; margin: 0 auto 14px auto;
+        }
+        .node-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+        .node-desc { color: var(--text-secondary); font-size: 0.8rem; line-height: 1.5; }
+
+        .protocol-health-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 16px;
+        }
+        .health-section, .boost-section {
+            background: var(--card-bg-warm);
+            border-radius: 32px;
+            padding: 24px;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .health-section:hover, .boost-section:hover {
+            background: white;
+            box-shadow: var(--card-shadow-hover);
+        }
+        .health-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 20px 0 16px;
+        }
+        .health-item {
+            background: var(--card-bg-warm);
+            border-radius: 24px;
+            padding: 20px 12px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .health-item:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+        }
+        .health-icon {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            background: rgba(0,102,255,0.08);
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            margin: 0 auto 12px auto;
+        }
+        .health-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .health-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .score-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,102,255,0.04);
+            border-radius: 28px;
+            padding: 16px 20px;
+            margin-top: 8px;
+        }
+        .score-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .score-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .score-ring svg {
+            width: 80px;
+            height: 80px;
+            transform: rotate(-90deg);
+        }
+        .score-number {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stake-table {
+            width: 100%; border-collapse: collapse; font-size: 0.95rem;
+            background: var(--card-bg-warm); border-radius: 24px; overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        .stake-table th { background: rgba(0,102,255,0.04); padding: 16px 20px; text-align: left; font-weight: 600; }
+        .stake-table td { padding: 14px 20px; }
+        .stake-table tr:hover td { background: rgba(255,255,255,0.6); }
+
+        .btn-sm {
+            padding: 12px 24px; border-radius: 40px; font-weight: 600; font-size: 0.9rem;
+            background: linear-gradient(105deg, var(--primary), var(--accent)); color: white;
+            border: none; cursor: pointer; transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+        .btn-sm:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+
+        .toggle-checkbox + label {
+            position: relative; display: inline-block; width: 52px; height: 28px;
+            background: rgba(0,0,0,0.06); border-radius: 28px; cursor: pointer; transition: 0.2s;
+        }
+        .toggle-checkbox + label::after {
+            content: ''; position: absolute; width: 24px; height: 24px; background: white; border-radius: 50%;
+            top: 2px; left: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;
+        }
+        .toggle-checkbox:checked + label { background: var(--primary); }
+        .toggle-checkbox:checked + label::after { left: 26px; }
+
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -1109,20 +1861,57 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(0,102,255,0.3);
         }
-        .unlock-btn i {
-            font-size: 1rem;
+        .goal-progress {
+            margin-top: 16px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 24px;
+            padding: 16px 18px;
+        }
+        .goal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .goal-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .goal-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 8px 0 4px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            width: 28.45%;
+        }
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-light);
         }
 
-        /* 响应式微调 */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .h-letter-container { height: 90px; }
+            .h-letter-container { height: 90px; margin-left: 30px; }
+            .menu-button { top: 12px; left: 12px; width: 40px; height: 40px; }
             .h-svg { width: 140px; height: 140px; }
             .h-interactive { font-size: 70px; }
             .action-btn { min-height: 130px; padding: 20px 8px; gap: 14px; }
             .btn-icon { width: 70px; height: 70px; font-size: 2rem; }
             .btn-label { font-size: 1.1rem; }
-            .card-header { padding: 16px 16px 12px; }
+            .card-header { padding: 16px 16px 10px; }
             .card-main { gap: 12px; }
             .card-icon { width: 60px; height: 60px; font-size: 1.8rem; }
             .card-text h3 { font-size: 1.15rem; }
@@ -1131,8 +1920,8 @@
             .card-expand { width: 36px; height: 36px; }
             .content-inner { padding: 0 16px; }
             .activity-card.active .content-inner { padding-bottom: 20px; }
+            .quick-stats { font-size: 0.8rem; gap: 12px; }
         }
-
         @media (max-width: 480px) {
             .h-letter-container { height: 80px; }
             .h-svg { width: 120px; height: 120px; }
@@ -1145,7 +1934,6 @@
             .data-card { padding: 14px; }
             .data-value { font-size: 1.5rem; }
         }
-
         @media (hover: none) {
             .user-panel:hover,
             .data-card:hover,
@@ -1158,8 +1946,78 @@
     </style>
 </head>
 <body>
-    <!-- 线条背景容器已隐藏 -->
-    <div class="line-background" id="lineBackground"></div>
+    <!-- 菜单按钮 -->
+    <div class="menu-button" id="menuButton">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- 侧边栏遮罩 -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>群组聊天</h2>
+            <div class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        <div class="chat-list">
+            <div class="chat-item" onclick="alert('打开海豚大本营聊天')">
+                <div class="chat-avatar">🐬</div>
+                <div class="chat-info">
+                    <div class="chat-name">
+                        海豚大本营
+                        <span class="chat-badge">5</span>
+                    </div>
+                    <div class="chat-preview">今晚8点有Boost活动...</div>
+                    <div class="chat-time">10:30</div>
+                </div>
+            </div>
+            <div class="chat-item" onclick="alert('打开OKX Boost 讨论群')">
+                <div class="chat-avatar">⚡</div>
+                <div class="chat-info">
+                    <div class="chat-name">
+                        OKX Boost 讨论群
+                        <span class="chat-badge">12</span>
+                    </div>
+                    <div class="chat-preview">新一期Launch明天开始...</div>
+                    <div class="chat-time">09:15</div>
+                </div>
+            </div>
+            <div class="chat-item" onclick="alert('打开质押收益交流群')">
+                <div class="chat-avatar">💰</div>
+                <div class="chat-info">
+                    <div class="chat-name">
+                        质押收益交流群
+                        <span class="chat-badge">3</span>
+                    </div>
+                    <div class="chat-preview">阶梯利率调整通知...</div>
+                    <div class="chat-time">昨天</div>
+                </div>
+            </div>
+            <div class="chat-item" onclick="alert('打开交易员俱乐部')">
+                <div class="chat-avatar">📈</div>
+                <div class="chat-info">
+                    <div class="chat-name">
+                        交易员俱乐部
+                    </div>
+                    <div class="chat-preview">有人分析下H的走势吗？</div>
+                    <div class="chat-time">昨天</div>
+                </div>
+            </div>
+            <div class="chat-item" onclick="alert('打开海豚治理大厅')">
+                <div class="chat-avatar">🏛️</div>
+                <div class="chat-info">
+                    <div class="chat-name">
+                        海豚治理大厅
+                    </div>
+                    <div class="chat-preview">提案 #42 投票中...</div>
+                    <div class="chat-time">15:20</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 顶部流动H字母 -->
     <div class="h-letter-container">
@@ -1234,9 +2092,8 @@
 
     <!-- ===== 卡片区域 ===== -->
     <div class="cards-container">
-
-        <!-- 原有 Boost 和 模型 卡片（此处保留占位，实际使用时由JS控制显示/隐藏） -->
-        <!-- ========== BOOST 卡片组（共4张）========== -->
+        <!-- ========== BOOST 卡片组（4张）========== -->
+        <!-- 卡片1：OKX Boost 专栏 -->
         <div class="activity-card boost-card" id="cardBoostColumn">
             <div class="card-header">
                 <div class="card-main">
@@ -1261,12 +2118,196 @@
                         <div class="section-title"><i class="fas fa-info-circle"></i> 活动解析</div>
                         <p class="description">OKX Boost 是 OKX Wallet 2025年9月份正式推出的链上创新项目参与平台，旨在为优质区块链项目与真实用户搭建高效桥梁。</p>
                     </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-list-check"></i> 三大核心模式</div>
+                        <ul class="rules-list">
+                            <li><i class="fas fa-rocket"></i> <strong>X Launch：</strong>基于 OKX DEX 交易活跃度，用户可瓜分新项目代币奖池，是“交易即贡献”的公平分配机制。</li>
+                            <li><i class="fas fa-gift"></i> <strong>Giveaway：</strong>完成关注社群、链上交互等简单任务，即可获得项目代币或白名单资格，适合 Web3 探索者。</li>
+                            <li><i class="fas fa-trophy"></i> <strong>交易赛：</strong>针对热门项目的限时交易竞赛，排行榜前列用户共享高额奖池。</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-scale-balanced"></i> 公平透明的参与逻辑</div>
+                        <p class="description">OKX Boost 引入 <strong>Boost 交易量</strong> 与 <strong>Boost 余额</strong> 两项核心指标——分别统计用户过去10天在 OKX DEX 的平均交易额与 OKX Wallet 中优质资产的日均持仓——共同决定活动资格与奖励权重。</p>
+                        <p class="description" style="margin-top: 8px;">所有奖励分发均在开源、去中心化的智能合约中自动执行，不受平台干预，确保每一份激励都流向真实参与者。</p>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-chart-line"></i> Boost数据说明</div>
+                        <p class="description">Boost 数据综合反映你过去 10 天在 OKX DEX 的交易活跃度 (Boost 交易量) 和在 OKX Wallet 的资产持仓 (Boost 余额)。这两个指标将用于 OKX Boost 各类活动，影响你的活动资格及奖励金额。</p>
+                        <ul class="rules-list">
+                            <li><i class="fas fa-chart-simple"></i> <strong>Boost交易量：</strong>十天内达到$500交易量即可领取空投奖励，量越多奖励越高（平均每天500U的交易量）。</li>
+                            <li><i class="fas fa-wallet"></i> <strong>Boost余额：</strong>本地址十天内有USDT或OKB，200U（这个很简单基本上都会通过）。</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-gift"></i> 奖励的新币 | 收益来源</div>
+                        <p class="description">代币发行方凭借良好的链上数据表现，入选OKX Boost作为上所前的预热活动，持续获得OKX生态关注，为代币增加曝光度，欧易增加交易量。参与者获得新币奖励，真正实现链上与中心化交易所的双重流动性与用户基础赋能。</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="card-action-button card-action-primary"><i class="action-button-icon fas fa-play-circle"></i> 参与Boost活动</button>
+                        <button class="card-action-button card-action-secondary"><i class="action-button-icon fas fa-share-alt"></i> 分享给好友</button>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- 其他 Boost 卡片略 (保持原有) ... 为简化篇幅仅保留一个示例，实际使用时全部保留 -->
 
-        <!-- ========== 模型卡片组 ========== -->
+        <!-- 卡片2：Boost规则与奖励 -->
+        <div class="activity-card boost-card" id="cardBoostRule">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon green">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>Boost规则与奖励</h3>
+                        <p>了解Boost交易量与Boost余额的计算方式及奖励分配</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge green">📋 详细规则</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-inner">
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-calculator"></i> Boost交易量规则</div>
+                        <p class="description">过去10天内用户在OKX DEX上的平均日交易额。统计范围为所有通过OKX DEX完成的交易对。交易额越高，活动资格等级越高，奖励权重越大。</p>
+                        <div class="rewards">
+                            <div class="reward-item"><span>🏅 基础档 ($500+)</span><span class="reward-value">空投资格</span></div>
+                            <div class="reward-item"><span>🥈 白银档 ($1000+)</span><span class="reward-value">奖励权重 x1.2</span></div>
+                            <div class="reward-item"><span>🥇 黄金档 ($5000+)</span><span class="reward-value">奖励权重 x1.8</span></div>
+                            <div class="reward-item"><span>💎 钻石档 ($10000+)</span><span class="reward-value">奖励权重 x3.0</span></div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-wallet"></i> Boost余额规则</div>
+                        <p class="description">过去10天内用户在OKX Wallet中持有的优质资产的日均持仓价值。优质资产包括USDT、USDC、OKB、BTC、ETH等。最低门槛200U，持仓越多奖励加成越高。</p>
+                        <div class="rewards">
+                            <div class="reward-item"><span>🌱 基础 ($200+)</span><span class="reward-value">资格通过</span></div>
+                            <div class="reward-item"><span>🌿 进阶 ($1000+)</span><span class="reward-value">奖励 +15%</span></div>
+                            <div class="reward-item"><span>🌳 资深 ($5000+)</span><span class="reward-value">奖励 +40%</span></div>
+                            <div class="reward-item"><span>🏝️ 巨鲸 ($20000+)</span><span class="reward-value">奖励 +100%</span></div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-medal"></i> 奖励分配机制</div>
+                        <p class="description">每个Boost活动根据参与者Boost交易量和Boost余额综合评分，按比例分配奖池。奖励以项目代币形式直接发放到参与钱包，完全智能合约执行，零手续费。</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="card-action-button card-action-primary"><i class="action-button-icon fas fa-calculator"></i> 模拟计算奖励</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片3：社区策略解析 -->
+        <div class="activity-card boost-card" id="cardBoostStrategy">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon purple">
+                        <i class="fas fa-chess-board"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>社区策略解析</h3>
+                        <p>海豚社区如何参与OKX Boost的实战策略</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge purple">💡 策略分享</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-inner">
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-bullseye"></i> 策略一：集中交易提升Boost交易量</div>
+                        <p class="description">社区成员可在特定时间段集中交易指定币对（如OKB/USDT、BTC/USDT），通过社群协作拉高日交易额，迅速达到$500门槛并冲刺更高档位，共同瓜分奖池。</p>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-people-arrows"></i> 策略二：联合持仓Boost余额</div>
+                        <p class="description">鼓励成员在OKX Wallet中持有USDT/OKB等资产，社区可组织联合持仓计划（例如多人凑单质押），降低个人门槛，同时获得更高的余额加成。</p>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-tasks"></i> 策略三：任务共享与白名单申请</div>
+                        <p class="description">社区实时整理Giveaway任务攻略，成员一键关注社群、完成链上交互，快速获得项目代币或白名单资格，大幅提升效率。</p>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-flag-checkered"></i> 策略四：交易竞赛协同作战</div>
+                        <p class="description">针对交易赛，社区内组建战队，分享K线技术、挂单策略、Gas优化技巧，提高整体排名，共享高额奖池。</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="card-action-button card-action-primary"><i class="action-button-icon fas fa-bullhorn"></i> 加入社区战队</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片4：Boost留言板 -->
+        <div class="activity-card boost-card" id="cardBoostBoard">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>Boost留言板</h3>
+                        <p>社区成员交流互动，分享参与经验</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge">💬 20条留言</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-inner">
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-clock"></i> 最新留言</div>
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <i class="fas fa-user-circle comment-avatar"></i>
+                                <span class="comment-author">海豚船长</span>
+                                <span class="comment-time">5分钟前</span>
+                            </div>
+                            <div class="comment-content">刚完成500U交易，收到Boost空投了！项目方直接发了2000个代币，真香！</div>
+                        </div>
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <i class="fas fa-user-circle comment-avatar"></i>
+                                <span class="comment-author">Web3探险家</span>
+                                <span class="comment-time">15分钟前</span>
+                            </div>
+                            <div class="comment-content">持仓了300U OKB，Boost余额轻松达标，坐等下一个Launch项目~</div>
+                        </div>
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <i class="fas fa-user-circle comment-avatar"></i>
+                                <span class="comment-author">交易员小新</span>
+                                <span class="comment-time">32分钟前</span>
+                            </div>
+                            <div class="comment-content">跟着战队冲交易赛，拿了排行榜第9，奖励3000U等值代币！</div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-pen"></i> 发表留言</div>
+                        <div class="comment-input-area">
+                            <input type="text" class="comment-input" placeholder="分享你的Boost经验...">
+                            <button class="comment-send-btn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 模型卡片组（原有2张 + 新增3张经济模型卡片）========= -->
+        <!-- 卡片5：海豚模式解析 -->
         <div class="activity-card model-card" id="cardDolphinModel">
             <div class="card-header">
                 <div class="card-main">
@@ -1289,15 +2330,338 @@
                 <div class="content-inner">
                     <div class="content-section">
                         <div class="section-title"><i class="fas fa-dharmachakra"></i> 海豚模式</div>
-                        <p class="description">海豚模式正向收益飞轮是一个由智能合约驱动、用户行为主导的链上价值循环系统。</p>
+                        <p class="description">
+                            <strong>海豚模式正向收益飞轮</strong> 是一个由智能合约驱动、用户行为主导的链上价值循环系统。他将质押、奖励、空投、增值、复投四个关键环节抽象为<strong>八个联动节点</strong>，通过自动化的飞轮机制，让每一个参与者的贡献都能被精确计量、即时奖励，并最终汇聚成生态整体的指数级增长。
+                        </p>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-coins"></i> 链上赚币</div>
+                        <p class="description">
+                            创新型的智能阶梯收益，<strong>无锁仓、无周期限制</strong>，全程无人工干预的智能质押模式。与 OKX Wallet 官方合作，所有奖励收益来源均链上可查，欧易官方发放，确保透明公平。旨在创建可持续的 DeFi 收益生态系统。
+                        </p>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-cogs"></i> 飞轮节点详解</div>
+                        <div style="margin-top: 8px;">
+                            <div class="flywheel-node"><strong>节点一 →</strong> 质押USDT —— 用户将USDT存入生态智能金库，成为流动性提供者，开启收益之旅</div>
+                            <div class="flywheel-node"><strong>节点二 →</strong> 每日领取H收益 —— 按照阶梯利率每日发放质押收益</div>
+                            <div class="flywheel-node"><strong>节点三 →</strong> 卖掉领取的H在OKX Wallet —— 产生交易量（Boost数据）</div>
+                            <div class="flywheel-node"><strong>节点四 →</strong> 使用交易所得继续买入H —— 产生交易量（Boost数据）</div>
+                            <div class="flywheel-node"><strong>节点五 →</strong> 不断产生交易量 —— 领取欧易空投（Boost数据达到一星期1-3次）</div>
+                            <div class="flywheel-node"><strong>节点六 →</strong> 新币卖成U —— 继续质押</div>
+                            <div class="flywheel-node"><strong>节点七 →</strong> 继续产生H收益 —— 积累原始资金</div>
+                            <div class="flywheel-node"><strong>节点八 →</strong> 交易量越来越大 → H价格越来越高 → 欧易奖励越领越多 → 消耗的H越来越少 → 资本利得到账，实现财富快速增值</div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title"><i class="fas fa-play-circle"></i> 飞轮演示</div>
+                        <div style="background: rgba(0,102,255,0.03); border-radius: 20px; padding: 18px; border: 1px solid rgba(0,102,255,0.1);">
+                            <p style="display: flex; align-items: center; gap: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+                                <i class="fas fa-cube" style="color: var(--primary); font-size: 1.4rem;"></i>
+                                <span style="font-weight: 600;">3D飞轮动态演示 · 全屏沉浸</span>
+                            </p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+                                <button class="card-action-button card-action-primary" style="margin:0; min-width: 180px;" onclick="document.getElementById('cardDolphinVideo').scrollIntoView({behavior:'smooth'});">
+                                    <i class="action-button-icon fas fa-arrow-down"></i> 立即观看
+                                </button>
+                                <button class="card-action-button card-action-secondary" style="margin:0; min-width: 180px;" onclick="window.open('https://aosima858588-boop.github.io/viphuiyuan/', '_blank')">
+                                    <i class="action-button-icon fas fa-external-link-alt"></i> 新窗口
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- 其他模型卡片略 -->
 
-        <!-- ===== 新增：数据卡片 ===== -->
-        <!-- 卡片A：社区数据总览 -->
+        <!-- 卡片6：海豚飞轮3D视频演示 -->
+        <div class="activity-card model-card" id="cardDolphinVideo">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon" style="color: #ff4d4d; border-color: rgba(255,77,77,0.2);">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3 style="color: var(--text-primary);">海豚飞轮·3D视频演示</h3>
+                        <p>沉浸式交互 · 八节点动态流转</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge video">🎬 纯视频·整屏可滚</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content" style="max-height: 80vh; overflow-y: auto;">
+                <div class="content-inner" style="opacity: 1; transform: translateY(0); padding: 0;">
+                    <div class="video-full-frame">
+                        <iframe 
+                            src="https://aosima858588-boop.github.io/viphuiyuan/" 
+                            allowfullscreen
+                            loading="lazy"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-presentation allow-top-navigation"
+                            title="海豚飞轮3D演示">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片7：动态收益模拟 + 底部计算公式说明 -->
+        <div class="activity-card model-card" id="cardSim">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="card-text">
+                        <h3>动态收益模拟</h3>
+                        <p>实时联动K线 · 双引擎收益</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge">🔄 实时计算</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-inner">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-label"><i class="fas fa-cart-shopping"></i> 购买价</div><div class="stat-number" id="buyPriceDisplay">$0.0010</div><div class="stat-trend">用户输入</div></div>
+                        <div class="stat-card"><div class="stat-label"><i class="fas fa-tag"></i> 卖出价</div><div class="stat-number" id="sellPriceDisplay">$0.0015</div><div class="stat-trend" id="priceChangePercent">📈 +50%</div></div>
+                        <div class="stat-card"><div class="stat-label"><i class="fas fa-lock"></i> 质押总额(TVL)</div><div class="stat-number" id="tvlDisplay">$199K</div><div class="stat-trend">模拟值</div></div>
+                        <div class="stat-card"><div class="stat-label"><i class="fas fa-arrows-spin"></i> 日交易量</div><div class="stat-number" id="volumeDisplay">$10K</div><div class="stat-trend">≈520笔</div></div>
+                        <div class="stat-card"><div class="stat-label"><i class="fas fa-gauge-high"></i> 年化APY</div><div class="stat-number" id="apyDisplay">438%</div><div class="stat-trend">阶梯利率</div></div>
+                        <div class="stat-card"><div class="stat-label"><i class="fas fa-star"></i> Boost积分</div><div class="stat-number" id="boostDisplay">20.0</div><div class="stat-trend">10天累计</div></div>
+                    </div>
+                    <div class="sim-row">
+                        <div class="param-panel">
+                            <div class="param-group">
+                                <div class="param-label"><span><i class="fas fa-dollar-sign"></i> 质押金额 (USDT)</span><span><input type="number" id="stakeInput" value="1000" min="100" max="50000" step="100" class="number-input"></span></div>
+                                <input type="range" id="stakeSlider" class="slider" min="100" max="50000" value="1000" step="100">
+                            </div>
+                            <div class="param-group">
+                                <div class="param-label"><span><i class="fas fa-calendar"></i> 质押天数</span><span id="daysValue">45 天</span></div>
+                                <input type="range" id="daysSlider" class="slider" min="1" max="90" value="45" step="1">
+                            </div>
+                            <div class="param-group">
+                                <div class="param-label"><span><i class="fas fa-cart-shopping"></i> 购买价 (USDT)</span><span><input type="number" id="buyPriceInput" value="0.0010" min="0.0001" max="0.01" step="0.0001" class="number-input"></span></div>
+                                <input type="range" id="buyPriceSlider" class="slider" min="0.0001" max="0.01" value="0.0010" step="0.0001">
+                            </div>
+                            <div class="param-group">
+                                <div class="param-label"><span><i class="fas fa-tag"></i> 卖出价 (USDT)</span><span><input type="number" id="sellPriceInput" value="0.0015" min="0.0001" max="0.01" step="0.0001" class="number-input"></span></div>
+                                <input type="range" id="sellPriceSlider" class="slider" min="0.0001" max="0.01" value="0.0015" step="0.0001">
+                            </div>
+                            <div class="param-group">
+                                <div class="param-label"><span><i class="fas fa-arrows-spin"></i> 日交易量</span><span id="volumeValue2">$10,000</span></div>
+                                <input type="range" id="volumeSlider" class="slider" min="1000" max="50000" value="10000" step="500">
+                            </div>
+                            <div style="display:flex; align-items:center; margin-top:8px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span style="display:flex; gap:6px; font-size:0.85rem;"><i class="fas fa-rotate"></i> 每日复投</span>
+                                    <input type="checkbox" id="compoundToggle" class="toggle-checkbox" hidden checked>
+                                    <label for="compoundToggle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="earning-panel">
+                            <div class="earning-grid">
+                                <div class="earning-item"><div class="label"><i class="fas fa-sun"></i> 日收益</div><div class="value" id="dailyEarn">$5.00</div></div>
+                                <div class="earning-item"><div class="label"><i class="fas fa-boxes-packing"></i> 质押收益</div><div class="value" id="stakeEarn">$225</div></div>
+                                <div class="earning-item"><div class="label"><i class="fas fa-chart-line"></i> 资本利得</div><div class="value" id="gainEarn">$500</div></div>
+                                <div class="earning-item"><div class="label"><i class="fas fa-bolt"></i> Boost奖励</div><div class="value" id="boostEarn">$120</div></div>
+                                <div class="total-value"><span><i class="fas fa-coins"></i> 总收益</span><span id="totalEarn">$845</span></div>
+                            </div>
+                            <div style="display:flex; gap:16px; margin-top:16px;">
+                                <div style="flex:1; background:transparent; border-radius:30px; padding:12px 16px;">
+                                    <div style="font-size:0.65rem; color:var(--text-light); margin-bottom:4px;">年化APY</div>
+                                    <strong style="font-size:1.5rem; color:var(--primary);" id="apyDynamic">438%</strong>
+                                </div>
+                                <div style="flex:1; background:transparent; border-radius:30px; padding:12px 16px;">
+                                    <div style="font-size:0.65rem; color:var(--text-light); margin-bottom:4px;">Boost积分</div>
+                                    <strong style="font-size:1.5rem; color:var(--warning);" id="boostDynamic">20.0</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kline-card">
+                        <div class="kline-header">
+                            <div class="kline-title">
+                                <i class="fas fa-chart-line"></i>
+                                <h4>H代币 30日价格模拟</h4>
+                            </div>
+                            <div class="price-range">
+                                <span><i class="fas fa-arrow-down" style="color:var(--danger);"></i> 低点 <strong id="lowPrice">$0.0008</strong></span>
+                                <span><i class="fas fa-arrow-up" style="color:var(--success);"></i> 高点 <strong id="highPrice">$0.0018</strong></span>
+                            </div>
+                        </div>
+                        <div class="kline-container">
+                            <canvas id="priceChart" width="800" height="200"></canvas>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:12px; color:var(--text-light); font-size:0.7rem;">
+                            <span><i class="fas fa-calendar"></i> 过去30天</span>
+                            <span><i class="fas fa-circle-info"></i> 橙线=买入价 · 绿线=卖出价</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 18px 20px; background: rgba(0,102,255,0.03); border-radius: 24px; border: 1px solid rgba(0,102,255,0.1); color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6;">
+                        <i class="fas fa-calculator" style="color: var(--primary); margin-right: 8px;"></i> <strong style="color: var(--text-primary);">收益计算公式：</strong><br>
+                        • <strong>质押收益</strong> = 本金 × 日利率 × 天数（复投时按复利计算）<br>
+                        • <strong>资本利得</strong> = (卖出价 - 买入价) × (本金 / 买入价)<br>
+                        • <strong>Boost奖励</strong> = (日交易量 / 500) × 0.6 USDT（按10天平均值估算）<br>
+                        • <strong>总收益</strong> = 质押收益 + 资本利得 + Boost奖励<br>
+                        <span style="color: var(--primary);">拖动上方滑块即可实时调整参数，模拟您的预期收益。</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片8：经济模型横向对比 —— 改为表格样式 -->
+        <div class="activity-card model-card" id="cardModelCompare">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon" style="color:var(--secondary);"><i class="fas fa-balance-scale"></i></div>
+                    <div class="card-text">
+                        <h3>经济模型横向对比</h3>
+                        <p>海豚 vs 四大主流 · 直观PK</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge" style="color:var(--secondary);">📊 表格对比</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-inner">
+                    <div class="content-section">
+                        <div class="section-title" style="color:var(--secondary);"><i class="fas fa-cubes"></i> 主流经济模型</div>
+                        <div class="model-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
+                            <div class="flywheel-node-card"><div class="node-number">1</div><div class="node-title">通缩燃烧</div><div class="node-desc">每笔交易销毁</div></div>
+                            <div class="flywheel-node-card"><div class="node-number">2</div><div class="node-title">Rebase弹性</div><div class="node-desc">供应量随价调整</div></div>
+                            <div class="flywheel-node-card"><div class="node-number">3</div><div class="node-title">双代币田园</div><div class="node-desc">治理+游戏</div></div>
+                            <div class="flywheel-node-card"><div class="node-number">4</div><div class="node-title">算力存证</div><div class="node-desc">资源证明</div></div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <div class="section-title" style="color:var(--secondary);"><i class="fas fa-dolphin"></i> 海豚 · 核心差异对照表</div>
+                        <table class="compare-table">
+                            <thead><tr><th>对比维度</th><th>海豚模式</th><th>其他模型</th><th>海豚优势</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>公平发射</strong></td><td>无预挖、100%社区驱动</td><td>团队预留、VC筹码</td><td><span class="dolphin-tag">完全去中心化</span></td></tr>
+                                <tr><td><strong>收益引擎</strong></td><td>质押收益 + 资本利得</td><td>单一通胀奖励</td><td><span class="dolphin-tag">双引擎飞轮</span></td></tr>
+                                <tr><td><strong>CEX协同</strong></td><td>OKX Boost 空投加持</td><td>无头部CEX协同</td><td><span class="dolphin-tag">唯一CEX协同</span></td></tr>
+                                <tr><td><strong>流动性</strong></td><td>无锁仓、阶梯利率</td><td>长周期锁仓</td><td><span class="dolphin-tag">高流动性</span></td></tr>
+                            </tbody>
+                        </table>
+                        <div style="margin-top:24px; background:transparent; border-radius:28px; padding:16px; display:flex; justify-content:space-between;">
+                            <span style="font-weight:700;">多维评分</span>
+                            <span style="color:var(--text-secondary);">公平9.8 · 可持续9.2 · 协同9.5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 卡片9：完整经济架构 + 动态飞轮模拟 -->
+        <div class="activity-card model-card" id="cardArch">
+            <div class="card-header">
+                <div class="card-main">
+                    <div class="card-icon" style="color:var(--accent);"><i class="fas fa-sitemap"></i></div>
+                    <div class="card-text">
+                        <h3>完整经济架构</h3>
+                        <p>双代币 · 动态飞轮 · 健康环</p>
+                    </div>
+                </div>
+                <div class="card-status">
+                    <span class="status-badge" style="color:var(--accent);">🏛️ 协议设计</span>
+                    <div class="card-expand">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content-inner">
+                    <div class="dual-token">
+                        <div class="token-card">
+                            <div class="token-icon"><i class="fas fa-token" style="color:var(--primary);"></i><h4>H代币</h4></div>
+                            <p>总量10亿 · 公平发射</p>
+                        </div>
+                        <div class="token-card">
+                            <div class="token-icon"><i class="fas fa-token" style="color:var(--secondary);"></i><h4>DPH代币</h4></div>
+                            <p>总量1亿 · 治理</p>
+                        </div>
+                    </div>
+                    <div style="background:transparent; border-radius:28px; padding:20px; margin-bottom:20px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                            <h4 style="font-weight:700;">智能质押收益表</h4>
+                            <button class="btn-sm" onclick="alert('即将跳转质押页面')">前往质押</button>
+                        </div>
+                        <table class="stake-table">
+                            <thead><tr><th>阶段</th><th>日利率</th><th>年化APY</th></tr></thead>
+                            <tbody>
+                                <tr><td>1-7天</td><td>0.5%</td><td>182.5%</td></tr>
+                                <tr><td>8-15天</td><td>0.6%</td><td>219.0%</td></tr>
+                                <tr><td>16-30天</td><td>0.8%</td><td>292.0%</td></tr>
+                                <tr><td>31-60天</td><td>1.0%</td><td>365.0%</td></tr>
+                                <tr><td>61+天</td><td>1.2%</td><td>438.0%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <div class="section-title"><i class="fas fa-dharmachakra"></i> 动态收益飞轮 · 实时联动</div>
+                        <div style="position:relative; width:100%; height:340px;">
+                            <canvas id="flywheelCanvas" width="600" height="340" style="width:100%; height:100%; display:block;"></canvas>
+                        </div>
+                        <div style="display:flex; justify-content:center; gap:20px; margin-top:20px;">
+                            <button id="flywheelPlayBtn" class="btn-sm" style="background:var(--primary);"><i class="fas fa-play"></i> 旋转</button>
+                            <button id="flywheelPauseBtn" class="btn-sm" style="background:var(--text-light);"><i class="fas fa-pause"></i> 暂停</button>
+                        </div>
+                    </div>
+                    <div class="protocol-health-wrapper">
+                        <div class="health-section">
+                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+                                <i class="fas fa-heart-pulse" style="color:var(--primary); font-size:1.8rem;"></i>
+                                <h4 style="font-weight:700;">协议健康度</h4>
+                            </div>
+                            <div class="health-grid">
+                                <div class="health-item"><div class="health-icon"><i class="fas fa-chart-pie"></i></div><div class="health-value">71.7%</div><div class="health-label">资金利用率</div></div>
+                                <div class="health-item"><div class="health-icon"><i class="fas fa-shield"></i></div><div class="health-value">1.8x</div><div class="health-label">储备金覆盖率</div></div>
+                                <div class="health-item"><div class="health-icon"><i class="fas fa-flag"></i></div><div class="health-value" style="color:var(--success);">低风险</div><div class="health-label">风险等级</div></div>
+                                <div class="health-item"><div class="health-icon"><i class="fas fa-water"></i></div><div class="health-value">$125K</div><div class="health-label">流动性深度</div></div>
+                            </div>
+                            <div class="score-row">
+                                <div class="score-left">
+                                    <div class="score-ring">
+                                        <svg viewBox="0 0 80 80">
+                                            <circle cx="40" cy="40" r="36" stroke="rgba(0,102,255,0.1)" stroke-width="6" fill="none"/>
+                                            <circle cx="40" cy="40" r="36" stroke="var(--primary)" stroke-width="6" fill="none" stroke-dasharray="226.2" stroke-dashoffset="30.2"/>
+                                        </svg>
+                                        <span class="score-number">86.5</span>
+                                    </div>
+                                    <div><span style="font-weight:700;">综合评分</span><span style="font-size:0.75rem; display:block;">较上周 +2.3</span></div>
+                                </div>
+                                <i class="fas fa-chevron-right" style="color:var(--primary);"></i>
+                            </div>
+                        </div>
+                        <div class="boost-section">
+                            <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+                                <div style="background:rgba(245,158,11,0.1); width:60px; height:60px; border-radius:20px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fas fa-bolt" style="color:var(--warning); font-size:2rem;"></i>
+                                </div>
+                                <div><h4 style="font-weight:700; color:var(--warning);">OKX Boost</h4><p style="font-size:0.75rem;">协同策略</p></div>
+                            </div>
+                            <p><span style="background:rgba(0,102,255,0.08); padding:4px 10px; border-radius:40px;">Boost积分</span> = 日交易量 × 0.85 × 10天</p>
+                            <p style="margin-top:12px;"><span style="background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:40px;">$500交易量 = 1积分</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 数据卡片 ===== -->
+        <!-- 卡片10：社区数据总览 -->
         <div class="activity-card data-card" id="cardCommunityOverview" style="display: none;">
             <div class="card-header">
                 <div class="card-main">
@@ -1315,27 +2679,19 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
+                <div class="quick-stats">
+                    <div class="quick-stat-item">
+                        <span class="quick-stat-label">质押总价值</span>
+                        <span class="quick-stat-value primary">$192.3M</span>
+                    </div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <!-- H 实时价格 & 交易量 -->
-                    <div class="stat-row">
-                        <span class="stat-label-sm">H实时价格</span>
-                        <span class="stat-value primary">$0.00127</span>
-                    </div>
-                    <div class="stat-row">
-                        <span class="stat-label-sm">24h交易量</span>
-                        <span class="stat-value">$1.24M</span>
-                    </div>
-                    <div class="contract-address">
-                        合约地址: 0x867fdd2eef548f80808d0c9065cd55f57e207777
-                    </div>
-                    <!-- 社区当前资产总价值 -->
-                    <div class="stat-row" style="margin-top:16px;">
-                        <span class="stat-label-sm">社区资产总价值</span>
-                        <span class="stat-value primary">$8.74M</span>
-                    </div>
-                    <!-- H 持有分布 -->
+                    <div class="stat-row"><span class="stat-label-sm">H实时价格</span><span class="stat-value primary">$0.00127</span></div>
+                    <div class="stat-row"><span class="stat-label-sm">24h交易量</span><span class="stat-value">$1.24M</span></div>
+                    <div class="contract-address">合约地址: 0x867fdd2eef548f80808d0c9065cd55f57e207777</div>
+                    <div class="stat-row" style="margin-top:12px;"><span class="stat-label-sm">社区资产总价值</span><span class="stat-value primary">$8.74M</span></div>
                     <div class="section-title" style="margin-top:20px;"><i class="fas fa-chart-simple"></i> H 持有分布</div>
                     <div class="distribution-grid">
                         <div class="dist-item"><div class="dist-label">社区持有</div><div class="dist-number">2.1M <span class="dist-percent">21%</span></div></div>
@@ -1344,12 +2700,10 @@
                         <div class="dist-item"><div class="dist-label">国库持有</div><div class="dist-number">1.2M <span class="dist-percent">12%</span></div></div>
                         <div class="dist-item"><div class="dist-label">外部持有</div><div class="dist-number">1.4M <span class="dist-percent">14%</span></div></div>
                     </div>
-                    <!-- 社区收入分布 -->
                     <div class="section-title" style="margin-top:20px;"><i class="fas fa-coins"></i> 社区收入分布</div>
                     <div class="income-row"><span class="income-label">税费收入</span><span class="income-value">$124.5K</span></div>
                     <div class="income-row"><span class="income-label">返佣收入</span><span class="income-value">$67.2K</span></div>
                     <div class="income-row"><span class="income-label">国库余额</span><span class="income-value">$892K</span></div>
-                    <!-- 社区支出情况 -->
                     <div class="section-title" style="margin-top:20px;"><i class="fas fa-arrow-up"></i> 社区支出情况</div>
                     <div class="income-row"><span class="income-label">支付分红</span><span class="income-value">$42.8K</span></div>
                     <div class="income-row"><span class="income-label">奖励活动</span><span class="income-value">$18.3K</span></div>
@@ -1358,7 +2712,7 @@
             </div>
         </div>
 
-        <!-- 卡片B：个人盈利分析 -->
+        <!-- 卡片11：个人盈利分析 -->
         <div class="activity-card data-card" id="cardPersonalProfit" style="display: none;">
             <div class="card-header">
                 <div class="card-main">
@@ -1376,72 +2730,38 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
+                <div class="quick-stats">
+                    <div class="quick-stat-item"><span class="quick-stat-label">昨日</span><span class="quick-stat-value success">+$58</span></div>
+                    <div class="quick-stat-item"><span class="quick-stat-label">累计</span><span class="quick-stat-value success">$2,845</span></div>
+                    <div class="quick-progress"><span class="quick-stat-label">目标</span><div class="quick-progress-bar"><div class="quick-progress-fill"></div></div><span class="quick-stat-value">$7,155</span></div>
+                </div>
             </div>
             <div class="card-content">
                 <div class="content-inner">
-                    <!-- 时间筛选器 -->
                     <div class="time-filter">
-                        <span class="time-btn active">30天</span>
-                        <span class="time-btn">60天</span>
-                        <span class="time-btn">90天</span>
-                        <span class="time-btn">180天</span>
-                        <span class="time-btn">全部</span>
+                        <span class="time-btn active">30天</span><span class="time-btn">60天</span><span class="time-btn">90天</span><span class="time-btn">180天</span><span class="time-btn">全部</span>
                     </div>
-                    <!-- 收益表现 & 累计收益 -->
-                    <div class="stat-row">
-                        <span class="stat-label-sm">累计收益</span>
-                        <span class="stat-value success">+$2,845</span>
+                    <div class="stat-row"><span class="stat-label-sm">昨日收益</span><span class="stat-value success">+$58</span></div>
+                    <div class="stat-row"><span class="stat-label-sm">累计收益</span><span class="stat-value success">+$2,845</span></div>
+                    <div class="goal-progress">
+                        <div class="goal-row"><span class="goal-label">距离目标收益</span><span class="goal-value">$7,155</span></div>
+                        <div class="progress-bar"><div class="progress-fill" style="width:28.45%"></div></div>
+                        <div class="progress-stats"><span>已达成 $2,845</span><span>目标 $10,000</span></div>
                     </div>
-                    <div class="mini-chart">
-                        <canvas id="profitChart" width="400" height="120" style="width:100%; height:120px;"></canvas>
-                    </div>
-                    <!-- 每日盈亏：日历 -->
+                    <div class="mini-chart"><canvas id="profitChart" width="400" height="120" style="width:100%; height:120px;"></canvas></div>
                     <div class="section-title"><i class="fas fa-calendar-alt"></i> 每日盈亏 (最近7天示例)</div>
                     <div class="calendar-grid">
-                        <div class="calendar-day positive">21 <span>+$12</span></div>
-                        <div class="calendar-day negative">22 <span>-$5</span></div>
-                        <div class="calendar-day positive">23 <span>+$23</span></div>
-                        <div class="calendar-day positive">24 <span>+$8</span></div>
-                        <div class="calendar-day negative">25 <span>-$3</span></div>
-                        <div class="calendar-day positive">26 <span>+$45</span></div>
-                        <div class="calendar-day positive">27 <span>+$18</span></div>
-                        <div class="calendar-day negative">28 <span>-$7</span></div>
-                        <div class="calendar-day positive">29 <span>+$9</span></div>
-                        <div class="calendar-day positive">30 <span>+$32</span></div>
-                        <div class="calendar-day negative">31 <span>-$2</span></div>
-                        <div class="calendar-day positive">1 <span>+$14</span></div>
-                        <div class="calendar-day positive">2 <span>+$27</span></div>
-                        <div class="calendar-day negative">3 <span>-$6</span></div>
+                        <div class="calendar-day positive">21 <span>+$12</span></div><div class="calendar-day negative">22 <span>-$5</span></div><div class="calendar-day positive">23 <span>+$23</span></div><div class="calendar-day positive">24 <span>+$8</span></div><div class="calendar-day negative">25 <span>-$3</span></div><div class="calendar-day positive">26 <span>+$45</span></div><div class="calendar-day positive">27 <span>+$18</span></div>
+                        <div class="calendar-day negative">28 <span>-$7</span></div><div class="calendar-day positive">29 <span>+$9</span></div><div class="calendar-day positive">30 <span>+$32</span></div><div class="calendar-day negative">31 <span>-$2</span></div><div class="calendar-day positive">1 <span>+$14</span></div><div class="calendar-day positive">2 <span>+$27</span></div><div class="calendar-day negative">3 <span>-$6</span></div>
                     </div>
-                    <!-- 各产品盈亏 -->
                     <div class="section-title"><i class="fas fa-boxes"></i> 各产品盈亏</div>
-                    <div class="product-row">
-                        <div class="product-name"><i class="fab fa-bitcoin" style="color:#f0b90b;"></i> OKB</div>
-                        <div class="product-pnl positive">+$342 (12.4%)</div>
-                    </div>
-                    <div class="product-row">
-                        <div class="product-name"><i class="fas fa-dolphin" style="color:var(--primary);"></i> H</div>
-                        <div class="product-pnl positive">+$1,283 (8.2%)</div>
-                    </div>
-                    <div class="product-row">
-                        <div class="product-name"><i class="fab fa-bnb" style="color:var(--secondary);"></i> BNB</div>
-                        <div class="product-pnl negative">-$107 (-2.1%)</div>
-                    </div>
-                    <!-- 资产分布 + 解锁赚币潜力 -->
+                    <div class="product-row"><div class="product-name"><i class="fab fa-bitcoin" style="color:#f0b90b;"></i> OKB</div><div class="product-pnl positive">+$342 (12.4%)</div></div>
+                    <div class="product-row"><div class="product-name"><i class="fas fa-dolphin" style="color:var(--primary);"></i> H</div><div class="product-pnl positive">+$1,283 (8.2%)</div></div>
+                    <div class="product-row"><div class="product-name"><i class="fab fa-bnb" style="color:var(--secondary);"></i> BNB</div><div class="product-pnl negative">-$107 (-2.1%)</div></div>
                     <div class="section-title"><i class="fas fa-pie-chart"></i> 资产分布</div>
-                    <div class="asset-bar">
-                        <div class="asset-bar-segment segment-okb" style="width:25%"></div>
-                        <div class="asset-bar-segment segment-h" style="width:55%"></div>
-                        <div class="asset-bar-segment segment-bnb" style="width:20%"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">
-                        <span><i class="fab fa-bitcoin" style="color:#f0b90b;"></i> OKB 25%</span>
-                        <span><i class="fas fa-dolphin" style="color:var(--primary);"></i> H 55%</span>
-                        <span><i class="fab fa-bnb" style="color:var(--secondary);"></i> BNB 20%</span>
-                    </div>
-                    <button class="unlock-btn" onclick="alert('解锁赚币潜力功能即将上线')">
-                        <i class="fas fa-unlock-alt"></i> 解锁赚币潜力
-                    </button>
+                    <div class="asset-bar"><div class="asset-bar-segment segment-okb" style="width:25%"></div><div class="asset-bar-segment segment-h" style="width:55%"></div><div class="asset-bar-segment segment-bnb" style="width:20%"></div></div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:4px;"><span><i class="fab fa-bitcoin"></i> OKB 25%</span><span><i class="fas fa-dolphin"></i> H 55%</span><span><i class="fab fa-bnb"></i> BNB 20%</span></div>
+                    <button class="unlock-btn" onclick="alert('解锁赚币潜力功能即将上线')"><i class="fas fa-unlock-alt"></i> 解锁赚币潜力</button>
                 </div>
             </div>
         </div>
@@ -1467,7 +2787,6 @@
             this.style.background = 'linear-gradient(45deg, #00c6ff, #0066ff)';
             this.style.webkitBackgroundClip = 'text';
             this.style.backgroundClip = 'text';
-
             setTimeout(() => {
                 this.style.transform = 'scale(1) rotate(0deg)';
                 this.style.filter = 'drop-shadow(0 0 20px rgba(0, 102, 255, 0.3))';
@@ -1489,7 +2808,7 @@
             }
         });
 
-        // ===== 核心按钮联动逻辑（Boost / 模型 / 数据）=====
+        // 核心按钮联动逻辑
         const actionButtons = document.querySelectorAll('.action-btn');
         const allCards = document.querySelectorAll('.activity-card');
 
@@ -1505,47 +2824,38 @@
             });
         }
 
-        // 默认激活Boost按钮
         filterCards('boost');
 
         actionButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 actionButtons.forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-
                 const btnId = this.id;
-                if (btnId === 'btnBoost') {
-                    filterCards('boost');
-                } else if (btnId === 'btnModel') {
-                    filterCards('model');
-                } else if (btnId === 'btnData') {
+                if (btnId === 'btnBoost') filterCards('boost');
+                else if (btnId === 'btnModel') filterCards('model');
+                else if (btnId === 'btnData') {
                     filterCards('data');
-                    // 数据卡片默认展开
                     document.querySelectorAll('.data-card').forEach(card => {
                         card.classList.add('active');
                         const content = card.querySelector('.card-content');
                         const inner = card.querySelector('.content-inner');
-                        if (inner) {
-                            content.style.maxHeight = inner.scrollHeight + 'px';
-                        }
+                        if (inner) content.style.maxHeight = inner.scrollHeight + 'px';
                     });
                 }
             });
         });
 
-        // ===== 卡片展开/收起（通用）=====
+        // 卡片展开/收起
         allCards.forEach(card => {
             const header = card.querySelector('.card-header');
             const content = card.querySelector('.card-content');
             const inner = card.querySelector('.content-inner');
 
-            // 特殊处理：视频卡片默认展开并固定高度 (保留原有逻辑)
             if (card.id === 'cardDolphinVideo') {
                 card.classList.add('active');
                 header.addEventListener('click', function(e) {
                     if (e.target.closest('button')) return;
-                    const isActive = card.classList.contains('active');
-                    if (isActive) {
+                    if (card.classList.contains('active')) {
                         card.classList.remove('active');
                         content.style.maxHeight = '0';
                         content.style.overflowY = 'hidden';
@@ -1558,7 +2868,6 @@
                 return;
             }
 
-            // 其他卡片通用折叠
             header.addEventListener('click', function(e) {
                 if (e.target.closest('button')) return;
                 const isActive = card.classList.contains('active');
@@ -1567,9 +2876,7 @@
                     content.style.maxHeight = '0';
                 } else {
                     card.classList.add('active');
-                    if (inner) {
-                        content.style.maxHeight = inner.scrollHeight + 'px';
-                    }
+                    if (inner) content.style.maxHeight = inner.scrollHeight + 'px';
                 }
             });
         });
@@ -1579,23 +2886,261 @@
             btn.addEventListener('click', e => e.stopPropagation());
         });
 
-        // 模拟时间筛选器切换
+        // 时间筛选器切换
         document.querySelectorAll('.time-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                // 这里可以更新图表数据，但为了简化，仅做UI切换
             });
         });
 
-        // 绘制迷你收益曲线
+        // 侧边栏控制
+        const menuBtn = document.getElementById('menuButton');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const closeBtn = document.getElementById('sidebarClose');
+        menuBtn.addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+        closeBtn.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+
+        // 收益模拟器 + 飞轮画布（简化版，保持功能）
+        const stakeInput = document.getElementById('stakeInput');
+        const stakeSlider = document.getElementById('stakeSlider');
+        const daysSlider = document.getElementById('daysSlider');
+        const daysValue = document.getElementById('daysValue');
+        const buyPriceInput = document.getElementById('buyPriceInput');
+        const buyPriceSlider = document.getElementById('buyPriceSlider');
+        const sellPriceInput = document.getElementById('sellPriceInput');
+        const sellPriceSlider = document.getElementById('sellPriceSlider');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue2 = document.getElementById('volumeValue2');
+        const compoundToggle = document.getElementById('compoundToggle');
+        const dailyEarn = document.getElementById('dailyEarn');
+        const stakeEarn = document.getElementById('stakeEarn');
+        const gainEarn = document.getElementById('gainEarn');
+        const boostEarn = document.getElementById('boostEarn');
+        const totalEarn = document.getElementById('totalEarn');
+        const apyDynamic = document.getElementById('apyDynamic');
+        const boostDynamic = document.getElementById('boostDynamic');
+        const buyPriceDisplay = document.getElementById('buyPriceDisplay');
+        const sellPriceDisplay = document.getElementById('sellPriceDisplay');
+        const priceChangePercent = document.getElementById('priceChangePercent');
+        const tvlDisplay = document.getElementById('tvlDisplay');
+        const volumeDisplay = document.getElementById('volumeDisplay');
+        const apyDisplay = document.getElementById('apyDisplay');
+        const boostDisplay = document.getElementById('boostDisplay');
+        const lowPriceEl = document.getElementById('lowPrice');
+        const highPriceEl = document.getElementById('highPrice');
+        const canvas = document.getElementById('priceChart');
+        const ctx = canvas ? canvas.getContext('2d') : null;
+
+        const flywheelCanvas = document.getElementById('flywheelCanvas');
+        let flywheelCtx = flywheelCanvas ? flywheelCanvas.getContext('2d') : null;
+        let flywheelAngle = 0;
+        let flywheelAnimFrame = null;
+        let isFlywheelSpinning = false;
+
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            this.moveTo(x + r, y);
+            this.lineTo(x + w - r, y);
+            this.quadraticCurveTo(x + w, y, x + w, y + r);
+            this.lineTo(x + w, y + h - r);
+            this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            this.lineTo(x + r, y + h);
+            this.quadraticCurveTo(x, y + h, x, y + h - r);
+            this.lineTo(x, y + r);
+            this.quadraticCurveTo(x, y, x + r, y);
+            return this;
+        };
+
+        function drawFlywheel() {
+            if (!flywheelCanvas || !flywheelCtx) return;
+            const w = flywheelCanvas.clientWidth, h = flywheelCanvas.clientHeight;
+            if (w === 0 || h === 0) return;
+            flywheelCanvas.width = w;
+            flywheelCanvas.height = h;
+            const ctx = flywheelCtx;
+            ctx.clearRect(0, 0, w, h);
+            const nodes = [
+                { icon: '💰', label: '质押USDT', value: '$1000', color: '#0066ff' },
+                { icon: '🌞', label: '每日领取H', value: '$5.00', color: '#10b981' },
+                { icon: '⚡', label: '卖出H→Boost', value: '20积分', color: '#f59e0b' },
+                { icon: '📈', label: '买入H', value: '+$500', color: '#8b5cf6' },
+                { icon: '🎁', label: '领取空投', value: '$120', color: '#ff6b6b' },
+                { icon: '💱', label: '新币换U', value: '$845', color: '#00c6ff' },
+                { icon: '🔄', label: '复投开启', value: '复投', color: '#a0aec0' },
+                { icon: '🚀', label: '飞轮加速', value: '438%', color: '#0066ff' }
+            ];
+            const centerX = w / 2, centerY = h / 2, radius = Math.min(w, h) * 0.35, angleStep = (Math.PI * 2) / nodes.length;
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(flywheelAngle);
+            for (let i = 0; i < nodes.length; i++) {
+                const angle = i * angleStep;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = 'rgba(0,102,255,0.2)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            for (let i = 0; i < nodes.length; i++) {
+                const angle = i * angleStep + flywheelAngle;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                ctx.beginPath();
+                ctx.arc(x, y, 32, 0, 2 * Math.PI);
+                ctx.fillStyle = 'white';
+                ctx.shadowColor = 'rgba(0,102,255,0.2)';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = nodes[i].color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.font = '24px "Segoe UI Emoji", "Inter"';
+                ctx.fillStyle = nodes[i].color;
+                ctx.fillText(nodes[i].icon, x - 16, y + 8);
+                ctx.font = 'bold 10px "Inter"';
+                ctx.fillStyle = '#1a1e2b';
+                ctx.fillText(nodes[i].label, x - 30, y + 28);
+                ctx.font = 'bold 9px "Inter"';
+                ctx.fillStyle = nodes[i].color;
+                ctx.fillText(nodes[i].value, x - 22, y + 42);
+            }
+        }
+
+        function flywheelAnimate() {
+            if (isFlywheelSpinning) {
+                flywheelAngle += 0.004;
+                if (flywheelAngle >= Math.PI * 2) flywheelAngle -= Math.PI * 2;
+            }
+            drawFlywheel();
+            flywheelAnimFrame = requestAnimationFrame(flywheelAnimate);
+        }
+        function initFlywheel() { if (flywheelCanvas && !flywheelAnimFrame) flywheelAnimate(); }
+        const playBtn = document.getElementById('flywheelPlayBtn');
+        const pauseBtn = document.getElementById('flywheelPauseBtn');
+        if (playBtn && pauseBtn) {
+            playBtn.addEventListener('click', (e) => { e.stopPropagation(); isFlywheelSpinning = true; });
+            pauseBtn.addEventListener('click', (e) => { e.stopPropagation(); isFlywheelSpinning = false; });
+        }
+
+        function resizeCanvas() { if (!canvas) return; const w = canvas.parentNode?.clientWidth || 800; canvas.width = w; canvas.height = 200; }
+        function generatePriceHistory(buy, sell) {
+            let data = [];
+            for (let i=0;i<30;i++) { let t=i/29, r=0.82+Math.random()*0.32; data.push(sell * (0.65+t*0.7) * r); }
+            data[29]=sell; let idx = Math.floor(Math.random()*12)+6; data[idx] = buy * (0.94+Math.random()*0.12); return data;
+        }
+        function drawChart(data, buy, sell) {
+            if (!ctx) return;
+            resizeCanvas();
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0,0,w,h);
+            let min = Math.min(...data)*0.92, max = Math.max(...data)*1.06, range = max-min||0.001;
+            ctx.beginPath();
+            ctx.moveTo(0, h-((data[0]-min)/range)*h);
+            for (let i=1;i<data.length;i++) ctx.lineTo(i/(data.length-1)*w, h-((data[i]-min)/range)*h);
+            ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+            ctx.fillStyle = 'rgba(0,102,255,0.04)'; ctx.fill();
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(0,102,255,0.9)'; ctx.lineWidth = 2.4;
+            for (let i=0;i<data.length;i++) {
+                let x=i/(data.length-1)*w, y=h-((data[i]-min)/range)*h;
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.stroke();
+            let buyY = h-((buy-min)/range)*h, sellY = h-((sell-min)/range)*h;
+            ctx.beginPath(); ctx.moveTo(0,buyY); ctx.lineTo(w,buyY);
+            ctx.strokeStyle = 'rgba(245,158,11,0.7)'; ctx.lineWidth=1.6; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0,sellY); ctx.lineTo(w,sellY);
+            ctx.strokeStyle = 'rgba(16,185,129,0.7)'; ctx.lineWidth=1.6; ctx.stroke();
+            ctx.font = '11px Inter, sans-serif'; ctx.fillStyle = '#666';
+            ctx.fillText('买入价', 14, buyY>20? buyY-8: buyY+22);
+            ctx.fillText('卖出价', 14, sellY>20? sellY-8: sellY+22);
+        }
+
+        function updateAll() {
+            if (!stakeInput) return;
+            let stake = parseFloat(stakeInput.value)||1000;
+            if(stake<100) stake=100; if(stake>50000) stake=50000;
+            let days = parseInt(daysSlider.value)||45;
+            let buy = parseFloat(buyPriceInput.value)||0.001;
+            let sell = parseFloat(sellPriceInput.value)||0.0015;
+            let volume = parseInt(volumeSlider.value)||10000;
+            let compound = compoundToggle.checked;
+            let dailyRate = days>=61?0.012: days>=31?0.01: days>=16?0.008: days>=8?0.006:0.005;
+            let apy = (dailyRate*365*100).toFixed(0);
+            let daily = stake * dailyRate;
+            let totalStake = compound ? stake * (Math.pow(1+dailyRate, days)-1) : daily * days;
+            let hAmount = stake / buy;
+            let capitalGain = (sell - buy) * hAmount;
+            let boostReward = (volume / 500) * 0.6;
+            let boostPoints = (volume / 500 * 10).toFixed(1);
+            let total = totalStake + capitalGain + boostReward;
+
+            if (dailyEarn) dailyEarn.innerText = '$' + daily.toFixed(2);
+            if (stakeEarn) stakeEarn.innerText = '$' + Math.round(totalStake);
+            if (gainEarn) gainEarn.innerText = '$' + Math.round(capitalGain);
+            if (boostEarn) boostEarn.innerText = '$' + Math.round(boostReward);
+            if (totalEarn) totalEarn.innerText = '$' + Math.round(total).toLocaleString();
+            if (apyDynamic) apyDynamic.innerText = apy + '%';
+            if (boostDynamic) boostDynamic.innerText = boostPoints;
+            if (buyPriceDisplay) buyPriceDisplay.innerText = '$' + buy.toFixed(4);
+            if (sellPriceDisplay) sellPriceDisplay.innerText = '$' + sell.toFixed(4);
+            if (priceChangePercent) {
+                let change = ((sell-buy)/buy*100).toFixed(0);
+                priceChangePercent.innerHTML = (sell>=buy?'📈 +':'📉 ')+change+'%';
+            }
+            if (volumeDisplay) volumeDisplay.innerText = '$' + volume.toLocaleString();
+            if (apyDisplay) apyDisplay.innerText = apy + '%';
+            if (boostDisplay) boostDisplay.innerText = boostPoints;
+            let tvlBase = 199000;
+            if (tvlDisplay) tvlDisplay.innerText = '$' + ((tvlBase + stake*0.3)/1000).toFixed(1) + 'K';
+
+            let history = generatePriceHistory(buy, sell);
+            if (lowPriceEl) lowPriceEl.innerText = '$' + Math.min(...history).toFixed(4);
+            if (highPriceEl) highPriceEl.innerText = '$' + Math.max(...history).toFixed(4);
+            drawChart(history, buy, sell);
+        }
+
+        if (stakeSlider) stakeSlider.addEventListener('input', function() { stakeInput.value = this.value; updateAll(); });
+        if (stakeInput) stakeInput.addEventListener('input', function() { let v = Math.min(Math.max(parseFloat(this.value)||1000,100),50000); stakeSlider.value = v; updateAll(); });
+        if (daysSlider) daysSlider.addEventListener('input', function() { if (daysValue) daysValue.innerText = this.value + ' 天'; updateAll(); });
+        if (buyPriceSlider) buyPriceSlider.addEventListener('input', function() { buyPriceInput.value = parseFloat(this.value).toFixed(4); updateAll(); });
+        if (buyPriceInput) buyPriceInput.addEventListener('input', function() { let v = Math.min(Math.max(parseFloat(this.value)||0.001,0.0001),0.01); buyPriceSlider.value = v; updateAll(); });
+        if (sellPriceSlider) sellPriceSlider.addEventListener('input', function() { sellPriceInput.value = parseFloat(this.value).toFixed(4); updateAll(); });
+        if (sellPriceInput) sellPriceInput.addEventListener('input', function() { let v = Math.min(Math.max(parseFloat(this.value)||0.0015,0.0001),0.01); sellPriceSlider.value = v; updateAll(); });
+        if (volumeSlider) volumeSlider.addEventListener('input', function() { if (volumeValue2) volumeValue2.innerText = '$' + parseInt(this.value).toLocaleString(); updateAll(); });
+        if (compoundToggle) compoundToggle.addEventListener('change', updateAll);
+        window.addEventListener('resize', updateAll);
+
+        if (daysValue) daysValue.innerText = (daysSlider?.value || 45) + ' 天';
+        if (volumeValue2) volumeValue2.innerText = '$' + (volumeSlider?.value || 10000).toLocaleString();
+        if (buyPriceInput) buyPriceInput.value = '0.0010';
+        if (buyPriceSlider) buyPriceSlider.value = '0.0010';
+        if (sellPriceInput) sellPriceInput.value = '0.0015';
+        if (sellPriceSlider) sellPriceSlider.value = '0.0015';
+
+        updateAll();
+        initFlywheel();
+
+        // 迷你收益曲线
         const profitCanvas = document.getElementById('profitChart');
         if (profitCanvas) {
             const ctx = profitCanvas.getContext('2d');
             const w = profitCanvas.parentNode.clientWidth || 400;
             profitCanvas.width = w;
             profitCanvas.height = 120;
-            const points = [30, 45, 42, 58, 63, 70, 82, 78, 95, 102, 110, 125, 140, 155, 168, 172, 190, 205, 220, 235, 250, 245, 260, 275, 290, 310, 325, 340, 358, 372];
+            const points = [30,45,42,58,63,70,82,78,95,102,110,125,140,155,168,172,190,205,220,235,250,245,260,275,290,310,325,340,358,372];
             ctx.clearRect(0,0,w,120);
             ctx.beginPath();
             ctx.strokeStyle = '#10b981';
@@ -1614,12 +3159,11 @@
             ctx.fill();
         }
 
-        // 模拟数据动态变化（用户身价等）
+        // 模拟数据动态变化
         const networthValue = document.getElementById('networthValue');
         const balanceValue = document.getElementById('balanceValue');
         const volumeValue = document.getElementById('volumeValue');
         const rankValue = document.getElementById('rankValue');
-
         let networth = 918, balance = 1023, volume = 8827, rank = 9;
         setInterval(() => {
             networth += Math.floor(Math.random() * 3) + 1;
