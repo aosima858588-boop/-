@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>海豚社区 · 辅助工具 (纯净白)</title>
+  <title>海豚社区 · 辅助工具 (Font Awesome版)</title>
+  <!-- Font Awesome 6 免费图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     * {
       margin: 0;
@@ -13,7 +15,7 @@
     }
 
     body {
-      background: #F5F9FF;  /* 极浅的蓝白背景，接近纯白 */
+      background: #F5F9FF;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,11 +23,10 @@
       padding: 12px;
     }
 
-    /* 手机卡片容器 — 纯白底，超浅灰阴影，干净明亮 */
     .app-container {
       max-width: 390px;
       width: 100%;
-      background: #FFFFFF;  /* 纯白背景 */
+      background: #FFFFFF;
       border-radius: 32px;
       box-shadow: 0 15px 30px rgba(0, 40, 80, 0.08), 0 2px 0 #E6EEF8 inset;
       overflow: hidden;
@@ -34,11 +35,10 @@
       color: #1F3A57;
     }
 
-    /* ----- 顶部用户信息面板 (纯白毛玻璃) ----- */
+    /* 顶部用户信息面板 */
     .profile-panel {
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
       border-radius: 28px;
       padding: 16px 18px;
       box-shadow: 0 4px 0 #D0E0F5, 0 8px 16px rgba(0, 35, 70, 0.04);
@@ -52,16 +52,15 @@
       gap: 12px;
     }
 
-    /* H 图标 — 深海蓝保持不变，更鲜明 */
-    .h-icon {
-      width: 48px;
-      height: 48px;
+    /* 海豚图标 - Font Awesome */
+    .dolphin-icon {
+      width: 52px;
+      height: 52px;
       background: linear-gradient(145deg, #0077BE, #004C8C);
       border-radius: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
       font-size: 28px;
       color: white;
       box-shadow: 0 4px 0 #002F5A, 0 2px 8px rgba(0,119,190,0.3);
@@ -74,7 +73,7 @@
 
     .nick-level {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
@@ -82,7 +81,7 @@
     .nickname {
       font-size: 18px;
       font-weight: 700;
-      color: #003459;  /* 深海军蓝 */
+      color: #003459;
     }
 
     .badge-gold {
@@ -94,7 +93,14 @@
       border-radius: 40px;
       box-shadow: 0 2px 0 #B3861A;
       border: 1px solid #FFEAA2;
-      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-gold i {
+      font-size: 10px;
+      color: #7F5F10;
     }
 
     .action-buttons {
@@ -112,16 +118,17 @@
       font-weight: 600;
       color: #005A9E;
       box-shadow: 0 3px 0 #D4E3FC;
-      transition: 0.1s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
       cursor: default;
     }
 
-    .btn-coin:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #D4E3FC;
+    .btn-coin i {
+      font-size: 12px;
+      color: #005A9E;
     }
 
-    /* 展开区域 */
     .expand-stats {
       margin-top: 16px;
       border-top: 1px dashed #C1D5F0;
@@ -139,6 +146,15 @@
       font-size: 12px;
       color: #51718C;
       letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .stat-label i {
+      font-size: 10px;
+      color: #0077BE;
     }
 
     .stat-value {
@@ -147,14 +163,14 @@
       color: #1F5A8E;
     }
 
-    /* ----- 公告资讯 (纯白底) ----- */
+    /* 公告资讯 */
     .notice {
       background: #FFFFFF;
       border-radius: 40px;
       padding: 12px 20px;
       margin-bottom: 24px;
       border: 1px solid #D0E4FF;
-      box-shadow: 0 4px 0 #E0EDFF, 0 4px 12px rgba(0, 45, 80, 0.03);
+      box-shadow: 0 4px 0 #E0EDFF;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -169,6 +185,14 @@
       border-radius: 50px;
       border: 1px solid #FFE899;
       box-shadow: 0 2px 0 #C57F1E;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .notice-badge i {
+      font-size: 10px;
+      color: #2A3B48;
     }
 
     .notice-text {
@@ -180,7 +204,13 @@
       text-overflow: ellipsis;
     }
 
-    /* 公用模块标题 */
+    .notice-text i {
+      font-size: 12px;
+      margin-right: 4px;
+      color: #FF6B6B;
+    }
+
+    /* 模块标题 */
     .section-title {
       display: flex;
       justify-content: space-between;
@@ -192,15 +222,30 @@
       font-size: 18px;
       font-weight: 700;
       color: #003C6C;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title h3 i {
+      font-size: 18px;
+      color: #0077BE;
     }
 
     .more-link {
       color: #0066B3;
       font-size: 13px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    /* ----- 工具集 8宫格 (纯白卡片) ----- */
+    .more-link i {
+      font-size: 10px;
+    }
+
+    /* 工具集 8宫格 */
     .grid-8 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -224,15 +269,10 @@
       align-items: center;
       justify-content: center;
       border: 1px solid #C8DCFA;
-      box-shadow: 0 4px 0 #D2E3FC, 0 4px 10px rgba(0, 40, 80, 0.02);
-      color: #1F6CB0;
-      font-size: 28px;
+      box-shadow: 0 4px 0 #D2E3FC;
+      font-size: 24px;
+      color: #0077BE;
       transition: 0.1s;
-    }
-
-    .tool-circle:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #D2E3FC;
     }
 
     .tool-label {
@@ -241,13 +281,13 @@
       color: #2D557A;
     }
 
-    /* 最新活动卡片 纯白 */
+    /* 最新活动卡片 */
     .activity-card {
       background: #FFFFFF;
       border-radius: 24px;
       padding: 16px 18px;
       border: 1px solid #C9DFFC;
-      box-shadow: 0 4px 0 #DCEAFF, 0 6px 14px rgba(0, 35, 70, 0.02);
+      box-shadow: 0 4px 0 #DCEAFF;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -262,7 +302,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 28px;
+      color: #0077BE;
       border: 1px solid #A9C9F0;
       box-shadow: 0 3px 0 #C3D9F5;
     }
@@ -271,6 +312,14 @@
       font-weight: 700;
       font-size: 16px;
       color: #0D4F8B;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .activity-desc i {
+      color: #FFB347;
+      font-size: 14px;
     }
 
     .boost-tag {
@@ -281,6 +330,14 @@
       font-weight: 600;
       border: 1px solid #3780C0;
       color: #00467A;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .boost-tag i {
+      font-size: 11px;
+      color: #FF6B4A;
     }
 
     /* 便捷访问双按钮 */
@@ -300,20 +357,20 @@
       font-weight: 700;
       font-size: 16px;
       color: #0F4F86;
-      box-shadow: 0 4px 0 #D2E2FC, 0 4px 10px rgba(0, 35, 70, 0.02);
+      box-shadow: 0 4px 0 #D2E2FC;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       transition: 0.1s;
     }
 
-    .quick-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #D2E2FC;
+    .quick-btn i {
+      font-size: 18px;
+      color: #0077BE;
     }
 
-    /* ----- 底部菜单栏 (纯白) ----- */
+    /* 底部菜单栏 */
     .bottom-nav {
       position: absolute;
       bottom: 0;
@@ -325,7 +382,6 @@
       padding: 12px 10px 20px;
       border-top: 2px solid #E1EFFF;
       box-shadow: 0 -4px 12px rgba(0, 30, 60, 0.02);
-      backdrop-filter: blur(8px);
     }
 
     .nav-item {
@@ -341,97 +397,105 @@
 
     .nav-item.active {
       color: #0070C0;
-      text-shadow: 0 0 5px #C0E0FF;
     }
 
-    .nav-icon {
+    .nav-item i {
       font-size: 22px;
-      filter: drop-shadow(0 1px 2px white);
+      margin-bottom: 2px;
+    }
+
+    .nav-item.active i {
+      text-shadow: 0 2px 8px #80C0FF;
+    }
+
+    /* 按压效果 */
+    .btn-coin:active, .tool-circle:active, .quick-btn:active, .nav-item:active {
+      transform: translateY(2px);
+      transition: 0.05s;
     }
   </style>
 </head>
 <body>
   <div class="app-container">
-    <!-- 1. 顶部用户信息面板 -->
+    <!-- 顶部用户信息面板 -->
     <div class="profile-panel" id="profilePanel">
       <div class="profile-row">
-        <div class="h-icon">H</div>
+        <div class="dolphin-icon"><i class="fas fa-dolphin"></i></div>
         <div class="user-info">
           <div class="nick-level">
             <span class="nickname">深海猎手</span>
-            <span class="badge-gold">金牌会员</span>
+            <span class="badge-gold"><i class="fas fa-crown"></i>金牌会员</span>
           </div>
           <div class="action-buttons">
-            <span class="btn-coin">充币</span>
-            <span class="btn-coin">提币</span>
+            <span class="btn-coin"><i class="fas fa-arrow-up"></i>充币</span>
+            <span class="btn-coin"><i class="fas fa-arrow-down"></i>提币</span>
           </div>
         </div>
-        <div style="color: #1F6FB5; font-size: 20px;">⌄</div>
+        <div style="color: #1F6FB5; font-size: 20px;"><i class="fas fa-chevron-down"></i></div>
       </div>
       <!-- 展开区域 -->
       <div class="expand-stats">
-        <div class="stat-item"><span class="stat-label">身价</span><div class="stat-value">128.5K</div></div>
-        <div class="stat-item"><span class="stat-label">资产</span><div class="stat-value">45.2K</div></div>
-        <div class="stat-item"><span class="stat-label">贡献度</span><div class="stat-value">8,392</div></div>
-        <div class="stat-item"><span class="stat-label">周排名</span><div class="stat-value">#17</div></div>
+        <div class="stat-item"><span class="stat-label"><i class="fas fa-gem"></i>身价</span><div class="stat-value">128.5K</div></div>
+        <div class="stat-item"><span class="stat-label"><i class="fas fa-coins"></i>资产</span><div class="stat-value">45.2K</div></div>
+        <div class="stat-item"><span class="stat-label"><i class="fas fa-chart-line"></i>贡献度</span><div class="stat-value">8,392</div></div>
+        <div class="stat-item"><span class="stat-label"><i class="fas fa-trophy"></i>周排名</span><div class="stat-value">#17</div></div>
       </div>
     </div>
 
-    <!-- 2. 公告资讯 -->
+    <!-- 公告资讯 -->
     <div class="notice">
-      <span class="notice-badge">公告</span>
-      <span class="notice-text">111111 · 新版空投已上线 双倍积分周</span>
+      <span class="notice-badge"><i class="fas fa-bullhorn"></i>公告</span>
+      <span class="notice-text"><i class="fas fa-circle"></i>111111 · 新版空投已上线 双倍积分周</span>
     </div>
 
-    <!-- 3. 工具集 8项 -->
+    <!-- 工具集 8项 - Font Awesome图标 -->
     <div class="section-title">
-      <h3>⚒️ 工具集</h3>
-      <span class="more-link">全部</span>
+      <h3><i class="fas fa-tools"></i>工具集</h3>
+      <span class="more-link">全部<i class="fas fa-arrow-right"></i></span>
     </div>
     <div class="grid-8">
-      <div class="tool-item"><div class="tool-circle">✅</div><span class="tool-label">签到</span></div>
-      <div class="tool-item"><div class="tool-circle">🎰</div><span class="tool-label">抽奖</span></div>
-      <div class="tool-item"><div class="tool-circle">📊</div><span class="tool-label">积分</span></div>
-      <div class="tool-item"><div class="tool-circle">🧧</div><span class="tool-label">红包</span></div>
-      <div class="tool-item"><div class="tool-circle">🔍</div><span class="tool-label">查询系统</span></div>
-      <div class="tool-item"><div class="tool-circle">🐬</div><span class="tool-label">社区数据</span></div>
-      <div class="tool-item"><div class="tool-circle">📱</div><span class="tool-label">计算器</span></div>
-      <div class="tool-item"><div class="tool-circle">⬇️</div><span class="tool-label">下载中心</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-sun"></i></div><span class="tool-label">签到</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-dice"></i></div><span class="tool-label">抽奖</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-star"></i></div><span class="tool-label">积分</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-red-envelope"></i></div><span class="tool-label">红包</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-magnifying-glass"></i></div><span class="tool-label">查询系统</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-chart-pie"></i></div><span class="tool-label">社区数据</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-calculator"></i></div><span class="tool-label">计算器</span></div>
+      <div class="tool-item"><div class="tool-circle"><i class="fas fa-download"></i></div><span class="tool-label">下载中心</span></div>
     </div>
 
-    <!-- 4. 最新活动 -->
+    <!-- 最新活动 -->
     <div class="section-title">
-      <h3>🔥 最新活动</h3>
-      <span class="more-link">更多</span>
+      <h3><i class="fas fa-fire"></i>最新活动</h3>
+      <span class="more-link">更多<i class="fas fa-arrow-right"></i></span>
     </div>
     <div class="activity-card">
-      <div class="activity-emoji">🪙</div>
+      <div class="activity-emoji"><i class="fas fa-gift"></i></div>
       <div style="flex:1">
-        <div class="activity-desc">OKX Boost 最佳策略获得空投</div>
-        <span class="boost-tag">策略大赛</span>
+        <div class="activity-desc"><i class="fas fa-bolt"></i>OKX Boost 最佳策略获得空投</div>
+        <span class="boost-tag"><i class="fas fa-rocket"></i>策略大赛</span>
       </div>
-      <div style="color:#1A69B3;">➔</div>
+      <div style="color:#1A69B3;"><i class="fas fa-chevron-right"></i></div>
     </div>
 
-    <!-- 5. 便捷访问 -->
+    <!-- 便捷访问 -->
     <div class="quick-row">
-      <div class="quick-btn"><span>🪙</span> 购买H币</div>
-      <div class="quick-btn"><span>👥</span> 进入社区群</div>
+      <div class="quick-btn"><i class="fas fa-coins"></i>购买H币</div>
+      <div class="quick-btn"><i class="fas fa-users"></i>进入社区群</div>
     </div>
 
     <!-- 底部菜单栏 -->
     <div class="bottom-nav">
-      <div class="nav-item active"><span class="nav-icon">🏠</span><span>首页</span></div>
-      <div class="nav-item"><span class="nav-icon">💰</span><span>赚币</span></div>
-      <div class="nav-item"><span class="nav-icon">🤖</span><span>模型</span></div>
-      <div class="nav-item"><span class="nav-icon">👛</span><span>钱包</span></div>
+      <div class="nav-item active"><i class="fas fa-home"></i><span>首页</span></div>
+      <div class="nav-item"><i class="fas fa-coins"></i><span>赚币</span></div>
+      <div class="nav-item"><i class="fas fa-robot"></i><span>模型</span></div>
+      <div class="nav-item"><i class="fas fa-wallet"></i><span>钱包</span></div>
     </div>
   </div>
 
   <script>
-    // 面板点击折叠/展开
     document.getElementById('profilePanel').addEventListener('click', function(e) {
-      if (e.target.classList.contains('btn-coin')) return;
+      if (e.target.closest('.btn-coin')) return;
       const expandDiv = this.querySelector('.expand-stats');
       if (expandDiv.style.display === 'none' || getComputedStyle(expandDiv).display === 'none') {
         expandDiv.style.display = 'flex';
