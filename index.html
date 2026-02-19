@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>海豚社区 · 精修导航</title>
+    <title>海豚社区 · 引导/注册/登录</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,7 @@
         }
 
         body {
-            background-color: #F5F7FA;
+            background-color: #FFFFFF;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -23,7 +23,7 @@
 
         .app-container {
             width: 100%;
-            max-width: 100%;
+            max-width: 430px;
             background-color: #FFFFFF;
             min-height: 100vh;
             display: flex;
@@ -31,703 +31,420 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
 
+        /* 头部 - 使用渐变H图标 */
+        .header {
+            padding: 20px 20px 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: radial-gradient(circle at 30% 30%, #42A5F5, #1565C0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 8px 15px -5px #0D47A1;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0A1929;
+            letter-spacing: -0.5px;
+        }
+
+        /* 标签切换 */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+        .tab {
+            flex: 1;
+            background: #F5F7FA;
+            border: none;
+            padding: 14px 0;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #546E7A;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .tab.active {
+            background: #1A73E8;
+            color: white;
+            box-shadow: 0 8px 18px -6px #1A73E8;
+        }
+
+        /* 内容区 */
         .content {
             flex: 1;
-            padding: 16px 0 30px 0;
-            display: flex;
+            padding: 24px 20px 40px;
+        }
+
+        /* 页面容器 */
+        .page {
+            display: none;
             flex-direction: column;
             gap: 28px;
         }
+        .page.active {
+            display: flex;
+        }
 
+        /* 卡片 */
         .card {
             background-color: #FFFFFF;
             border-radius: 32px;
-            padding: 24px 22px;
+            padding: 28px 24px;
             box-shadow: 
                 0 15px 35px -15px rgba(0, 0, 0, 0.08),
                 0 0 0 1px rgba(0, 0, 0, 0.01);
             width: 100%;
             border: none;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .card:active {
-            transform: scale(0.992);
-            box-shadow: 0 10px 25px -8px rgba(0,0,0,0.1);
         }
 
-        .card.highlight {
-            background: linear-gradient(145deg, #1A73E8, #0D47A1);
-            color: white;
-            box-shadow: 0 20px 35px -10px rgba(21, 101, 192, 0.3);
-        }
-        .card.highlight .section-title,
-        .card.highlight .activity-desc,
-        .card.highlight .activity-link {
-            color: white;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
+        /* 大标题 */
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 800;
             color: #0A1929;
-            margin-bottom: 22px;
             line-height: 1.2;
-            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .welcome-sub {
+            font-size: 16px;
+            color: #546E7A;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        /* 特性列表 */
+        .feature-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 16px;
+            margin-bottom: 24px;
         }
-        .section-title i {
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: #E3F2FD;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #1A73E8;
-            font-size: 22px;
+            font-size: 28px;
         }
-        .section-title.light i {
-            color: white;
-        }
-
-        .user-panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-        .user-meta {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        .dolphin-icon {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            border-radius: 30px;
-            background: radial-gradient(circle at 30% 30%, #42A5F5, #1565C0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 15px -5px #0D47A1;
-        }
-        .dolphin-icon .h-main {
-            font-size: 36px;
-            font-weight: 800;
-            color: white;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            line-height: 1;
-        }
-        .dolphin-icon .h-letter {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 20px;
-            height: 20px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 14px;
-            color: #1565C0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 1.5px solid white;
-        }
-
-        .user-name {
-            font-weight: 700;
-            font-size: 20px;
-            color: #0A1929;
-        }
-
-        .badge {
-            background: linear-gradient(145deg, #FFD966, #F1C40F, #D4AC0D);
-            color: #4A3B00;
-            font-size: 14px;
-            font-weight: 800;
-            padding: 6px 16px;
-            border-radius: 40px;
-            box-shadow: 
-                0 4px 8px rgba(212, 172, 13, 0.3),
-                inset 0 1px 3px rgba(255,255,240,0.8),
-                inset 0 -2px 2px rgba(0,0,0,0.1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.5);
-            white-space: nowrap;
-            border: 1px solid rgba(255,215,0,0.3);
-        }
-
-        .expand-indicator {
-            color: #99A7B9;
+        .feature-text h3 {
             font-size: 18px;
-            transition: transform 0.3s;
+            font-weight: 700;
+            color: #0A1929;
+            margin-bottom: 4px;
+        }
+        .feature-text p {
+            font-size: 14px;
+            color: #546E7A;
         }
 
-        .button-row {
-            display: flex;
-            gap: 12px;
+        /* 输入框组 */
+        .input-group {
             margin-bottom: 20px;
         }
-        .btn-block {
-            flex: 1;
-            border: none;
-            background: linear-gradient(145deg, #1A73E8, #0D47A1);
-            color: white;
-            font-size: 15px;
+        .input-label {
+            font-size: 14px;
             font-weight: 600;
-            padding: 12px 0;
-            border-radius: 30px;
+            color: #0A1929;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .input-field {
+            width: 100%;
+            background: #F5F7FA;
+            border: none;
+            padding: 18px 20px;
+            border-radius: 24px;
+            font-size: 16px;
+            color: #0A1929;
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(26,115,232,0.2);
+        }
+        .input-field::placeholder {
+            color: #94A3B8;
+            font-weight: 400;
+        }
+
+        /* 按钮 */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(145deg, #1A73E8, #0D47A1);
+            border: none;
+            padding: 18px 0;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 16px -6px rgba(13,71,161,0.4);
-            text-align: center;
-            letter-spacing: 0.3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px -8px rgba(13,71,161,0.5);
+            margin-top: 12px;
         }
-        .btn-block.outline {
-            background: transparent;
-            color: #1A73E8;
-            border: 2px solid #1A73E8;
-            box-shadow: 0 4px 8px rgba(26,115,232,0.1);
-        }
-        .btn-block:active {
+        .btn-primary:active {
             transform: scale(0.97);
             box-shadow: 0 5px 10px -3px rgba(0,0,0,0.2);
         }
 
-        .expand-content {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            text-align: center;
-            padding-top: 22px;
-            border-top: 1px solid #EDF2F7;
-            margin-top: 6px;
-        }
-        .expand-content.hidden {
-            display: none;
-        }
-        .expand-item .value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0A1929;
-            line-height: 1.3;
-            font-feature-settings: "tnum";
-        }
-        .expand-item .label {
-            font-size: 14px;
-            color: #546E7A;
-            margin-top: 6px;
-            font-weight: 500;
-        }
-
-        .announcement {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .announcement i {
-            color: #F57C00;
-            font-size: 26px;
-            filter: drop-shadow(0 4px 4px rgba(245,124,0,0.25));
-        }
-        .announcement-text {
-            flex: 1;
-            font-size: 16px;
-            color: #1E293B;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .announcement .more {
-            color: #94A3B8;
-            font-size: 16px;
-            transition: transform 0.2s;
-        }
-        .announcement .more:active {
-            transform: translateX(3px);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 28px 16px;
-            margin-top: 6px;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 26px;
-            font-weight: 800;
-            color: #0A1929;
-            line-height: 1.2;
-            font-feature-settings: "tnum";
-            margin-bottom: 4px;
-        }
-        .stat-compare {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            background: white;
-            padding: 2px 10px;
-            border-radius: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .stat-compare.positive {
-            color: #2E7D32;
-        }
-        .stat-compare.negative {
-            color: #C62828;
-        }
-        .stat-label {
-            font-size: 14px;
-            color: #546E7A;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 28px 16px;
-            margin-top: 10px;
-        }
-        .tool-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: transform 0.15s, filter 0.15s;
-        }
-        .tool-item:active {
-            transform: scale(0.94);
-        }
-        .tool-icon {
-            font-size: 40px;
-            width: auto;
-            height: auto;
-            line-height: 1;
-            filter: drop-shadow(0 8px 6px rgba(0,0,0,0.15));
-            transition: all 0.2s;
-            text-shadow: 
-                0 2px 4px rgba(0,0,0,0.2),
-                0 -1px 0 rgba(255,255,255,0.5),
-                0 1px 2px rgba(0,0,0,0.1);
-        }
-        .tool-item:nth-child(1) .tool-icon { color: #E53935; }
-        .tool-item:nth-child(2) .tool-icon { color: #8E24AA; }
-        .tool-item:nth-child(3) .tool-icon { color: #FB8C00; }
-        .tool-item:nth-child(4) .tool-icon { color: #D81B60; }
-        .tool-item:nth-child(5) .tool-icon { color: #3949AB; }
-        .tool-item:nth-child(6) .tool-icon { color: #00897B; }
-        .tool-item:nth-child(7) .tool-icon { color: #F4511E; }
-        .tool-item:nth-child(8) .tool-icon { color: #43A047; }
-
-        .tool-label {
-            font-size: 13px;
-            color: #546E7A;
-            text-align: center;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.5);
-        }
-
-        .activity-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .activity-desc {
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1.4;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .activity-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 22px;
-            border-radius: 40px;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-            transition: all 0.2s;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .activity-link:active {
-            background: rgba(255,255,255,0.35);
-            transform: scale(0.96);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 14px;
-            margin: 16px 0 8px;
-        }
-        .quick-btn {
-            flex: 1;
+        .btn-link {
+            background: none;
             border: none;
-            padding: 14px 0;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 16px;
+            color: #1A73E8;
+            font-weight: 600;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.2s;
+            padding: 10px;
+            margin-top: 16px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 分割线 */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94A3B8;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #EDF2F7;
+        }
+
+        /* 社交登录 */
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+        .social-icon {
+            width: 48px;
+            height: 48px;
+            background: #F5F7FA;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            box-shadow: 0 12px 20px -8px rgba(0,0,0,0.15);
-        }
-        .quick-btn.primary {
-            background: linear-gradient(145deg, #1A73E8, #0D47A1);
-            color: white;
-        }
-        .quick-btn.secondary {
-            background: #F8FAFC;
-            color: #1E293B;
-            border: 1px solid rgba(26,115,232,0.2);
-        }
-        .quick-btn:active {
-            transform: scale(0.97);
-            box-shadow: 0 8px 15px -5px rgba(0,0,0,0.2);
-        }
-
-        /* 底部导航 - 优化尺寸 */
-        .bottom-nav {
-            background-color: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            padding: 8px 24px 8px;           /* 上下内边距减小，高度更紧凑 */
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid rgba(0, 0, 0, 0.03);
-            box-shadow: 0 -5px 20px -5px rgba(0,0,0,0.02);
-            position: relative;
-            z-index: 5;
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;                         /* 图标与文字间距缩小 */
-            font-size: 12px;                   /* 文字稍小 */
-            font-weight: 600;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.1s;
-            color: #94A3B8;
-            position: relative;
-            padding: 6px 12px;                 /* 点击区域微调 */
-            border-radius: 30px;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            overflow: visible;
-        }
-        .nav-item i {
-            font-size: 22px;                   /* 图标稍小 */
-            pointer-events: none;
-            position: relative;
-            z-index: 3;
-        }
-        .nav-item.active {
             color: #1A73E8;
-            transform: translateY(-2px);
-        }
-
-        /* 常驻水泡 (尺寸微调，适应新导航) */
-        .bubble {
-            position: absolute;
-            background: rgba(26, 115, 232, 0.2);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            animation: float 3s ease-in-out infinite;
-        }
-        .bubble1 {
-            width: 10px;
-            height: 10px;
-            top: 4px;
-            left: 8px;
-            animation-delay: 0s;
-            background: rgba(26, 115, 232, 0.15);
-        }
-        .bubble2 {
-            width: 6px;
-            height: 6px;
-            bottom: 8px;
-            right: 4px;
-            animation-delay: 0.5s;
-            background: rgba(26, 115, 232, 0.25);
-        }
-        .bubble3 {
-            width: 5px;
-            height: 5px;
-            top: 16px;
-            right: 16px;
-            animation-delay: 1s;
-            background: rgba(26, 115, 232, 0.2);
-        }
-        .bubble4 {
-            width: 8px;
-            height: 8px;
-            bottom: 2px;
-            left: 16px;
-            animation-delay: 1.2s;
-            background: rgba(26, 115, 232, 0.1);
-        }
-        .bubble5 {
-            width: 6px;
-            height: 6px;
-            top: 0px;
-            right: 24px;
-            animation-delay: 0.8s;
-            background: rgba(26, 115, 232, 0.3);
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* 点击水波纹 */
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background-color: rgba(26, 115, 232, 0.4);
-            transform: scale(0);
-            animation: ripple-animation 0.5s ease-out;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        @keyframes ripple-animation {
-            to {
-                transform: scale(6);
-                opacity: 0;
-            }
-        }
-
-        .clickable {
+            font-size: 24px;
             cursor: pointer;
+            transition: background 0.2s;
         }
-        .status-bar {
-            height: 8px;
+        .social-icon:active {
+            background: #E3F2FD;
         }
-        body, button, input {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+
+        /* 其他 */
+        .forgot-password {
+            text-align: right;
+            margin-top: 8px;
         }
-        .stat-value, .expand-item .value {
-            font-family: system-ui, -apple-system, 'SF Mono', 'Roboto Mono', monospace;
+        .forgot-password a {
+            color: #1A73E8;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .terms {
+            text-align: center;
+            color: #94A3B8;
+            font-size: 13px;
+            margin-top: 24px;
+        }
+        .terms a {
+            color: #1A73E8;
+            text-decoration: none;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="status-bar"></div>
-
-        <div class="content">
-            <div class="card" id="userPanel">
-                <div class="user-panel-header clickable" id="toggleExpand">
-                    <div class="user-meta">
-                        <div class="dolphin-icon">
-                            <span class="h-main">H</span>
-                            <span class="h-letter">H</span>
-                        </div>
-                        <span class="user-name">深海探险家</span>
-                        <span class="badge">金牌会员</span>
-                    </div>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-
-                <div class="button-row">
-                    <button class="btn-block" onclick="alert('充币')"><i class="fas fa-arrow-up"></i> 充币</button>
-                    <button class="btn-block outline" onclick="alert('提币')"><i class="fas fa-arrow-down"></i> 提币</button>
-                </div>
-
-                <div class="expand-content hidden" id="expandArea">
-                    <div class="expand-item"><div class="value">$12.3k</div><div class="label">身价</div></div>
-                    <div class="expand-item"><div class="value">5.82</div><div class="label">资产</div></div>
-                    <div class="expand-item"><div class="value">89.2k</div><div class="label">贡献度</div></div>
-                    <div class="expand-item"><div class="value">#8</div><div class="label">周排名</div></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="announcement">
-                    <i class="fas fa-bullhorn"></i>
-                    <span class="announcement-text">111111 · 海豚社区新活动即将开启，敬请期待</span>
-                    <span class="more"><i class="fas fa-chevron-right"></i></span>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="section-title"><i class="fas fa-chart-line"></i> 数据总览</div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value">2.45M</div>
-                        <div class="stat-compare positive"><i class="fas fa-arrow-up"></i> 5.2%</div>
-                        <div class="stat-label">质押H总量</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">8.92M</div>
-                        <div class="stat-compare positive"><i class="fas fa-arrow-up"></i> 12.3%</div>
-                        <div class="stat-label">总交易量</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">1.23M</div>
-                        <div class="stat-compare positive"><i class="fas fa-arrow-up"></i> 2.7%</div>
-                        <div class="stat-label">国库累计</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">12.3k</div>
-                        <div class="stat-compare negative"><i class="fas fa-arrow-down"></i> 1.5%</div>
-                        <div class="stat-label">活跃人数</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="section-title"><i class="fas fa-tools"></i> 常用工具</div>
-                <div class="tools-grid">
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-calendar-check"></i></div><span class="tool-label">签到</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-ticket-alt"></i></div><span class="tool-label">抽奖</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-coins"></i></div><span class="tool-label">积分</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-gift"></i></div><span class="tool-label">红包</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-search"></i></div><span class="tool-label">查询系统</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-chart-pie"></i></div><span class="tool-label">社区数据</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-calculator"></i></div><span class="tool-label">计算器</span></div>
-                    <div class="tool-item"><div class="tool-icon"><i class="fas fa-download"></i></div><span class="tool-label">下载中心</span></div>
-                </div>
-            </div>
-
-            <div class="card highlight">
-                <div class="section-title light"><i class="fas fa-star"></i> 最新活动</div>
-                <div class="activity-content">
-                    <span class="activity-desc">OKX Boost 最佳策略<br>获得空投</span>
-                    <span class="activity-link">立即参与 <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </div>
-
-            <div class="quick-actions">
-                <button class="quick-btn primary" onclick="alert('购买H币')"><i class="fas fa-shopping-cart"></i> 购买H币</button>
-                <button class="quick-btn secondary" onclick="alert('进入社区群')"><i class="fab fa-telegram-plane"></i> 进入社区群</button>
-            </div>
+        <!-- 头部 - 使用渐变H图标 -->
+        <div class="header">
+            <div class="header-icon">H</div>
+            <h1>海豚社区</h1>
         </div>
 
-        <!-- 底部导航 - 优化尺寸，带常驻水泡和点击水波纹 -->
-        <div class="bottom-nav">
-            <div class="nav-item active" data-ripple>
-                <span class="bubble bubble1"></span>
-                <span class="bubble bubble2"></span>
-                <span class="bubble bubble3"></span>
-                <span class="bubble bubble4"></span>
-                <span class="bubble bubble5"></span>
-                <i class="fas fa-home"></i><span>首页</span>
+        <!-- 标签切换 -->
+        <div class="tab-bar">
+            <button class="tab active" id="tabGuide">引导</button>
+            <button class="tab" id="tabRegister">注册</button>
+            <button class="tab" id="tabLogin">登录</button>
+        </div>
+
+        <!-- 内容区（三个页面） -->
+        <div class="content">
+            <!-- 引导页 -->
+            <div class="page active" id="guidePage">
+                <div class="card">
+                    <div class="welcome-title">欢迎来到<br>海豚社区</div>
+                    <div class="welcome-sub">探索、赚币、连接，尽在掌握</div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="feature-text">
+                            <h3>实时数据</h3>
+                            <p>质押总量、交易动态一目了然</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-gift"></i></div>
+                        <div class="feature-text">
+                            <h3>丰富工具</h3>
+                            <p>签到、抽奖、红包等你来拿</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="feature-text">
+                            <h3>安全可靠</h3>
+                            <p>多重防护，资产无忧</p>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" onclick="switchTab('register')">立即体验</button>
+                    <button class="btn-link" onclick="switchTab('login')">已有账号？去登录</button>
+                </div>
             </div>
-            <div class="nav-item" data-ripple>
-                <span class="bubble bubble1"></span>
-                <span class="bubble bubble2"></span>
-                <span class="bubble bubble3"></span>
-                <span class="bubble bubble4"></span>
-                <span class="bubble bubble5"></span>
-                <i class="fas fa-coins"></i><span>赚币</span>
+
+            <!-- 注册页 -->
+            <div class="page" id="registerPage">
+                <div class="card">
+                    <div class="welcome-title">创建账号</div>
+                    <div class="welcome-sub">加入海豚社区，开启旅程</div>
+
+                    <div class="input-group">
+                        <label class="input-label">手机号 / 邮箱</label>
+                        <input class="input-field" type="text" placeholder="输入手机号或邮箱">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">密码</label>
+                        <input class="input-field" type="password" placeholder="至少8位字符">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">确认密码</label>
+                        <input class="input-field" type="password" placeholder="再次输入密码">
+                    </div>
+
+                    <button class="btn-primary" onclick="alert('注册功能演示')">注册</button>
+
+                    <div class="divider">
+                        <span class="divider-line"></span>
+                        <span>其他方式</span>
+                        <span class="divider-line"></span>
+                    </div>
+
+                    <div class="social-row">
+                        <div class="social-icon"><i class="fab fa-weixin"></i></div>
+                        <div class="social-icon"><i class="fab fa-qq"></i></div>
+                        <div class="social-icon"><i class="fab fa-apple"></i></div>
+                    </div>
+
+                    <div class="terms">
+                        点击注册即表示同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a>
+                    </div>
+                </div>
             </div>
-            <div class="nav-item" data-ripple>
-                <span class="bubble bubble1"></span>
-                <span class="bubble bubble2"></span>
-                <span class="bubble bubble3"></span>
-                <span class="bubble bubble4"></span>
-                <span class="bubble bubble5"></span>
-                <i class="fas fa-robot"></i><span>模型</span>
-            </div>
-            <div class="nav-item" data-ripple>
-                <span class="bubble bubble1"></span>
-                <span class="bubble bubble2"></span>
-                <span class="bubble bubble3"></span>
-                <span class="bubble bubble4"></span>
-                <span class="bubble bubble5"></span>
-                <i class="fas fa-wallet"></i><span>钱包</span>
+
+            <!-- 登录页 -->
+            <div class="page" id="loginPage">
+                <div class="card">
+                    <div class="welcome-title">欢迎回来</div>
+                    <div class="welcome-sub">登录你的海豚账号</div>
+
+                    <div class="input-group">
+                        <label class="input-label">手机号 / 邮箱</label>
+                        <input class="input-field" type="text" placeholder="输入手机号或邮箱">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">密码</label>
+                        <input class="input-field" type="password" placeholder="输入密码">
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#">忘记密码？</a>
+                    </div>
+
+                    <button class="btn-primary" onclick="alert('登录功能演示')">登录</button>
+
+                    <div class="divider">
+                        <span class="divider-line"></span>
+                        <span>社交登录</span>
+                        <span class="divider-line"></span>
+                    </div>
+
+                    <div class="social-row">
+                        <div class="social-icon"><i class="fab fa-weixin"></i></div>
+                        <div class="social-icon"><i class="fab fa-qq"></i></div>
+                        <div class="social-icon"><i class="fab fa-apple"></i></div>
+                    </div>
+
+                    <button class="btn-link" onclick="switchTab('register')">还没有账号？立即注册</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        (function() {
-            // 水波纹效果
-            const navItems = document.querySelectorAll('.nav-item[data-ripple]');
-            navItems.forEach(item => {
-                item.addEventListener('mousedown', createRipple);
-                item.addEventListener('touchstart', createRipple, {passive: true});
-            });
+        // 切换标签和页面
+        const tabGuide = document.getElementById('tabGuide');
+        const tabRegister = document.getElementById('tabRegister');
+        const tabLogin = document.getElementById('tabLogin');
+        const guidePage = document.getElementById('guidePage');
+        const registerPage = document.getElementById('registerPage');
+        const loginPage = document.getElementById('loginPage');
 
-            function createRipple(e) {
-                const target = e.currentTarget;
-                let x, y;
-                if (e.type === 'mousedown') {
-                    x = e.clientX - target.getBoundingClientRect().left;
-                    y = e.clientY - target.getBoundingClientRect().top;
-                } else if (e.type === 'touchstart') {
-                    const touch = e.touches[0];
-                    x = touch.clientX - target.getBoundingClientRect().left;
-                    y = touch.clientY - target.getBoundingClientRect().top;
-                }
+        function switchTab(tabName) {
+            // 移除所有active
+            tabGuide.classList.remove('active');
+            tabRegister.classList.remove('active');
+            tabLogin.classList.remove('active');
+            guidePage.classList.remove('active');
+            registerPage.classList.remove('active');
+            loginPage.classList.remove('active');
 
-                const ripple = document.createElement('span');
-                ripple.className = 'ripple';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.style.width = ripple.style.height = '20px';
-                ripple.style.marginLeft = '-10px';
-                ripple.style.marginTop = '-10px';
-
-                target.appendChild(ripple);
-
-                ripple.addEventListener('animationend', () => {
-                    ripple.remove();
-                });
+            if (tabName === 'guide') {
+                tabGuide.classList.add('active');
+                guidePage.classList.add('active');
+            } else if (tabName === 'register') {
+                tabRegister.classList.add('active');
+                registerPage.classList.add('active');
+            } else if (tabName === 'login') {
+                tabLogin.classList.add('active');
+                loginPage.classList.add('active');
             }
+        }
 
-            // 展开/折叠
-            const toggleBtn = document.getElementById('toggleExpand');
-            const expandArea = document.getElementById('expandArea');
-            const indicator = document.querySelector('.expand-indicator');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    expandArea.classList.toggle('hidden');
-                    indicator.style.transform = expandArea.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-                });
-            }
+        tabGuide.addEventListener('click', () => switchTab('guide'));
+        tabRegister.addEventListener('click', () => switchTab('register'));
+        tabLogin.addEventListener('click', () => switchTab('login'));
 
-            // 导航激活状态切换（演示）
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        })();
+        // 供按钮调用的全局函数
+        window.switchTab = switchTab;
     </script>
 </body>
 </html>
