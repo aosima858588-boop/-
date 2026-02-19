@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>海豚社区 · 极简无底色版</title>
+    <title>海豚社区 · 精致版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -21,7 +21,6 @@
             min-height: 100vh;
         }
 
-        /* 移动端容器，满宽但保留适当边距，让内容更舒展 */
         .app-container {
             width: 100%;
             max-width: 450px;
@@ -32,30 +31,28 @@
             box-shadow: 0 0 30px rgba(0,0,0,0.02);
         }
 
-        /* 主内容区：左右留12px，上下留白，flex伸缩占满剩余空间 */
         .content {
             flex: 1;
             padding: 12px 12px 24px 12px;
             display: flex;
             flex-direction: column;
-            gap: 32px;               /* 卡片之间超大间距，绝不拥挤 */
+            gap: 32px;
         }
 
-        /* 卡片：纯白背景 + 柔和阴影 + 大圆角，无任何底色块 */
+        /* 卡片样式 */
         .card {
             background-color: #FFFFFF;
-            border-radius: 24px;       /* 更大圆角，更柔和 */
-            padding: 24px;              /* 内部呼吸空间 */
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
             width: 100%;
             border: none;
         }
 
-        /* 高亮活动卡片保留渐变 */
         .card.highlight {
-            background: linear-gradient(135deg, #1E88E5 0%, #64B5F6 100%);
+            background: linear-gradient(145deg, #1E88E5, #42A5F5);
             color: white;
-            box-shadow: 0 12px 28px rgba(30, 136, 229, 0.2);
+            box-shadow: 0 16px 32px rgba(30, 136, 229, 0.25);
         }
         .card.highlight .section-title,
         .card.highlight .activity-desc,
@@ -63,157 +60,238 @@
             color: white;
         }
 
+        /* 标题优化 */
         .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1E1E1E;
-            margin-bottom: 20px;
-            line-height: 1.3;
+            font-size: 20px;
+            font-weight: 700;
+            color: #121212;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            letter-spacing: -0.3px;
         }
         .section-title.light {
             color: white;
             opacity: 0.95;
         }
 
-        /* ----- 顶部用户面板（重构：按钮下移）----- */
+        /* 用户面板头部 */
         .user-panel-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;        /* 与按钮行间隔 */
+            margin-bottom: 20px;
             cursor: pointer;
         }
         .user-meta {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             flex-wrap: wrap;
         }
         .dolphin-icon {
-            font-size: 28px;
+            font-size: 30px;
             color: #1E88E5;
-            background: #E3F2FD;        /* 头像浅底，不算卡片底色，可保留 */
-            width: 50px;
-            height: 50px;
+            background: #E3F2FD;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 6px 12px rgba(30,136,229,0.15);
         }
         .user-name {
-            font-weight: 600;
-            font-size: 18px;
-            color: #1E1E1E;
+            font-weight: 700;
+            font-size: 20px;
+            color: #121212;
         }
         .badge {
-            background-color: #FFE0B2;
-            color: #BF6A02;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 6px 14px;
-            border-radius: 30px;
+            background: linear-gradient(145deg, #FFB74D, #FFA726);
+            color: #5D3A00;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 40px;
+            box-shadow: 0 4px 8px rgba(255,167,38,0.2);
             white-space: nowrap;
         }
 
-        /* 按钮行：充币提币并排，不再挤在右上角 */
+        /* 按钮美化 */
         .button-row {
             display: flex;
             gap: 16px;
-            margin-bottom: 20px;        /* 与下方展开区域的间距 */
+            margin-bottom: 20px;
         }
         .btn-block {
             flex: 1;
             border: none;
-            background: #1E88E5;
+            background: linear-gradient(145deg, #1E88E5, #1976D2);
             color: white;
-            font-size: 16px;
-            font-weight: 500;
-            padding: 14px 0;
-            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            padding: 16px 0;
+            border-radius: 24px;
             cursor: pointer;
-            transition: opacity 0.15s;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 18px rgba(25,118,210,0.25);
             text-align: center;
+            letter-spacing: 0.3px;
         }
         .btn-block.outline {
             background: transparent;
             color: #1E88E5;
-            border: 1.5px solid #1E88E5;
+            border: 2px solid #1E88E5;
+            box-shadow: 0 6px 12px rgba(30,136,229,0.1);
         }
         .btn-block:active {
-            opacity: 0.7;
+            transform: scale(0.97);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        /* 展开区域（默认隐藏） */
+        /* 快捷按钮 */
+        .quick-actions {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0 8px;
+        }
+        .quick-btn {
+            flex: 1;
+            border: none;
+            padding: 20px 0;
+            border-radius: 28px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .quick-btn.primary {
+            background: linear-gradient(145deg, #1E88E5, #1565C0);
+            color: white;
+            box-shadow: 0 10px 20px rgba(21,101,192,0.25);
+        }
+        .quick-btn.secondary {
+            background: #F5F7FA;
+            color: #1E1E1E;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .quick-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* 活动卡片内按钮 */
+        .activity-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 24px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .activity-link:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.96);
+        }
+
+        /* 展开区域 */
         .expand-content {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             text-align: center;
-            padding-top: 16px;
-            border-top: 1px solid #F0F0F0;   /* 极细线条区分 */
+            padding-top: 20px;
+            border-top: 1px solid #F0F0F0;
         }
         .expand-content.hidden {
             display: none;
         }
         .expand-item .value {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            color: #1E1E1E;
+            color: #121212;
             line-height: 1.3;
+            font-feature-settings: "tnum";
         }
         .expand-item .label {
-            font-size: 13px;
-            color: #666666;
+            font-size: 14px;
+            color: #666;
             margin-top: 6px;
+            font-weight: 500;
         }
 
-        /* 公告资讯 */
+        /* 公告 */
         .announcement {
             display: flex;
             align-items: center;
             gap: 16px;
         }
         .announcement i {
-            color: #1E88E5;
-            font-size: 24px;
-            width: 30px;
+            color: #FF9800;
+            font-size: 26px;
+            width: 32px;
+            filter: drop-shadow(0 4px 4px rgba(255,152,0,0.2));
         }
         .announcement-text {
             flex: 1;
-            font-size: 15px;
-            color: #333333;
+            font-size: 16px;
+            color: #2C3E50;
+            font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .announcement .more {
-            color: #999999;
-            font-size: 15px;
+            color: #999;
+            font-size: 16px;
         }
 
-        /* 数据总览：完全去掉小卡片底色，只有文字 */
+        /* 数据总览（含同比） */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px 20px;            /* 行列间距加大，无背景全靠间隔 */
+            gap: 28px 20px;
             margin-top: 8px;
         }
         .stat-item {
             text-align: center;
         }
         .stat-value {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
-            color: #1E1E1E;
-            line-height: 1.4;
+            color: #121212;
+            line-height: 1.3;
+            font-feature-settings: "tnum";
+            margin-bottom: 4px;
+        }
+        .stat-compare {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .stat-compare.positive {
+            color: #2E7D32;  /* 深绿色 */
+        }
+        .stat-compare.negative {
+            color: #C62828;  /* 深红色 */
         }
         .stat-label {
-            font-size: 14px;
-            color: #666666;
-            margin-top: 6px;
+            font-size: 15px;
+            color: #666;
+            font-weight: 500;
         }
 
-        /* 工具集 8宫格：去掉图标背景，仅保留线性图标 */
+        /* 工具图标彩色化 */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -229,22 +307,33 @@
             transition: transform 0.1s;
         }
         .tool-item:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
         }
         .tool-icon {
-            font-size: 32px;            /* 纯图标，无背景 */
-            color: #1E88E5;
+            font-size: 36px;
             width: auto;
             height: auto;
             line-height: 1;
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.1));
         }
+        /* 为每个工具设置不同颜色 */
+        .tool-item:nth-child(1) .tool-icon { color: #F44336; } /* 签到 */
+        .tool-item:nth-child(2) .tool-icon { color: #9C27B0; } /* 抽奖 */
+        .tool-item:nth-child(3) .tool-icon { color: #FF9800; } /* 积分 */
+        .tool-item:nth-child(4) .tool-icon { color: #E91E63; } /* 红包 */
+        .tool-item:nth-child(5) .tool-icon { color: #3F51B5; } /* 查询系统 */
+        .tool-item:nth-child(6) .tool-icon { color: #009688; } /* 社区数据 */
+        .tool-item:nth-child(7) .tool-icon { color: #FF5722; } /* 计算器 */
+        .tool-item:nth-child(8) .tool-icon { color: #4CAF50; } /* 下载中心 */
+
         .tool-label {
-            font-size: 12px;
-            color: #666666;
+            font-size: 13px;
+            color: #666;
             text-align: center;
+            font-weight: 500;
         }
 
-        /* 最新活动 */
+        /* 活动区域 */
         .activity-content {
             display: flex;
             align-items: center;
@@ -253,74 +342,35 @@
             gap: 16px;
         }
         .activity-desc {
-            font-size: 18px;
-            font-weight: 500;
+            font-size: 20px;
+            font-weight: 700;
             line-height: 1.4;
-        }
-        .activity-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            font-size: 15px;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 30px;
-            backdrop-filter: blur(2px);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* 便捷访问双按钮 */
-        .quick-actions {
-            display: flex;
-            gap: 16px;
-            margin: 16px 0 8px 0;
-        }
-        .quick-btn {
-            flex: 1;
-            text-align: center;
-            padding: 18px 0;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 17px;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.15s, transform 0.1s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        }
-        .quick-btn.primary {
-            background-color: #1E88E5;
-            color: white;
-        }
-        .quick-btn.secondary {
-            background-color: #F0F0F0;
-            color: #1E1E1E;
-        }
-        .quick-btn:active {
-            opacity: 0.7;
-            transform: scale(0.98);
-        }
-
-        /* 底部导航固定（始终在底部） */
+        /* 底部导航 */
         .bottom-nav {
             background-color: #FFFFFF;
-            padding: 12px 24px 14px 24px;
+            padding: 12px 24px 16px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-top: 1px solid #F0F0F0;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.02);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.02);
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: #999999;
+            color: #999;
             font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
+            transition: color 0.2s;
         }
         .nav-item i {
-            font-size: 24px;
+            font-size: 26px;
         }
         .nav-item.active {
             color: #1E88E5;
@@ -332,6 +382,13 @@
         .status-bar {
             height: 8px;
         }
+
+        /* 字体微调 */
+        body, button, input {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
     </style>
 </head>
 <body>
@@ -339,26 +396,24 @@
         <div class="status-bar"></div>
 
         <div class="content">
-            <!-- 1. 顶部用户面板（默认折叠，按钮下移） -->
+            <!-- 顶部用户面板（默认折叠） -->
             <div class="card" id="userPanel">
-                <!-- 第一行：头像、昵称、等级（点击可展开/折叠） -->
                 <div class="user-panel-header clickable" id="toggleExpand">
                     <div class="user-meta">
                         <div class="dolphin-icon"><i class="fas fa-fish"></i></div>
                         <span class="user-name">深海探险家</span>
                         <span class="badge">金牌会员</span>
                     </div>
-                    <!-- 右上角无按钮，留空或放一个小箭头（可选） -->
-                    <i class="fas fa-chevron-down" style="color:#999; font-size:16px;"></i>
+                    <i class="fas fa-chevron-down" style="color:#999; font-size:18px;"></i>
                 </div>
 
-                <!-- 第二行：充币/提币按钮并排（始终可见） -->
+                <!-- 充币提币按钮行 -->
                 <div class="button-row">
-                    <button class="btn-block" onclick="alert('充币功能')">充币</button>
-                    <button class="btn-block outline" onclick="alert('提币功能')">提币</button>
+                    <button class="btn-block" onclick="alert('充币')">充币</button>
+                    <button class="btn-block outline" onclick="alert('提币')">提币</button>
                 </div>
 
-                <!-- 第三行：展开区域（默认隐藏） -->
+                <!-- 展开数据（默认隐藏） -->
                 <div class="expand-content hidden" id="expandArea">
                     <div class="expand-item"><div class="value">$12.3k</div><div class="label">身价</div></div>
                     <div class="expand-item"><div class="value">5.82</div><div class="label">资产</div></div>
@@ -367,7 +422,7 @@
                 </div>
             </div>
 
-            <!-- 2. 公告资讯 -->
+            <!-- 公告资讯（喇叭图标彩色） -->
             <div class="card">
                 <div class="announcement">
                     <i class="fas fa-bullhorn"></i>
@@ -376,18 +431,34 @@
                 </div>
             </div>
 
-            <!-- 3. 数据总览（无任何底色块） -->
+            <!-- 数据总览（含同比） -->
             <div class="card">
                 <div class="section-title">数据总览</div>
                 <div class="stats-grid">
-                    <div class="stat-item"><div class="stat-value">2.45M</div><div class="stat-label">质押H总量</div></div>
-                    <div class="stat-item"><div class="stat-value">8.92M</div><div class="stat-label">总交易量</div></div>
-                    <div class="stat-item"><div class="stat-value">1.23M</div><div class="stat-label">国库累计</div></div>
-                    <div class="stat-item"><div class="stat-value">12.3k</div><div class="stat-label">活跃人数</div></div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.45M</div>
+                        <div class="stat-compare positive">+5.2%</div>
+                        <div class="stat-label">质押H总量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8.92M</div>
+                        <div class="stat-compare positive">+12.3%</div>
+                        <div class="stat-label">总交易量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1.23M</div>
+                        <div class="stat-compare positive">+2.7%</div>
+                        <div class="stat-label">国库累计</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12.3k</div>
+                        <div class="stat-compare negative">-1.5%</div>
+                        <div class="stat-label">活跃人数</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 4. 工具集（图标无底色） -->
+            <!-- 工具集（彩色图标） -->
             <div class="card">
                 <div class="section-title">常用工具</div>
                 <div class="tools-grid">
@@ -402,7 +473,7 @@
                 </div>
             </div>
 
-            <!-- 5. 最新活动（渐变卡片不变） -->
+            <!-- 最新活动（渐变卡片） -->
             <div class="card highlight">
                 <div class="section-title light">✨ 最新活动</div>
                 <div class="activity-content">
@@ -411,13 +482,13 @@
                 </div>
             </div>
 
-            <!-- 6. 便捷访问双按钮 -->
+            <!-- 便捷访问双按钮（美化后） -->
             <div class="quick-actions">
-                <button class="quick-btn primary" onclick="alert('购买H币')">💰 购买H币</button>
-                <button class="quick-btn secondary" onclick="alert('进入社区群')">💬 进入社区群</button>
+                <button class="quick-btn primary" onclick="alert('购买H币')"><i class="fas fa-shopping-cart"></i> 购买H币</button>
+                <button class="quick-btn secondary" onclick="alert('进入社区群')"><i class="fab fa-telegram-plane"></i> 进入社区群</button>
             </div>
 
-            <div style="height: 4px;"></div> <!-- 底部留一点空间 -->
+            <div style="height: 4px;"></div>
         </div>
 
         <!-- 底部导航固定 -->
@@ -433,11 +504,9 @@
         (function() {
             const toggleBtn = document.getElementById('toggleExpand');
             const expandArea = document.getElementById('expandArea');
-            // 默认隐藏 (已经加hidden类)
             toggleBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 expandArea.classList.toggle('hidden');
-                // 可以顺便旋转箭头，但为了简洁略过
             });
         })();
     </script>
