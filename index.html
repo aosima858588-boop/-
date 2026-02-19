@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>海豚社区 · 辅助工具</title>
+  <title>海豚社区 · 辅助工具 (日间)</title>
   <style>
     * {
       margin: 0;
@@ -13,7 +13,8 @@
     }
 
     body {
-      background-color: #0A0F1E;  /* 深海暗色底 */
+      background: linear-gradient(145deg, #A2C2E0 0%, #D4E4F5 100%);
+      /* 模拟日间天空底色 */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,26 +22,28 @@
       padding: 12px;
     }
 
-    /* 手机卡片容器 */
+    /* 手机卡片容器 — 日间模式: 白/浅灰底，柔和阴影 */
     .app-container {
       max-width: 390px;
       width: 100%;
-      background: linear-gradient(145deg, #121827 0%, #0B111C 100%);
+      background: #F0F7FF;  /* 柔和冰蓝白 */
       border-radius: 32px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 2px #2A3A5A inset; /* 深色描边 */
+      box-shadow: 0 20px 30px rgba(58, 78, 105, 0.2), 0 4px 0 #C0D3EB inset, 0 -2px 0 #FFFFFF inset;
       overflow: hidden;
-      padding: 20px 18px 80px;  /* 底部留白给菜单栏 */
+      padding: 20px 18px 80px;
       position: relative;
-      color: #EAF4FF;
+      color: #1C2E44;
     }
 
-    /* ----- 顶部用户信息面板 (可展开) ----- */
+    /* ----- 顶部用户信息面板 (日间: 浅色半透明) ----- */
     .profile-panel {
-      background: linear-gradient(135deg, #1E2A41 0%, #131D2F 100%);
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border-radius: 28px;
       padding: 16px 18px;
-      box-shadow: 0 8px 0 #0B1110;
-      border: 1px solid #3E526F;
+      box-shadow: 0 6px 0 #B0C8E5, 0 2px 10px rgba(0,30,60,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.9);
       margin-bottom: 20px;
     }
 
@@ -50,11 +53,11 @@
       gap: 12px;
     }
 
-    /* H 图标 — 海豚剪影 + H字母 */
+    /* H 图标 — 日间更鲜艳 */
     .h-icon {
       width: 48px;
       height: 48px;
-      background: linear-gradient(145deg, #4AB1FF, #1A5F9E);
+      background: linear-gradient(145deg, #0077BE, #004C8C);
       border-radius: 30px;
       display: flex;
       align-items: center;
@@ -62,9 +65,8 @@
       font-weight: 800;
       font-size: 28px;
       color: white;
-      text-shadow: 0 2px 4px #003366;
-      box-shadow: 0 4px 0 #0C2A48;
-      border: 1px solid #8AC4FF;
+      box-shadow: 0 4px 0 #002F5A, 0 2px 8px rgba(0,119,190,0.5);
+      border: 1px solid #96D0FF;
     }
 
     .user-info {
@@ -81,23 +83,21 @@
     .nickname {
       font-size: 18px;
       font-weight: 700;
-      color: white;
-      letter-spacing: 0.5px;
+      color: #0F344D;
     }
 
     .badge-gold {
-      background: linear-gradient(145deg, #FFD966, #CA9E1E);
-      color: #1E2A2E;
+      background: linear-gradient(145deg, #F7D968, #E4B013);
+      color: #2D3B45;
       font-size: 12px;
       font-weight: 800;
       padding: 4px 10px;
       border-radius: 40px;
-      box-shadow: 0 2px 0 #7F5F10;
-      border: 1px solid #FFE38F;
+      box-shadow: 0 2px 0 #A87C1A;
+      border: 1px solid #FFEDA2;
       white-space: nowrap;
     }
 
-    /* 充币提币按钮 */
     .action-buttons {
       display: flex;
       gap: 8px;
@@ -105,26 +105,27 @@
     }
 
     .btn-coin {
-      background: #1F3147;
-      border: 1px solid #5577A5;
+      background: #E1EDFF;
+      border: 1px solid #8DB0DA;
       border-radius: 30px;
       padding: 5px 16px;
       font-size: 13px;
       font-weight: 600;
-      color: #B3D9FF;
-      box-shadow: 0 3px 0 #0D1827;
+      color: #004B7C;
+      box-shadow: 0 3px 0 #B6CDED;
       transition: 0.1s ease;
+      cursor: default;
     }
 
     .btn-coin:active {
       transform: translateY(2px);
-      box-shadow: 0 1px 0 #0D1827;
+      box-shadow: 0 1px 0 #B6CDED;
     }
 
-    /* 展开区域 (身价资产等) */
+    /* 展开区域 (身价资产等) 日间 */
     .expand-stats {
       margin-top: 16px;
-      border-top: 1px dashed #3A4F6E;
+      border-top: 1px dashed #B0C6DF;
       padding-top: 14px;
       display: flex;
       justify-content: space-between;
@@ -137,46 +138,46 @@
 
     .stat-label {
       font-size: 12px;
-      color: #8DA3C0;
+      color: #4E6A89;
       letter-spacing: 0.3px;
     }
 
     .stat-value {
       font-size: 20px;
       font-weight: 800;
-      color: #FFE8B5;
-      text-shadow: 0 2px 2px #1A2C42;
+      color: #1F537C;
+      text-shadow: 0 1px 1px white;
     }
 
-    /* ----- 公告资讯 ----- */
+    /* ----- 公告资讯 (日间浅色) ----- */
     .notice {
-      background: #1D2A3F;
+      background: #FFFFFFD9;
+      backdrop-filter: blur(4px);
       border-radius: 40px;
       padding: 12px 20px;
       margin-bottom: 24px;
-      border: 1px solid #3C5680;
-      box-shadow: 0 5px 0 #0F1A28;
+      border: 1px solid #CCE1FC;
+      box-shadow: 0 4px 0 #B6CEEB;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     .notice-badge {
-      background: #F1C40F;
-      color: #1D2A2D;
+      background: #FFB347;
+      color: #2A3B48;
       font-weight: 800;
       font-size: 12px;
       padding: 4px 12px;
       border-radius: 50px;
-      white-space: nowrap;
-      border: 1px solid #FFE17C;
+      border: 1px solid #FFE085;
+      box-shadow: 0 2px 0 #C57F1E;
     }
 
     .notice-text {
       font-size: 15px;
       font-weight: 500;
-      color: #DBE9FF;
-      letter-spacing: 0.3px;
+      color: #1F4460;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -193,20 +194,17 @@
     .section-title h3 {
       font-size: 18px;
       font-weight: 700;
-      background: linear-gradient(135deg, #C4DAFF, #8FB0FF);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.2px;
+      color: #0B3C5F;
+      text-shadow: 0 1px 0 white;
     }
 
     .more-link {
-      color: #5695FF;
+      color: #1D70B7;
       font-size: 13px;
       font-weight: 600;
     }
 
-    /* ----- 工具集 (8宫格) 第一行4个 + 第二行4个 ----- */
+    /* ----- 工具集 8宫格 (日间卡片) ----- */
     .grid-8 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -224,37 +222,36 @@
     .tool-circle {
       width: 58px;
       height: 58px;
-      background: linear-gradient(145deg, #1E314C, #142236);
+      background: linear-gradient(145deg, #F7FBFF, #DFECFC);
       border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1.5px solid #3F6190;
-      box-shadow: 0 6px 0 #0A1422;
-      color: #7BB3FF;
+      border: 1px solid #B0CBEF;
+      box-shadow: 0 5px 0 #B1C8E6, 0 2px 6px rgba(0, 55, 100, 0.15);
+      color: #1C6090;
       font-size: 28px;
       transition: 0.1s;
     }
 
     .tool-circle:active {
-      transform: translateY(4px);
-      box-shadow: 0 2px 0 #0A1422;
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #B1C8E6;
     }
 
     .tool-label {
       font-size: 11px;
       font-weight: 600;
-      color: #B7D0F0;
-      text-align: center;
+      color: #2E5070;
     }
 
-    /* 最新活动卡片 */
+    /* 最新活动卡片 日间 */
     .activity-card {
-      background: linear-gradient(135deg, #1E2F48, #142437);
+      background: linear-gradient(135deg, #E1F0FF, #CDE4FF);
       border-radius: 24px;
       padding: 16px 18px;
-      border: 1px solid #47658B;
-      box-shadow: 0 6px 0 #0E1C2C;
+      border: 1px solid #B1CFF5;
+      box-shadow: 0 5px 0 #A5BFE0;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -262,7 +259,7 @@
     }
 
     .activity-emoji {
-      background: #1F3955;
+      background: #FFFFFFE0;
       width: 52px;
       height: 52px;
       border-radius: 20px;
@@ -270,25 +267,24 @@
       align-items: center;
       justify-content: center;
       font-size: 32px;
-      border: 1px solid #6898D3;
+      border: 1px solid #7FA9D3;
+      box-shadow: 0 3px 0 #7A9CC2;
     }
 
     .activity-desc {
       font-weight: 700;
       font-size: 16px;
-      background: linear-gradient(135deg, #FFD966, #FFB347);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #145A9E;
     }
 
     .boost-tag {
-      background: #20568A;
+      background: #C4DDFF;
       border-radius: 18px;
       padding: 2px 14px;
       font-size: 13px;
       font-weight: 600;
-      border: 1px solid #6BA5FF;
-      color: #DDF0FF;
+      border: 1px solid #2670B0;
+      color: #003F6F;
     }
 
     /* 便捷访问双按钮 */
@@ -300,15 +296,15 @@
 
     .quick-btn {
       flex: 1;
-      background: #1F3147;
-      border: 1px solid #44679A;
+      background: #E7F2FF;
+      border: 1px solid #99BEE9;
       border-radius: 40px;
       padding: 14px 0;
       text-align: center;
       font-weight: 700;
       font-size: 16px;
-      color: #C4DEFF;
-      box-shadow: 0 6px 0 #0F1D30;
+      color: #0E4B7A;
+      box-shadow: 0 5px 0 #AFC6E8;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -318,29 +314,29 @@
 
     .quick-btn:active {
       transform: translateY(4px);
-      box-shadow: 0 2px 0 #0F1D30;
+      box-shadow: 0 1px 0 #AFC6E8;
     }
 
-    /* ----- 底部菜单栏 (首页,赚币,模型,钱包) ----- */
+    /* ----- 底部菜单栏 (日间) ----- */
     .bottom-nav {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      background: #0E1626;
+      background: #EFF5FF;
       display: flex;
       justify-content: space-around;
       padding: 12px 10px 20px;
-      border-top: 2px solid #253A57;
-      backdrop-filter: blur(5px);
-      box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.8);
+      border-top: 2px solid #BAD0F0;
+      box-shadow: 0 -5px 15px rgba(72, 112, 156, 0.1);
+      backdrop-filter: blur(8px);
     }
 
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #61799F;
+      color: #57779C;
       font-size: 12px;
       font-weight: 600;
       gap: 3px;
@@ -348,19 +344,19 @@
     }
 
     .nav-item.active {
-      color: #4CB5FF;
-      text-shadow: 0 0 8px #0088ff70;
+      color: #006BB3;
+      text-shadow: 0 0 5px #A0CAFF;
     }
 
     .nav-icon {
       font-size: 22px;
-      filter: drop-shadow(0 2px 2px black);
+      filter: drop-shadow(0 1px 1px white);
     }
   </style>
 </head>
 <body>
   <div class="app-container">
-    <!-- 1. 顶部用户信息面板 (点击展开效果通过CSS演示, 但交互需js, 这里展示展开状态) -->
+    <!-- 1. 顶部用户信息面板 (日间展开状态) -->
     <div class="profile-panel" id="profilePanel">
       <div class="profile-row">
         <div class="h-icon">H</div>
@@ -374,9 +370,9 @@
             <span class="btn-coin">提币</span>
           </div>
         </div>
-        <div style="color: #8EB3FF; font-size: 20px;">⌄</div>  <!-- 展开箭头 -->
+        <div style="color: #1F6FB5; font-size: 20px;">⌄</div>
       </div>
-      <!-- 展开区域 (身价资产等) -->
+      <!-- 展开区域 -->
       <div class="expand-stats">
         <div class="stat-item"><span class="stat-label">身价</span><div class="stat-value">128.5K</div></div>
         <div class="stat-item"><span class="stat-label">资产</span><div class="stat-value">45.2K</div></div>
@@ -391,7 +387,7 @@
       <span class="notice-text">111111 · 新版空投已上线 双倍积分周</span>
     </div>
 
-    <!-- 3. 工具集 (8项) -->
+    <!-- 3. 工具集 8项 -->
     <div class="section-title">
       <h3>⚒️ 工具集</h3>
       <span class="more-link">全部</span>
@@ -418,7 +414,7 @@
         <div class="activity-desc">OKX Boost 最佳策略获得空投</div>
         <span class="boost-tag">策略大赛</span>
       </div>
-      <div style="color:#89B9FF;">➔</div>
+      <div style="color:#1A69B3;">➔</div>
     </div>
 
     <!-- 5. 便捷访问 -->
@@ -427,7 +423,7 @@
       <div class="quick-btn"><span>👥</span> 进入社区群</div>
     </div>
 
-    <!-- 底部菜单栏 (四个) -->
+    <!-- 底部菜单栏 -->
     <div class="bottom-nav">
       <div class="nav-item active"><span class="nav-icon">🏠</span><span>首页</span></div>
       <div class="nav-item"><span class="nav-icon">💰</span><span>赚币</span></div>
@@ -437,9 +433,8 @@
   </div>
 
   <script>
-    // (辅助功能) 点击面板可折叠/展开——轻量演示
+    // 简单的点击展开/折叠面板 (日间)
     document.getElementById('profilePanel').addEventListener('click', function(e) {
-      // 如果点的是按钮，不触发展开折叠，防止误触
       if (e.target.classList.contains('btn-coin')) return;
       const expandDiv = this.querySelector('.expand-stats');
       if (expandDiv.style.display === 'none' || getComputedStyle(expandDiv).display === 'none') {
