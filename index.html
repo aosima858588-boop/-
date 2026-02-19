@@ -31,31 +31,25 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
 
-        /* 头部 - 使用渐变H图标 */
+        /* 头部 - 仅居中H图标 */
         .header {
-            padding: 20px 20px 10px;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
+            padding: 32px 20px 28px;  /* 上下内边距增加，与导航拉开距离 */
         }
         .header-icon {
-            width: 48px;
-            height: 48px;
+            width: 56px;               /* 稍大一点，更突出 */
+            height: 56px;
             background: radial-gradient(circle at 30% 30%, #42A5F5, #1565C0);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 28px;
+            font-size: 32px;
             color: white;
             box-shadow: 0 8px 15px -5px #0D47A1;
-        }
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0A1929;
-            letter-spacing: -0.5px;
         }
 
         /* 标签切换 */
@@ -284,10 +278,9 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- 头部 - 使用渐变H图标 -->
+        <!-- 头部 - 仅居中H图标，与导航保持距离 -->
         <div class="header">
             <div class="header-icon">H</div>
-            <h1>海豚社区</h1>
         </div>
 
         <!-- 标签切换 -->
@@ -419,7 +412,6 @@
         const loginPage = document.getElementById('loginPage');
 
         function switchTab(tabName) {
-            // 移除所有active
             tabGuide.classList.remove('active');
             tabRegister.classList.remove('active');
             tabLogin.classList.remove('active');
@@ -443,7 +435,6 @@
         tabRegister.addEventListener('click', () => switchTab('register'));
         tabLogin.addEventListener('click', () => switchTab('login'));
 
-        // 供按钮调用的全局函数
         window.switchTab = switchTab;
     </script>
 </body>
