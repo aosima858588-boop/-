@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>海豚社区 · 终极版</title>
+    <title>海豚社区 · 水波版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -21,7 +21,6 @@
             min-height: 100vh;
         }
 
-        /* 满宽容器，底部导航固定 */
         .app-container {
             width: 100%;
             max-width: 100%;
@@ -40,7 +39,6 @@
             gap: 28px;
         }
 
-        /* 卡片样式 */
         .card {
             background-color: #FFFFFF;
             border-radius: 32px;
@@ -87,7 +85,6 @@
             color: white;
         }
 
-        /* 用户头像 - 双H渐变 */
         .user-panel-header {
             display: flex;
             align-items: center;
@@ -143,7 +140,6 @@
             color: #0A1929;
         }
 
-        /* 金牌会员金属徽章 */
         .badge {
             background: linear-gradient(145deg, #FFD966, #F1C40F, #D4AC0D);
             color: #4A3B00;
@@ -168,7 +164,6 @@
             transition: transform 0.3s;
         }
 
-        /* 充币提币按钮带图标 */
         .button-row {
             display: flex;
             gap: 12px;
@@ -230,7 +225,6 @@
             font-weight: 500;
         }
 
-        /* 公告资讯 */
         .announcement {
             display: flex;
             align-items: center;
@@ -259,7 +253,6 @@
             transform: translateX(3px);
         }
 
-        /* 数据总览 - 完全无底色 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -302,7 +295,6 @@
             margin-top: 4px;
         }
 
-        /* 工具图标立体彩色 */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -335,7 +327,7 @@
         .tool-item:nth-child(1) .tool-icon { color: #E53935; }
         .tool-item:nth-child(2) .tool-icon { color: #8E24AA; }
         .tool-item:nth-child(3) .tool-icon { color: #FB8C00; }
-        .tool-item:nth-child(4) .tool-icon { color: #D81B60; } /* 红包(礼物) */
+        .tool-item:nth-child(4) .tool-icon { color: #D81B60; }
         .tool-item:nth-child(5) .tool-icon { color: #3949AB; }
         .tool-item:nth-child(6) .tool-icon { color: #00897B; }
         .tool-item:nth-child(7) .tool-icon { color: #F4511E; }
@@ -350,7 +342,6 @@
             text-shadow: 0 1px 1px rgba(255,255,255,0.5);
         }
 
-        /* 最新活动 */
         .activity-content {
             display: flex;
             align-items: center;
@@ -386,7 +377,6 @@
             box-shadow: 0 5px 10px rgba(0,0,0,0.1);
         }
 
-        /* 快捷按钮 */
         .quick-actions {
             display: flex;
             gap: 14px;
@@ -421,36 +411,63 @@
             box-shadow: 0 8px 15px -5px rgba(0,0,0,0.2);
         }
 
-        /* 底部导航固定 */
+        /* 底部导航 - iOS透明毛玻璃 + 水波纹容器 */
         .bottom-nav {
-            background-color: #FFFFFF;
+            background-color: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             padding: 12px 24px 16px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid rgba(0,0,0,0.03);
+            border-top: 1px solid rgba(0, 0, 0, 0.03);
             box-shadow: 0 -5px 20px -5px rgba(0,0,0,0.02);
+            color: #94A3B8;
+            /* 确保水波纹在子元素内显示 */
+            position: relative;
         }
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: #94A3B8;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: color 0.2s, transform 0.1s;
+            color: #94A3B8;
+            position: relative;
+            overflow: hidden;        /* 让水波纹不超出边界 */
+            padding: 8px 16px;       /* 扩大点击区域 */
+            border-radius: 30px;      /* 圆角，水波纹也会被裁剪成圆角 */
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         .nav-item i {
             font-size: 24px;
+            pointer-events: none;     /* 让图标不阻挡点击事件 */
         }
         .nav-item.active {
             color: #1A73E8;
             transform: translateY(-2px);
         }
-        .nav-item:active {
-            opacity: 0.7;
+
+        /* 水波纹样式 */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(26, 115, 232, 0.4);  /* 品牌色半透明 */
+            transform: scale(0);
+            animation: ripple-animation 0.5s ease-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(6);
+                opacity: 0;
+            }
         }
 
         .clickable {
@@ -473,7 +490,6 @@
         <div class="status-bar"></div>
 
         <div class="content">
-            <!-- 顶部用户面板 -->
             <div class="card" id="userPanel">
                 <div class="user-panel-header clickable" id="toggleExpand">
                     <div class="user-meta">
@@ -500,7 +516,6 @@
                 </div>
             </div>
 
-            <!-- 公告资讯 -->
             <div class="card">
                 <div class="announcement">
                     <i class="fas fa-bullhorn"></i>
@@ -509,7 +524,6 @@
                 </div>
             </div>
 
-            <!-- 数据总览（无底色） -->
             <div class="card">
                 <div class="section-title"><i class="fas fa-chart-line"></i> 数据总览</div>
                 <div class="stats-grid">
@@ -536,7 +550,6 @@
                 </div>
             </div>
 
-            <!-- 工具集（红包图标为礼物） -->
             <div class="card">
                 <div class="section-title"><i class="fas fa-tools"></i> 常用工具</div>
                 <div class="tools-grid">
@@ -551,7 +564,6 @@
                 </div>
             </div>
 
-            <!-- 最新活动 -->
             <div class="card highlight">
                 <div class="section-title light"><i class="fas fa-star"></i> 最新活动</div>
                 <div class="activity-content">
@@ -560,31 +572,84 @@
                 </div>
             </div>
 
-            <!-- 便捷访问 -->
             <div class="quick-actions">
                 <button class="quick-btn primary" onclick="alert('购买H币')"><i class="fas fa-shopping-cart"></i> 购买H币</button>
                 <button class="quick-btn secondary" onclick="alert('进入社区群')"><i class="fab fa-telegram-plane"></i> 进入社区群</button>
             </div>
         </div>
 
-        <!-- 底部导航固定 -->
+        <!-- 底部导航 - 带水波纹效果 -->
         <div class="bottom-nav">
-            <div class="nav-item active"><i class="fas fa-home"></i><span>首页</span></div>
-            <div class="nav-item"><i class="fas fa-coins"></i><span>赚币</span></div>
-            <div class="nav-item"><i class="fas fa-robot"></i><span>模型</span></div>
-            <div class="nav-item"><i class="fas fa-wallet"></i><span>钱包</span></div>
+            <div class="nav-item active" data-ripple><i class="fas fa-home"></i><span>首页</span></div>
+            <div class="nav-item" data-ripple><i class="fas fa-coins"></i><span>赚币</span></div>
+            <div class="nav-item" data-ripple><i class="fas fa-robot"></i><span>模型</span></div>
+            <div class="nav-item" data-ripple><i class="fas fa-wallet"></i><span>钱包</span></div>
         </div>
     </div>
 
     <script>
         (function() {
+            // 水波纹效果
+            const navItems = document.querySelectorAll('.nav-item[data-ripple]');
+            navItems.forEach(item => {
+                // 监听鼠标和触摸事件
+                item.addEventListener('mousedown', createRipple);
+                item.addEventListener('touchstart', createRipple, {passive: true});
+            });
+
+            function createRipple(e) {
+                const target = e.currentTarget;
+                // 获取点击坐标
+                let x, y;
+                if (e.type === 'mousedown') {
+                    x = e.clientX - target.getBoundingClientRect().left;
+                    y = e.clientY - target.getBoundingClientRect().top;
+                } else if (e.type === 'touchstart') {
+                    const touch = e.touches[0];
+                    x = touch.clientX - target.getBoundingClientRect().left;
+                    y = touch.clientY - target.getBoundingClientRect().top;
+                }
+
+                // 创建水波纹元素
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.width = ripple.style.height = '20px'; // 初始小尺寸
+                ripple.style.marginLeft = '-10px';
+                ripple.style.marginTop = '-10px';
+
+                target.appendChild(ripple);
+
+                // 动画结束后移除
+                ripple.addEventListener('animationend', () => {
+                    ripple.remove();
+                });
+            }
+
+            // 原有的展开/折叠逻辑
             const toggleBtn = document.getElementById('toggleExpand');
             const expandArea = document.getElementById('expandArea');
             const indicator = document.querySelector('.expand-indicator');
-            toggleBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                expandArea.classList.toggle('hidden');
-                indicator.style.transform = expandArea.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    expandArea.classList.toggle('hidden');
+                    indicator.style.transform = expandArea.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                });
+            }
+
+            // 可在此处添加导航项点击切换激活状态的逻辑（仅演示）
+            // 简单处理：点击导航项时移除其他active，添加自身active（模拟页面跳转）
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // 防止触发两次（因为mousedown也会触发click）
+                    // 但为了演示，我们只处理激活状态
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    // 可添加实际跳转逻辑
+                    // alert(this.innerText.trim() + ' 页面');
+                });
             });
         })();
     </script>
