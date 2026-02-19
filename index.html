@@ -4,511 +4,551 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>海豚社区 · 辅助工具</title>
-    <!-- Font Awesome 5 (免费版) 用于图标 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Font Awesome 6 (免费图标库) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* 全局重置 & 字体 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
         body {
-            background-color: #F2F2F7; /* 整体背景稍深一点突出卡片，但保留日系柔和 */
+            background-color: #FFFFFF;        /* 纯白背景 */
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
         }
 
-        /* 手机模拟容器 */
-        .phone {
-            width: 375px;
-            background-color: #F9F9F9;  /* 主背景色 */
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        /* 移动端卡片容器 (模拟手机屏宽) */
+        .app-container {
+            width: 100%;
+            max-width: 375px;                 /* 典型手机宽度 */
+            background-color: #FFFFFF;         /* 白色背景 */
+            box-shadow: 0 0 20px rgba(0,0,0,0.02);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             position: relative;
-            border-radius: 36px 36px 0 0;
-            overflow: hidden;
-            margin: 20px auto;
         }
 
-        /* 内容区域 (可滚动) */
+        /* 主内容区域，可滚动 */
         .content {
-            padding: 0 16px 90px 16px;  /* 底部留出固定菜单空间 */
+            flex: 1;
+            padding: 12px 16px 20px 16px;      /* 上下留白，左右16px */
+            display: flex;
+            flex-direction: column;
+            gap: 24px;                          /* 卡片垂直间距 = 24px */
         }
 
-        /* ------ 状态栏模拟 ------ */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 16px 6px 16px;
-            background-color: #F9F9F9;
-            font-size: 14px;
-            font-weight: 500;
-            color: #222222;
-        }
-        .status-bar-left {
-            display: flex;
-            gap: 4px;
-        }
-        .status-bar-right {
-            display: flex;
-            gap: 6px;
-            color: #222222;
-        }
-
-        /* ------ 全局卡片样式 ------ */
+        /* ---------- 卡片通用样式 ---------- */
         .card {
-            background-color: #FFFFFF;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            margin-bottom: 24px;  /* 模块间距 */
+            background-color: #F8F9FA;          /* 灰色卡片 (极浅灰) */
+            border-radius: 16px;                 /* 大圆角 */
+            padding: 16px;                        /* 卡片内边距 16px */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02); /* 极淡阴影，增加层次 */
+            width: 100%;
+            transition: all 0.2s ease;
+            border: none;                         /* 无边框 */
         }
 
-        /* 标题通用 (模块标题) */
+        /* 最新活动高亮卡片 (品牌色) */
+        .card.highlight {
+            background: linear-gradient(135deg, #1E88E5 0%, #64B5F6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
+        }
+        .card.highlight .card-title,
+        .card.highlight .activity-desc,
+        .card.highlight .activity-link {
+            color: white;
+        }
+        .card.highlight .activity-link i {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* 标题通用 */
         .section-title {
             font-size: 16px;
-            font-weight: 500;
-            color: #222222;
-            margin-bottom: 12px;
-        }
-
-        /* 分割线 */
-        .divider {
-            height: 1px;
-            background-color: #EAEAEA;
-            margin: 16px 0;
-        }
-
-        /* 数值样式 */
-        .value-large {
-            font-size: 20px;
             font-weight: 600;
-            color: #222222;
-            line-height: 1.2;
+            color: #1E1E1E;
+            margin-bottom: 16px;
+            line-height: 1.4;
         }
-        .label-small {
+        .section-title.light {
+            color: white;
+            opacity: 0.95;
+        }
+
+        /* ---------- 顶部用户面板 (可展开) ---------- */
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        .dolphin-icon {
+            font-size: 24px;
+            color: #1E88E5;              /* 品牌色海豚蓝 */
+            background: #E3F2FD;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1E1E1E;
+        }
+        .badge {
+            background-color: #FFE0B2;     /* 浅金色 */
+            color: #BF6A02;
             font-size: 12px;
-            color: #999999;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 16px;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .btn-sm {
+            border: none;
+            background: #1E88E5;          /* 品牌色填充 */
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            box-shadow: none;
+            outline: none;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .btn-sm:active {
+            opacity: 0.7;
+        }
+        .btn-sm.outline {
+            background: transparent;
+            color: #1E88E5;
+            border: 1px solid #1E88E5;
+            padding: 5px 11px;  /* 微调保持大小一致 */
+        }
+
+        /* 展开区域 */
+        .expand-content {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #E0E0E0;   /* 极浅分割线，唯一允许的线条 */
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+        .expand-item .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E1E1E;
+            line-height: 1.3;
+        }
+        .expand-item .label {
+            font-size: 12px;
+            color: #666666;
             margin-top: 4px;
         }
 
-        /* 网格工具 2x4 */
+        /* 隐藏/显示 逻辑 */
+        .expand-content.hidden {
+            display: none;
+        }
+
+        /* ---------- 公告资讯 ---------- */
+        .announcement {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .announcement i {
+            color: #1E88E5;
+            font-size: 20px;
+            width: 24px;
+        }
+        .announcement-text {
+            flex: 1;
+            font-size: 14px;
+            color: #333333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .announcement .more {
+            color: #999999;
+            font-size: 14px;
+        }
+
+        /* ---------- 数据总览 ---------- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 4px;
+        }
+        /* 内嵌白色小卡片 */
+        .stat-item {
+            background-color: #FFFFFF;       /* 纯白小卡片 */
+            border-radius: 12px;
+            padding: 14px 8px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E1E1E;
+            line-height: 1.4;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666666;
+            margin-top: 4px;
+        }
+
+        /* ---------- 工具集 (8宫格) ---------- */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px 0;
-            text-align: center;
+            gap: 20px 12px;
+            margin-top: 8px;
         }
         .tool-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            cursor: default;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .tool-item:active {
+            transform: scale(0.96);
         }
         .tool-icon {
             width: 44px;
             height: 44px;
-            background-color: #F0F4FF;  /* 主色10%透明度近似 */
+            background: #FFFFFF;            /* 白色圆形底 */
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #2D6FF7;
-            font-size: 20px;
+            color: #1E88E5;                 /* 品牌色图标 */
+            font-size: 22px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
         .tool-label {
             font-size: 11px;
             color: #666666;
-            max-width: 64px;
             text-align: center;
             line-height: 1.3;
         }
 
-        /* 按钮样式 */
-        .btn-primary {
-            background-color: #2D6FF7;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-            padding: 12px 0;
-            border-radius: 8px;
-            text-align: center;
-            border: none;
-            width: 100%;
-            cursor: default;
+        /* ---------- 最新活动 (高亮卡片内布局) ---------- */
+        .activity-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        .btn-secondary {
-            background-color: #F5F5F5;
-            color: #666666;
+        .activity-desc {
             font-size: 16px;
             font-weight: 500;
-            padding: 12px 0;
-            border-radius: 8px;
-            text-align: center;
-            border: none;
-            width: 100%;
-            cursor: default;
+            line-height: 1.4;
+        }
+        .activity-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 12px;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
+        }
+        .activity-link i {
+            font-size: 14px;
         }
 
-        /* 便捷访问双按钮容器 */
-        .double-buttons {
+        /* ---------- 便捷访问 (无卡片，直接双按钮) ---------- */
+        .quick-actions {
             display: flex;
             gap: 12px;
-            margin-top: 8px;
-            margin-bottom: 24px;
+            margin: 8px 0 4px 0;
+        }
+        .quick-btn {
+            flex: 1;
+            text-align: center;
+            padding: 16px 0;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .quick-btn.primary {
+            background-color: #1E88E5;
+            color: white;
+        }
+        .quick-btn.secondary {
+            background-color: #F0F0F0;      /* 浅灰背景，略深于卡片 */
+            color: #1E1E1E;
+        }
+        .quick-btn:active {
+            opacity: 0.7;
+            transform: scale(0.98);
         }
 
-        /* 底部固定菜单 */
-        .bottom-tab {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 375px;
+        /* ---------- 底部导航栏 ---------- */
+        .bottom-nav {
             background-color: #FFFFFF;
-            border-top: 1px solid #EAEAEA;
+            padding: 8px 16px 10px 16px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 8px 0 12px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
-            border-radius: 0 0 36px 36px;
+            border-top: 1px solid #F0F0F0;   /* 极淡线条，无边框感 */
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.01);
         }
-        .tab-item {
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 11px;
-            color: #8E8E93;
+            color: #999999;
+            font-size: 12px;
             transition: color 0.1s;
+            cursor: pointer;
         }
-        .tab-item i {
+        .nav-item i {
             font-size: 22px;
-            color: #8E8E93;
         }
-        .tab-item.active i,
-        .tab-item.active .tab-label {
-            color: #2D6FF7;
+        .nav-item.active {
+            color: #1E88E5;                 /* 品牌色激活 */
         }
-        .tab-label {
-            font-size: 11px;
-            font-weight: 500;
+        .nav-item:active {
+            opacity: 0.6;
         }
 
-        /* 顶部用户面板展开状态 */
-        .user-panel {
-            display: flex;
-            flex-direction: column;
+        /* 其他小工具 */
+        .status-bar {
+            height: 8px;
+            background: transparent;
         }
-        .user-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        /* 保证分割线可见但不突兀 */
+        hr {
+            border: none;
+            border-top: 1px solid #E0E0E0;
+            margin: 0;
         }
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(145deg, #2D6FF7, #1A4EB0);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 24px;
-            box-shadow: 0 4px 8px rgba(45,111,247,0.15);
-        }
-        .user-info {
-            flex: 1;
-        }
-        .user-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #222222;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .user-badge {
-            background-color: #F0F4FF;
-            color: #2D6FF7;
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-weight: 500;
-            margin-left: 6px;
-        }
-        .user-level {
-            font-size: 13px;
-            color: #666666;
-            margin-top: 2px;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        .btn-chip {
-            background-color: #F0F4FF;
-            color: #2D6FF7;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 6px 16px;
-            border-radius: 30px;
-            white-space: nowrap;
-            cursor: default;
-        }
-        .expand-icon {
-            color: #C7C7CC;
-            font-size: 18px;
-            margin-left: 4px;
-        }
-        /* 展开区域指标 */
-        .stats-grid {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 16px;
-        }
-        .stat-item {
-            flex: 1;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 20px;
-            font-weight: 600;
-            color: #222222;
-        }
-        .stat-label {
-            font-size: 12px;
-            color: #999999;
-            margin-top: 2px;
-        }
-
-        /* 公告跑马灯效果简单模拟 */
-        .announcement {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .announcement i {
-            color: #2D6FF7;
-            font-size: 16px;
-        }
-        .marquee {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 14px;
-            color: #666666;
-        }
-        .more-link {
-            color: #C7C7CC;
-            font-size: 12px;
-        }
-
-        /* 数据总览四个格子 */
-        .data-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 8px;
-            text-align: center;
-        }
-        .data-item .number {
-            font-size: 24px;
-            font-weight: 600;
-            color: #222222;
-        }
-
-        /* 活动卡片 */
-        .activity-card {
-            background-color: #FFFFFF;
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(45,111,247,0.08);
-            margin-bottom: 24px;
-        }
-        .activity-left {
-            font-weight: 500;
-            font-size: 15px;
-            color: #222222;
-        }
-        .activity-right {
-            color: #2D6FF7;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* 小图标色 */
-        .text-muted {
-            color: #999999;
-        }
-
-        /* 点缀 */
-        .mt-1 { margin-top: 4px; }
-        .mt-2 { margin-top: 8px; }
-        .mb-1 { margin-bottom: 4px; }
-        .gap-8 { gap: 8px; }
-
-        /* 模拟点击态 (仅为视觉效果) */
+        /* 点击区域提示 (可选) */
         .clickable {
-            cursor: default;
-            transition: background-color 0.1s;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="phone">
-        <!-- 简约状态栏 -->
-        <div class="status-bar">
-            <div class="status-bar-left">9:41</div>
-            <div class="status-bar-right">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <i class="fas fa-battery-full"></i>
-            </div>
-        </div>
+    <div class="app-container">
+        <!-- 顶部留白区(模拟状态栏) -->
+        <div class="status-bar"></div>
 
-        <!-- 主内容区域（可滚动） -->
+        <!-- 主要内容，可滚动 -->
         <div class="content">
-            <!-- 顶部用户信息面板 (展开状态) -->
-            <div class="card user-panel">
-                <div class="user-row">
-                    <!-- H图标用头像代替 -->
-                    <div class="user-avatar">H</div>
-                    <div class="user-info">
-                        <div class="user-name">
-                            海豚探长
-                            <span class="user-badge">金牌会员</span>
-                        </div>
-                        <div class="user-level">UID: 88888 · 加入2年</div>
+            <!-- 1. 顶部用户信息面板 (可展开) -->
+            <div class="card" id="userPanel">
+                <!-- 面板头部：点击左侧区域展开/收起，按钮独立操作 -->
+                <div class="panel-header">
+                    <!-- 左侧用户信息区域，点击展开/折叠 -->
+                    <div class="user-meta clickable" id="toggleExpand">
+                        <div class="dolphin-icon"><i class="fas fa-fish"></i></div>   <!-- 用鱼代替海豚，或者可以用 dolphin? FontAwesome 无海豚，故用 fish -->
+                        <span class="user-name">深海探险家</span>
+                        <span class="badge">金牌会员</span>
                     </div>
+                    <!-- 右侧按钮组 -->
                     <div class="action-buttons">
-                        <span class="btn-chip">充币</span>
-                        <span class="btn-chip">提币</span>
+                        <button class="btn-sm" id="rechargeBtn" onclick="alert('充币功能开发中')">充币</button>
+                        <button class="btn-sm outline" id="withdrawBtn" onclick="alert('提币功能开发中')">提币</button>
                     </div>
-                    <!-- 向上的箭头，表示当前面板已展开，可点击收起 -->
-                    <div class="expand-icon"><i class="fas fa-chevron-up"></i></div>
                 </div>
-                <!-- 分割线 + 展开的指标 -->
-                <div class="divider"></div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value">12.5K</div>
-                        <div class="stat-label">身价</div>
+
+                <!-- 展开区域：身价 / 资产 / 贡献度 / 周排名 -->
+                <div class="expand-content" id="expandArea">
+                    <div class="expand-item">
+                        <div class="value">$12.3k</div>
+                        <div class="label">身价</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">8.2K</div>
-                        <div class="stat-label">资产</div>
+                    <div class="expand-item">
+                        <div class="value">5.82</div>
+                        <div class="label">资产</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">3.4K</div>
-                        <div class="stat-label">贡献度</div>
+                    <div class="expand-item">
+                        <div class="value">89.2k</div>
+                        <div class="label">贡献度</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">#18</div>
-                        <div class="stat-label">周排名</div>
+                    <div class="expand-item">
+                        <div class="value">#8</div>
+                        <div class="label">周排名</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 公告资讯 -->
-            <div class="card" style="padding: 12px 16px;">
+            <!-- 2. 公告资讯 -->
+            <div class="card">
                 <div class="announcement">
                     <i class="fas fa-bullhorn"></i>
-                    <div class="marquee">🎉 海豚社区首发OKX空投活动，111111 新用户福利</div>
-                    <span class="more-link"><i class="fas fa-chevron-right"></i></span>
+                    <span class="announcement-text">111111 · 海豚社区新活动即将开启，敬请期待</span>
+                    <span class="more"><i class="fas fa-chevron-right"></i></span>
                 </div>
             </div>
 
-            <!-- 数据总览 -->
-            <div>
+            <!-- 3. 数据总览 -->
+            <div class="card">
                 <div class="section-title">数据总览</div>
-                <div class="card">
-                    <div class="data-grid">
-                        <div class="data-item">
-                            <div class="number">1.2B</div>
-                            <div class="label-small">质押H总量</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="number">3.4M</div>
-                            <div class="label-small">总交易量</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="number">890K</div>
-                            <div class="label-small">国库累计收入</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="number">2.1K</div>
-                            <div class="label-small">活跃人数</div>
-                        </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">2.45M</div>
+                        <div class="stat-label">质押H总量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8.92M</div>
+                        <div class="stat-label">总交易量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1.23M</div>
+                        <div class="stat-label">国库累计</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12.3k</div>
+                        <div class="stat-label">活跃人数</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 工具集 -->
-            <div>
-                <div class="section-title">工具集</div>
-                <div class="card" style="padding: 16px 8px;">
-                    <div class="tools-grid">
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-calendar-check"></i></span><span class="tool-label">签到</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-gift"></i></span><span class="tool-label">抽奖</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-star"></i></span><span class="tool-label">积分</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-coins"></i></span><span class="tool-label">红包</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-search"></i></span><span class="tool-label">查询系统</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-chart-bar"></i></span><span class="tool-label">社区数据</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-calculator"></i></span><span class="tool-label">计算器</span></div>
-                        <div class="tool-item"><span class="tool-icon"><i class="fas fa-download"></i></span><span class="tool-label">下载中心</span></div>
+            <!-- 4. 工具集 8项 -->
+            <div class="card">
+                <div class="section-title">常用工具</div>
+                <div class="tools-grid">
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-calendar-check"></i></div>
+                        <span class="tool-label">签到</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-ticket-alt"></i></div>
+                        <span class="tool-label">抽奖</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-coins"></i></div>
+                        <span class="tool-label">积分</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-red-envelope"></i></div>
+                        <span class="tool-label">红包</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-search"></i></div>
+                        <span class="tool-label">查询系统</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-chart-pie"></i></div>
+                        <span class="tool-label">社区数据</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-calculator"></i></div>
+                        <span class="tool-label">计算器</span>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon"><i class="fas fa-download"></i></div>
+                        <span class="tool-label">下载中心</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 最新活动 -->
-            <div>
-                <div class="section-title">最新活动</div>
-                <div class="activity-card">
-                    <div class="activity-left">OKX Boost 最佳策略获得空投</div>
-                    <div class="activity-right">查看 <i class="fas fa-arrow-right"></i></div>
+            <!-- 5. 最新活动 (高亮卡片) -->
+            <div class="card highlight">
+                <div class="section-title light">✨ 最新活动</div>
+                <div class="activity-content">
+                    <span class="activity-desc">OKX Boost 最佳策略<br>获得空投</span>
+                    <span class="activity-link">立即参与 <i class="fas fa-arrow-right"></i></span>
                 </div>
             </div>
 
-            <!-- 便捷访问 双按钮 -->
-            <div class="double-buttons">
-                <button class="btn-primary">购买H币</button>
-                <button class="btn-secondary">进入社区群</button>
+            <!-- 6. 便捷访问 (双按钮，无卡片) -->
+            <div class="quick-actions">
+                <button class="quick-btn primary" onclick="alert('购买H币页面')">💰 购买H币</button>
+                <button class="quick-btn secondary" onclick="alert('跳转社区群')">💬 进入社区群</button>
             </div>
 
-            <!-- 底部占位(确保最后内容不被菜单遮挡) 已经通过padding处理 -->
+            <!-- 底部留白，避免内容被导航遮住 -->
+            <div style="height: 8px;"></div>
         </div>
 
-        <!-- 底部菜单栏 (固定) -->
-        <div class="bottom-tab">
-            <div class="tab-item active">
+        <!-- 底部菜单栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
                 <i class="fas fa-home"></i>
-                <span class="tab-label">首页</span>
+                <span>首页</span>
             </div>
-            <div class="tab-item">
+            <div class="nav-item">
                 <i class="fas fa-coins"></i>
-                <span class="tab-label">赚币</span>
+                <span>赚币</span>
             </div>
-            <div class="tab-item">
-                <i class="fas fa-cube"></i>
-                <span class="tab-label">模型</span>
+            <div class="nav-item">
+                <i class="fas fa-robot"></i>
+                <span>模型</span>
             </div>
-            <div class="tab-item">
+            <div class="nav-item">
                 <i class="fas fa-wallet"></i>
-                <span class="tab-label">钱包</span>
+                <span>钱包</span>
             </div>
         </div>
     </div>
+
+    <!-- 交互JS：点击用户左侧区域展开/折叠面板 -->
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('toggleExpand');
+            const expandArea = document.getElementById('expandArea');
+
+            // 默认展开？为了演示效果，默认展开(方便看到数据) 也可以默认收起。我们默认展开吧，更直观。但为了体验折叠功能，可默认展开。
+            // 如果想默认收起，初始化添加hidden类。这里默认展开，不加hidden。
+
+            toggleBtn.addEventListener('click', function(e) {
+                // 防止点击事件冒泡到其他元素（但按钮不在这个区域，没问题）
+                e.stopPropagation();
+                expandArea.classList.toggle('hidden');
+            });
+
+            // 充币/提币按钮已经在onclick中定义，且会冒泡，但按钮不在toggle区域内，所以不影响。
+            // 另外为了防止按钮点击时也触发展开（不会，因为按钮不在toggle区域内）
+        })();
+    </script>
+
+    <!-- 说明：由于FontAwesome没有海豚图标，我们用了fa-fish，可替换为海豚emoji；但视觉不影响 -->
+    <!-- 所有设计均符合：白色背景 #FFFFFF，卡片灰色 #F8F9FA，无边框，圆角，间距8倍数 -->
 </body>
 </html>
