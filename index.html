@@ -1,441 +1,986 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>海豚社区 · 引导/注册/登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>海豚经济 · 手机版（顺序联动版）</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: #FFFFFF;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 430px;
-            background-color: #FFFFFF;
+            background: #f0f7fc;
+            font-family: 'Inter', sans-serif;
+            padding: 16px 12px 30px 12px;
             min-height: 100vh;
             display: flex;
+            justify-content: center;
+        }
+        .phone-frame {
+            max-width: 480px;
+            width: 100%;
+            display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            gap: 18px;
         }
-
-        /* 头部 - 仅居中H图标 */
-        .header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 32px 20px 28px;  /* 上下内边距增加，与导航拉开距离 */
+        .hero {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 36px;
+            padding: 22px 20px;
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 8px 20px -8px #295e7e;
         }
-        .header-icon {
-            width: 56px;               /* 稍大一点，更突出 */
-            height: 56px;
-            background: radial-gradient(circle at 30% 30%, #42A5F5, #1565C0);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .hero h1 {
+            font-size: 1.8rem;
             font-weight: 800;
-            font-size: 32px;
-            color: white;
-            box-shadow: 0 8px 15px -5px #0D47A1;
-        }
-
-        /* 标签切换 */
-        .tab-bar {
-            display: flex;
-            gap: 8px;
-            padding: 0 20px 20px;
-            border-bottom: 1px solid #F0F0F0;
-        }
-        .tab {
-            flex: 1;
-            background: #F5F7FA;
-            border: none;
-            padding: 14px 0;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 16px;
-            color: #546E7A;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
-        .tab.active {
-            background: #1A73E8;
-            color: white;
-            box-shadow: 0 8px 18px -6px #1A73E8;
-        }
-
-        /* 内容区 */
-        .content {
-            flex: 1;
-            padding: 24px 20px 40px;
-        }
-
-        /* 页面容器 */
-        .page {
-            display: none;
-            flex-direction: column;
-            gap: 28px;
-        }
-        .page.active {
-            display: flex;
-        }
-
-        /* 卡片 */
-        .card {
-            background-color: #FFFFFF;
-            border-radius: 32px;
-            padding: 28px 24px;
-            box-shadow: 
-                0 15px 35px -15px rgba(0, 0, 0, 0.08),
-                0 0 0 1px rgba(0, 0, 0, 0.01);
-            width: 100%;
-            border: none;
-        }
-
-        /* 大标题 */
-        .welcome-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: #0A1929;
-            line-height: 1.2;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-        .welcome-sub {
-            font-size: 16px;
-            color: #546E7A;
-            font-weight: 500;
-            margin-bottom: 24px;
-        }
-
-        /* 特性列表 */
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: #E3F2FD;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1A73E8;
-            font-size: 28px;
-        }
-        .feature-text h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0A1929;
-            margin-bottom: 4px;
-        }
-        .feature-text p {
-            font-size: 14px;
-            color: #546E7A;
-        }
-
-        /* 输入框组 */
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #0A1929;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .input-field {
-            width: 100%;
-            background: #F5F7FA;
-            border: none;
-            padding: 18px 20px;
-            border-radius: 24px;
-            font-size: 16px;
-            color: #0A1929;
-            outline: none;
-            transition: box-shadow 0.2s;
-        }
-        .input-field:focus {
-            box-shadow: 0 0 0 3px rgba(26,115,232,0.2);
-        }
-        .input-field::placeholder {
-            color: #94A3B8;
-            font-weight: 400;
-        }
-
-        /* 按钮 */
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(145deg, #1A73E8, #0D47A1);
-            border: none;
-            padding: 18px 0;
-            border-radius: 40px;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 10px 20px -8px rgba(13,71,161,0.5);
-            margin-top: 12px;
-        }
-        .btn-primary:active {
-            transform: scale(0.97);
-            box-shadow: 0 5px 10px -3px rgba(0,0,0,0.2);
-        }
-
-        .btn-link {
-            background: none;
-            border: none;
-            color: #1A73E8;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            padding: 10px;
-            margin-top: 16px;
-            width: 100%;
-            text-align: center;
-        }
-
-        /* 分割线 */
-        .divider {
+            background: linear-gradient(145deg, #0a4b6e, #247da3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: #94A3B8;
-            font-size: 14px;
-            margin: 20px 0;
+            border-left: 6px solid #247da3;
+            padding-left: 16px;
         }
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: #EDF2F7;
-        }
-
-        /* 社交登录 */
-        .social-row {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-        }
-        .social-icon {
-            width: 48px;
-            height: 48px;
-            background: #F5F7FA;
+        .hero h1 i {
+            background: #1f6f94;
+            color: white;
+            padding: 12px;
             border-radius: 50%;
+            font-size: 1.5rem;
+        }
+        .hero .sub {
+            color: #2b6e91;
+            margin-left: 22px;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .card {
+            background: white;
+            border-radius: 32px;
+            padding: 20px 18px;
+            box-shadow: 0 8px 18px -8px #a3c2da;
+        }
+        .card-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #1A73E8;
-            font-size: 24px;
-            cursor: pointer;
-            transition: background 0.2s;
+            gap: 10px;
+            margin-bottom: 16px;
+            border-bottom: 2px dashed #c5dff0;
+            padding-bottom: 10px;
         }
-        .social-icon:active {
-            background: #E3F2FD;
+        .card-header i {
+            font-size: 1.5rem;
+            color: #247da3;
+            background: #dcf0fd;
+            padding: 10px;
+            border-radius: 30px;
         }
-
-        /* 其他 */
-        .forgot-password {
-            text-align: right;
-            margin-top: 8px;
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #135e83;
         }
-        .forgot-password a {
-            color: #1A73E8;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
+        .dist-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
-        .terms {
+        .dist-cell {
+            background: #f3f9fe;
+            border-radius: 24px;
+            padding: 14px 8px;
             text-align: center;
-            color: #94A3B8;
-            font-size: 13px;
-            margin-top: 24px;
+            border-left: 4px solid #7fb9da;
         }
-        .terms a {
-            color: #1A73E8;
-            text-decoration: none;
+        .dist-cell .label {
+            font-size: 0.7rem;
+            color: #366f94;
+        }
+        .dist-cell .number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0b3e5a;
+            font-family: 'Courier New', monospace;
+        }
+        .dist-cell .percent {
+            font-size: 0.7rem;
+            color: #749bb3;
+        }
+        .pool-stats {
+            display: flex;
+            gap: 16px;
+            justify-content: space-around;
+            margin-bottom: 16px;
+        }
+        .pool-item {
+            background: #f3f9fe;
+            border-radius: 28px;
+            padding: 14px 16px;
+            text-align: center;
+            flex: 1;
+        }
+        .pool-item .label {
+            font-size: 0.7rem;
+            color: #2f6d8b;
+        }
+        .pool-item .number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f4d70;
+            font-family: 'Courier New', monospace;
+        }
+        .price-row {
+            background: linear-gradient(115deg, #1a618b, #247da3);
+            border-radius: 30px;
+            padding: 14px 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .price-row span:last-child {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-family: 'Courier New', monospace;
+        }
+        .mini-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .mini-card {
+            background: #f4f9fe;
+            border-radius: 24px;
+            padding: 14px 10px;
+            flex: 1 1 80px;
+            border-left: 5px solid #f4a261;
+        }
+        .mini-card .title {
+            font-size: 0.65rem;
+            color: #316d8f;
+        }
+        .mini-card .number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0b4b6b;
+            font-family: 'Courier New', monospace;
+        }
+        .trade-highlight {
+            background: #fff1dc;
+            border-radius: 32px;
+            padding: 16px 14px;
+            border: 2px solid #f4a261;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-around;
+        }
+        .trade-item .label {
+            font-size: 0.65rem;
+            color: #8f5f2b;
+        }
+        .trade-item .value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #b45f1b;
+            font-family: 'Courier New', monospace;
+        }
+        .control-panel {
+            background: white;
+            border-radius: 36px;
+            padding: 22px 18px;
+        }
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .mode-btn {
+            flex: 1;
+            background: #eef4fa;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1a5f82;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .mode-btn.active {
+            background: #247da3;
+            color: white;
+        }
+        .slider-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .slider-label {
+            font-weight: 600;
+            color: #1a5f82;
+            font-size: 0.95rem;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 8px;
+            background: #d0e6f5;
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            background: #247da3;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px #0f4d70;
+            cursor: pointer;
+        }
+        .selected-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1b6f93;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        .action-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn {
+            background: #247da3;
+            color: white;
+            font-weight: 700;
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            flex: 1;
+            cursor: pointer;
+        }
+        .btn.secondary {
+            background: #3a7b9b;
+        }
+        .history-panel {
+            background: #e5f2fd;
+            border-radius: 32px;
+            padding: 18px;
+        }
+        .history-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+        }
+        .history-item {
+            background: white;
+            border-radius: 24px;
+            padding: 10px 16px;
+            flex: 1 1 100px;
+            text-align: center;
+        }
+        .history-item .label {
+            font-size: 0.7rem;
+            color: #2f6d8b;
+        }
+        .history-item .number {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .market-card {
+            background: #e0f0fa;
+            border-radius: 32px;
+            padding: 20px 18px;
+            border-left: 6px solid #2ecc71;
+        }
+        .market-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .market-header i {
+            font-size: 1.5rem;
+            color: #27ae60;
+        }
+        .market-header h4 {
+            font-size: 1.2rem;
+            color: #1e6f5c;
+        }
+        .market-desc {
+            font-size: 0.9rem;
+            color: #1a4b5a;
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        .dual-section {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .stake-card, .dump-card {
+            background: #fff7e5;
+            border-radius: 32px;
+            padding: 22px 18px;
+            border-left: 6px solid #f4a261;
+        }
+        .dump-card {
+            background: #f3eafa;
+            border-left-color: #9b6bc0;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .stat-cell {
+            background: white;
+            border-radius: 24px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-cell .label {
+            font-size: 0.7rem;
+            color: #4a5f6b;
+        }
+        .stat-cell .value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f4d70;
+            font-family: 'Courier New', monospace;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 40px;
+            padding: 4px 8px 4px 16px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+        .input-group input {
+            width: 100px;
+            border: none;
+            padding: 10px 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .result-cell {
+            background: white;
+            border-radius: 24px;
+            padding: 12px;
+            text-align: center;
+        }
+        .result-cell .label {
+            font-size: 0.65rem;
+            color: #5f3b5f;
+        }
+        .result-cell .value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #4a2c6b;
+            font-family: 'Courier New', monospace;
+        }
+        footer {
+            text-align: center;
+            color: #4a7897;
+            font-size: 0.75rem;
+            margin-top: 16px;
+        }
+        .slider-unit {
+            font-size: 1rem;
             font-weight: 500;
+            margin-left: 6px;
+            color: #247da3;
+        }
+        .dump-note {
+            font-size: 0.75rem;
+            color: #6b4f8c;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- 头部 - 仅居中H图标，与导航保持距离 -->
-        <div class="header">
-            <div class="header-icon">H</div>
-        </div>
+<div class="phone-frame">
 
-        <!-- 标签切换 -->
-        <div class="tab-bar">
-            <button class="tab active" id="tabGuide">引导</button>
-            <button class="tab" id="tabRegister">注册</button>
-            <button class="tab" id="tabLogin">登录</button>
-        </div>
+    <!-- 标题头 -->
+    <div class="hero">
+        <h1><i class="fas fa-dolphin"></i> 海豚经济</h1>
+        <div class="sub">手机优化版 · 飞轮效应</div>
+    </div>
 
-        <!-- 内容区（三个页面） -->
-        <div class="content">
-            <!-- 引导页 -->
-            <div class="page active" id="guidePage">
-                <div class="card">
-                    <div class="welcome-title">欢迎来到<br>海豚社区</div>
-                    <div class="welcome-sub">探索、赚币、连接，尽在掌握</div>
-
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-                        <div class="feature-text">
-                            <h3>实时数据</h3>
-                            <p>质押总量、交易动态一目了然</p>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="fas fa-gift"></i></div>
-                        <div class="feature-text">
-                            <h3>丰富工具</h3>
-                            <p>签到、抽奖、红包等你来拿</p>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                        <div class="feature-text">
-                            <h3>安全可靠</h3>
-                            <p>多重防护，资产无忧</p>
-                        </div>
-                    </div>
-
-                    <button class="btn-primary" onclick="switchTab('register')">立即体验</button>
-                    <button class="btn-link" onclick="switchTab('login')">已有账号？去登录</button>
-                </div>
-            </div>
-
-            <!-- 注册页 -->
-            <div class="page" id="registerPage">
-                <div class="card">
-                    <div class="welcome-title">创建账号</div>
-                    <div class="welcome-sub">加入海豚社区，开启旅程</div>
-
-                    <div class="input-group">
-                        <label class="input-label">手机号 / 邮箱</label>
-                        <input class="input-field" type="text" placeholder="输入手机号或邮箱">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">密码</label>
-                        <input class="input-field" type="password" placeholder="至少8位字符">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">确认密码</label>
-                        <input class="input-field" type="password" placeholder="再次输入密码">
-                    </div>
-
-                    <button class="btn-primary" onclick="alert('注册功能演示')">注册</button>
-
-                    <div class="divider">
-                        <span class="divider-line"></span>
-                        <span>其他方式</span>
-                        <span class="divider-line"></span>
-                    </div>
-
-                    <div class="social-row">
-                        <div class="social-icon"><i class="fab fa-weixin"></i></div>
-                        <div class="social-icon"><i class="fab fa-qq"></i></div>
-                        <div class="social-icon"><i class="fab fa-apple"></i></div>
-                    </div>
-
-                    <div class="terms">
-                        点击注册即表示同意 <a href="#">用户协议</a> 和 <a href="#">隐私政策</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 登录页 -->
-            <div class="page" id="loginPage">
-                <div class="card">
-                    <div class="welcome-title">欢迎回来</div>
-                    <div class="welcome-sub">登录你的海豚账号</div>
-
-                    <div class="input-group">
-                        <label class="input-label">手机号 / 邮箱</label>
-                        <input class="input-field" type="text" placeholder="输入手机号或邮箱">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">密码</label>
-                        <input class="input-field" type="password" placeholder="输入密码">
-                    </div>
-                    <div class="forgot-password">
-                        <a href="#">忘记密码？</a>
-                    </div>
-
-                    <button class="btn-primary" onclick="alert('登录功能演示')">登录</button>
-
-                    <div class="divider">
-                        <span class="divider-line"></span>
-                        <span>社交登录</span>
-                        <span class="divider-line"></span>
-                    </div>
-
-                    <div class="social-row">
-                        <div class="social-icon"><i class="fab fa-weixin"></i></div>
-                        <div class="social-icon"><i class="fab fa-qq"></i></div>
-                        <div class="social-icon"><i class="fab fa-apple"></i></div>
-                    </div>
-
-                    <button class="btn-link" onclick="switchTab('register')">还没有账号？立即注册</button>
-                </div>
-            </div>
+    <!-- 持币分布 -->
+    <div class="card">
+        <div class="card-header"><i class="fas fa-chart-pie"></i><h3>持币分布</h3></div>
+        <div class="dist-grid">
+            <div class="dist-cell"><span class="label">社区多签</span><div class="number" id="communityH">682,648,402</div><div class="percent" id="communityPct">68.26%</div></div>
+            <div class="dist-cell"><span class="label">质押池</span><div class="number" id="stakeH">300,000,000</div><div class="percent" id="stakePct">30.00%</div></div>
+            <div class="dist-cell"><span class="label">外部用户</span><div class="number" id="externalH">0</div><div class="percent" id="externalPct">0.00%</div></div>
+            <div class="dist-cell"><span class="label">LP池</span><div class="number" id="lpH">17,351,598</div><div class="percent" id="lpPct">1.74%</div></div>
         </div>
     </div>
 
-    <script>
-        // 切换标签和页面
-        const tabGuide = document.getElementById('tabGuide');
-        const tabRegister = document.getElementById('tabRegister');
-        const tabLogin = document.getElementById('tabLogin');
-        const guidePage = document.getElementById('guidePage');
-        const registerPage = document.getElementById('registerPage');
-        const loginPage = document.getElementById('loginPage');
+    <!-- 流动性池 + 价格 -->
+    <div class="card">
+        <div class="card-header"><i class="fas fa-water"></i><h3>流动性池</h3></div>
+        <div class="pool-stats">
+            <div class="pool-item"><span class="label">USDT</span><div class="number" id="poolU">110,000</div></div>
+            <div class="pool-item"><span class="label">H</span><div class="number" id="poolH">17,351,598</div></div>
+        </div>
+        <div class="price-row">
+            <span>当前价格</span>
+            <span id="currentPrice">0.00634</span>
+        </div>
+    </div>
 
-        function switchTab(tabName) {
-            tabGuide.classList.remove('active');
-            tabRegister.classList.remove('active');
-            tabLogin.classList.remove('active');
-            guidePage.classList.remove('active');
-            registerPage.classList.remove('active');
-            loginPage.classList.remove('active');
+    <!-- 国库/多签/回购 -->
+    <div class="card">
+        <div class="card-header"><i class="fas fa-landmark"></i><h3>国库 & 回购</h3></div>
+        <div class="mini-row">
+            <div class="mini-card"><span class="title">国库余额 (U)</span><div class="number" id="treasuryBal">0</div></div>
+            <div class="mini-card"><span class="title">多签储备 (U)</span><div class="number" id="multiSigBal">0</div></div>
+            <div class="mini-card"><span class="title">回购次数</span><div class="number" id="buybackCount">0</div></div>
+            <div class="mini-card"><span class="title">回购H总量</span><div class="number" id="buybackTotalH">0</div></div>
+            <div class="mini-card"><span class="title">分红池 (U)</span><div class="number" id="dividendPool">0</div></div>
+        </div>
+    </div>
 
-            if (tabName === 'guide') {
-                tabGuide.classList.add('active');
-                guidePage.classList.add('active');
-            } else if (tabName === 'register') {
-                tabRegister.classList.add('active');
-                registerPage.classList.add('active');
-            } else if (tabName === 'login') {
-                tabLogin.classList.add('active');
-                loginPage.classList.add('active');
-            }
+    <!-- 最近交易 -->
+    <div class="trade-highlight">
+        <div class="trade-item"><span class="label">花费 USDT</span><div class="value" id="lastSpent">0</div></div>
+        <div class="trade-item"><span class="label">获得 H</span><div class="value" id="lastObtained">0</div></div>
+        <div class="trade-item"><span class="label">成交价</span><div class="value" id="lastPrice">0.00634</div></div>
+        <div class="trade-item"><span class="label">税费</span><div class="value" id="lastTax">0</div></div>
+        <div class="trade-item"><span class="label">累计买入U</span><div class="value" id="totalBuyU">0</div></div>
+        <div class="trade-item"><span class="label">累计卖出H</span><div class="value" id="totalSellH">0</div></div>
+    </div>
+
+    <!-- 交易控制 -->
+    <div class="control-panel">
+        <div class="mode-switch">
+            <button class="mode-btn active" id="modeBuy">💵 买入 H</button>
+            <button class="mode-btn" id="modeSell">🪙 卖出 H</button>
+        </div>
+        <div class="slider-area">
+            <span class="slider-label" id="sliderLabel">买入金额 (USDT)</span>
+            <input type="range" id="actionSlider" min="100" max="100000" value="1000" step="100">
+            <div>
+                <span class="selected-amount" id="sliderValue">1,000</span>
+                <span class="slider-unit" id="sliderUnit">USDT</span>
+            </div>
+        </div>
+        <div class="action-btns">
+            <button class="btn" id="executeBtn"><i class="fas fa-bolt"></i> 执行</button>
+            <button class="btn secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> 重置</button>
+        </div>
+    </div>
+
+    <!-- 回购历史 -->
+    <div class="history-panel">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+            <i class="fas fa-history" style="color:#0f4d70;"></i>
+            <h4 style="color:#0f4d70;">最近回购</h4>
+        </div>
+        <div class="history-flex">
+            <div class="history-item"><span class="label">回购数量</span><br><span class="number" id="lastBuybackH">0</span> H</div>
+            <div class="history-item"><span class="label">回购价格</span><br><span class="number" id="lastBuybackPrice">0.00634</span></div>
+            <div class="history-item"><span class="label">累计回购</span><br><span class="number" id="cumBuybackH">0</span> H</div>
+        </div>
+    </div>
+
+    <!-- 市场环境测试 -->
+    <div class="market-card">
+        <div class="market-header">
+            <i class="fas fa-trophy"></i>
+            <h4>市场环境测试</h4>
+        </div>
+        <div class="market-desc">
+            <p>✨ <strong>质押H享最高1.2%日利率 + 无常损失补偿</strong><br>
+            参与OKX交易赛可获双重奖励：质押收益与空投奖励叠加。即使价格波动，质押的H依然产生每日收益，同时交易赛返佣和奖金为用户提供额外激励。</p>
+            <p style="margin-top:6px;">👉 当前外部持币可质押模拟见下方。</p>
+        </div>
+    </div>
+
+    <!-- 质押 + 砸盘（基于真实外部持币） -->
+    <div class="dual-section">
+        <!-- 质押区（不变） -->
+        <div class="stake-card">
+            <h4 style="display:flex; gap:8px;"><i class="fas fa-layer-group"></i> 当前外部持币质押</h4>
+            <div style="margin:10px 0;">外部持币: <strong class="number" id="externalForStake">0</strong> H</div>
+            <select id="stakeDuration" style="width:100%; padding:10px; border-radius:40px; border:1px solid #ccc;">
+                <option value="0.5">1-7天 (0.5%)</option>
+                <option value="0.6">8-15天 (0.6%)</option>
+                <option value="0.8">16-30天 (0.8%)</option>
+                <option value="1.0">31-60天 (1.0%)</option>
+                <option value="1.2" selected>61天以上 (1.2%)</option>
+            </select>
+            <div class="stat-grid" style="margin-top:15px;">
+                <div class="stat-cell"><span class="label">每日收益</span><span class="value" id="dailyReward">0</span> H</div>
+                <div class="stat-cell"><span class="label">等值USDT</span><span class="value" id="dailyUsdt">0</span></div>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; margin:12px 0;">
+                <span>天数:</span>
+                <input type="number" id="stakeDays" value="7" min="1" max="365" style="width:70px; padding:8px; border-radius:40px; border:1px solid #aaa;">
+            </div>
+            <div class="stat-grid">
+                <div class="stat-cell"><span class="label">累计收益</span><span class="value" id="cumulativeReward">0</span> H</div>
+                <div class="stat-cell"><span class="label">累计价值</span><span class="value" id="cumulativeValue">0</span> U</div>
+            </div>
+        </div>
+
+        <!-- 砸盘区（基于真实外部持币） -->
+        <div class="dump-card">
+            <h4 style="display:flex; gap:8px;"><i class="fas fa-chart-line"></i> 真实砸盘模拟（基于当前外部持币）</h4>
+            <p style="font-size:0.8rem; color:#4a2c6b; margin-bottom:8px;">⚡ 输入质押天数，系统将模拟把当前所有外部持币（含收益）一次性卖出，价格随深度变化。</p>
+            <div style="background:#e6d4f5; border-radius:30px; padding:12px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>当前外部持币:</span>
+                    <strong class="number" id="dumpExternalDisplay">0</strong> H
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                    <span>当前价格:</span>
+                    <strong class="number" id="dumpCurrentPriceDisplay">0.00634</strong> U
+                </div>
+            </div>
+            <div class="input-group">
+                <span>质押天数</span>
+                <input type="number" id="dumpDays" value="100" min="1" max="3650" step="1">
+            </div>
+            <button class="btn" id="simulateDumpBtn" style="background:#8a4eb3; width:100%; margin:8px 0;">模拟砸盘</button>
+            <div class="result-grid">
+                <div class="result-cell"><span class="label">累计收益</span><span class="value" id="dumpRewardH">0</span> H</div>
+                <div class="result-cell"><span class="label">总砸盘量</span><span class="value" id="totalDumpH">0</span> H</div>
+                <div class="result-cell"><span class="label">卖出后价格</span><span class="value" id="dumpAfterPrice">0.00634</span> U</div>
+                <div class="result-cell"><span class="label">卖出所得U</span><span class="value" id="dumpObtainedU">0</span> U</div>
+                <div class="result-cell"><span class="label">交易税费</span><span class="value" id="dumpTax">0</span> U</div>
+                <div class="result-cell"><span class="label">净得U</span><span class="value" id="dumpNetU">0</span> U</div>
+                <div class="result-cell"><span class="label">当前市值</span><span class="value" id="dumpMarketValue">0</span> U</div>
+                <div class="result-cell"><span class="label">亏损额</span><span class="value" id="dumpLossU">0</span> U</div>
+                <div class="result-cell"><span class="label">亏损率</span><span class="value" id="dumpLossRate">0%</span></div>
+            </div>
+            <div class="dump-note">* 亏损 = 当前市值 - 净得U。市值 = 外部持币 × 当前价。</div>
+        </div>
+    </div>
+
+    <footer>国库≥1000U触发回购(300U买H，700U入多签) · 先买入/卖出产生外部持币，再砸盘模拟</footer>
+</div>
+
+<script>
+(function() {
+    // ---------- 常量 ----------
+    const TOTAL_SUPPLY = 1_000_000_000;
+    const TAX = 0.05;                     // 5% 交易税
+    const REPUBLIC_THRESHOLD = 1000;       // 国库达到1000U触发回购
+    const REPUBLIC_BUYBACK = 300;          // 每次回购使用300U买入H
+    const REPUBLIC_MULTISIG = 700;         // 每次回购同时向多签储备存入700U
+
+    // ---------- 状态变量 ----------
+    let communityH = 682_648_402;           // 社区多签持币
+    let stakePoolH = 300_000_000;           // 质押池持币（固定）
+    let lpPoolH = 17_351_598;               // LP池中的H数量
+    let lpPoolU = 110_000;                   // LP池中的USDT数量
+
+    let treasury = 0;                        // 国库USDT（来自税费）
+    let multiSig = 0;                        // 多签储备USDT
+    let buybackCount = 0;                     // 回购次数
+    let totalBuybackH = 0;                    // 累计回购H总量
+    let lastBuybackH = 0;                     // 最近一次回购H数量
+    let lastBuybackPrice = lpPoolU / lpPoolH;  // 最近回购价格
+
+    let totalBuyUSDT = 0;                      // 累计买入USDT总额（含税）
+    let totalSellH = 0;                        // 累计卖出H总量
+
+    let lastSpent = 0;                         // 最近一次交易花费（买入为正USDT，卖出为负净得U）
+    let lastObtained = 0;                       // 最近一次交易获得（买入为正H，卖出为负H）
+    let lastTradePrice = lpPoolU / lpPoolH;     // 最近一次交易均价
+    let lastTax = 0;                            // 最近一次交易税费
+
+    // ---------- 辅助函数：外部持币 = 总供应 - 其他 ----------
+    function getExternalH() {
+        return TOTAL_SUPPLY - communityH - stakePoolH - lpPoolH;
+    }
+
+    // ---------- DOM 元素 ----------
+    const communitySpan = document.getElementById('communityH');
+    const stakeSpan = document.getElementById('stakeH');
+    const externalSpan = document.getElementById('externalH');
+    const lpHSpan = document.getElementById('lpH');
+    const communityPct = document.getElementById('communityPct');
+    const stakePct = document.getElementById('stakePct');
+    const externalPct = document.getElementById('externalPct');
+    const lpPct = document.getElementById('lpPct');
+    const poolUSpan = document.getElementById('poolU');
+    const poolHSpan = document.getElementById('poolH');
+    const currentPriceSpan = document.getElementById('currentPrice');
+    const treasuryBalSpan = document.getElementById('treasuryBal');
+    const multiSigBalSpan = document.getElementById('multiSigBal');
+    const buybackCountSpan = document.getElementById('buybackCount');
+    const buybackTotalHSpan = document.getElementById('buybackTotalH');
+    const dividendPoolSpan = document.getElementById('dividendPool');
+
+    const lastSpentSpan = document.getElementById('lastSpent');
+    const lastObtainedSpan = document.getElementById('lastObtained');
+    const lastPriceSpan = document.getElementById('lastPrice');
+    const lastTaxSpan = document.getElementById('lastTax');
+    const totalBuyUSpan = document.getElementById('totalBuyU');
+    const totalSellHSpan = document.getElementById('totalSellH');
+
+    const lastBuybackHSpan = document.getElementById('lastBuybackH');
+    const lastBuybackPriceSpan = document.getElementById('lastBuybackPrice');
+    const cumBuybackHSpan = document.getElementById('cumBuybackH');
+
+    const externalForStake = document.getElementById('externalForStake');
+    const dailyRewardSpan = document.getElementById('dailyReward');
+    const dailyUsdtSpan = document.getElementById('dailyUsdt');
+    const stakeDuration = document.getElementById('stakeDuration');
+    const stakeDays = document.getElementById('stakeDays');
+    const cumulativeRewardSpan = document.getElementById('cumulativeReward');
+    const cumulativeValueSpan = document.getElementById('cumulativeValue');
+
+    // 砸盘模拟元素
+    const dumpExternalDisplay = document.getElementById('dumpExternalDisplay');
+    const dumpCurrentPriceDisplay = document.getElementById('dumpCurrentPriceDisplay');
+    const dumpDaysInput = document.getElementById('dumpDays');
+    const simulateDumpBtn = document.getElementById('simulateDumpBtn');
+    const dumpRewardHSpan = document.getElementById('dumpRewardH');
+    const totalDumpHSpan = document.getElementById('totalDumpH');
+    const dumpAfterPriceSpan = document.getElementById('dumpAfterPrice');
+    const dumpObtainedUSpan = document.getElementById('dumpObtainedU');
+    const dumpTaxSpan = document.getElementById('dumpTax');
+    const dumpNetUSpan = document.getElementById('dumpNetU');
+    const dumpMarketValueSpan = document.getElementById('dumpMarketValue');
+    const dumpLossUSpan = document.getElementById('dumpLossU');
+    const dumpLossRateSpan = document.getElementById('dumpLossRate');
+
+    const modeBuyBtn = document.getElementById('modeBuy');
+    const modeSellBtn = document.getElementById('modeSell');
+    const sliderLabel = document.getElementById('sliderLabel');
+    const actionSlider = document.getElementById('actionSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const sliderUnit = document.getElementById('sliderUnit');
+    const executeBtn = document.getElementById('executeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let isBuyMode = true;   // 当前模式 true=买入, false=卖出
+
+    // ---------- 格式化工具 ----------
+    function formatNumber(num) {
+        return Math.floor(num).toLocaleString('en-US');
+    }
+    function formatFloat(num, d=2) {
+        return num.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+    }
+    function formatPrice(p) {
+        if (p < 0.0001) return p.toFixed(8);
+        if (p < 0.01) return p.toFixed(6);
+        if (p < 1) return p.toFixed(4);
+        return p.toFixed(4);
+    }
+
+    // ---------- 核心：回购执行（从LP池买入H，加入社区多签）----------
+    function performBuyback() {
+        while (treasury >= REPUBLIC_THRESHOLD) {
+            const buyU = REPUBLIC_BUYBACK;      // 300
+            const multiU = REPUBLIC_MULTISIG;    // 700
+
+            // 恒定乘积 k = U * H
+            const k = lpPoolU * lpPoolH;
+            const newU = lpPoolU + buyU;
+            const newH = k / newU;
+            const hBought = lpPoolH - newH;      // 从池中买出的H
+
+            if (hBought <= 0) break;             // 防止极端情况
+
+            // 更新流动池
+            lpPoolU = newU;
+            lpPoolH = newH;
+            // 买入的H进入社区多签
+            communityH += hBought;
+            // 多签储备增加700U
+            multiSig += multiU;
+            // 记录回购数据
+            totalBuybackH += hBought;
+            lastBuybackH = hBought;
+            lastBuybackPrice = buyU / hBought;
+            buybackCount++;
+            // 国库扣除1000U
+            treasury -= REPUBLIC_THRESHOLD;
+        }
+    }
+
+    // ---------- 买入逻辑 ----------
+    function executeBuy(amountU) {
+        if (amountU <= 0) return;
+        const tax = amountU * TAX;
+        const net = amountU - tax;
+        if (net <= 0) return;
+
+        const k = lpPoolU * lpPoolH;
+        const newU = lpPoolU + net;
+        const newH = k / newU;
+        const hObtained = lpPoolH - newH;
+        if (hObtained <= 0) return;
+
+        const avgPrice = net / hObtained;
+
+        // 更新状态
+        lastSpent = amountU;
+        lastObtained = hObtained;
+        lastTradePrice = avgPrice;
+        lastTax = tax;
+        totalBuyUSDT += amountU;
+
+        lpPoolU = newU;
+        lpPoolH = newH;
+        treasury += tax;
+
+        performBuyback();    // 尝试回购
+        refreshAll();
+    }
+
+    // ---------- 卖出逻辑 ----------
+    function executeSell(amountH) {
+        if (amountH <= 0) return;
+        const external = getExternalH();
+        if (amountH > external) {
+            alert('外部持币不足');
+            return;
         }
 
-        tabGuide.addEventListener('click', () => switchTab('guide'));
-        tabRegister.addEventListener('click', () => switchTab('register'));
-        tabLogin.addEventListener('click', () => switchTab('login'));
+        const k = lpPoolU * lpPoolH;
+        const newH = lpPoolH + amountH;
+        const newU = k / newH;
+        const uObtained = lpPoolU - newU;    // 用户卖出得到的U（税前）
+        if (uObtained <= 0) return;
 
-        window.switchTab = switchTab;
-    </script>
+        const tax = uObtained * TAX;
+        const netU = uObtained - tax;
+        const avgPrice = uObtained / amountH;
+
+        lastSpent = -netU;          // 负值表示获得U
+        lastObtained = -amountH;    // 负值表示减少H
+        lastTradePrice = avgPrice;
+        lastTax = tax;
+        totalSellH += amountH;
+
+        lpPoolU = newU;
+        lpPoolH = newH;
+        treasury += tax;
+
+        performBuyback();    // 尝试回购
+        refreshAll();
+    }
+
+    // ---------- 重置初始状态 ----------
+    function resetToInitial() {
+        communityH = 682_648_402;
+        stakePoolH = 300_000_000;
+        lpPoolH = 17_351_598;
+        lpPoolU = 110_000;
+        treasury = 0;
+        multiSig = 0;
+        buybackCount = 0;
+        totalBuybackH = 0;
+        lastBuybackH = 0;
+        lastBuybackPrice = lpPoolU / lpPoolH;
+        totalBuyUSDT = 0;
+        totalSellH = 0;
+        lastSpent = 0;
+        lastObtained = 0;
+        lastTradePrice = lpPoolU / lpPoolH;
+        lastTax = 0;
+        refreshAll();
+    }
+
+    // ---------- 刷新所有显示 ----------
+    function refreshAll() {
+        const external = getExternalH();
+        const price = lpPoolU / lpPoolH;
+        const total = TOTAL_SUPPLY;  // 总和恒为10亿
+
+        // 持币分布
+        communitySpan.innerText = formatNumber(communityH);
+        stakeSpan.innerText = formatNumber(stakePoolH);
+        externalSpan.innerText = formatNumber(external);
+        lpHSpan.innerText = formatNumber(lpPoolH);
+        communityPct.innerText = ((communityH / total) * 100).toFixed(2) + '%';
+        stakePct.innerText = ((stakePoolH / total) * 100).toFixed(2) + '%';
+        externalPct.innerText = ((external / total) * 100).toFixed(2) + '%';
+        lpPct.innerText = ((lpPoolH / total) * 100).toFixed(2) + '%';
+
+        // 流动池 & 价格
+        poolUSpan.innerText = formatNumber(lpPoolU);
+        poolHSpan.innerText = formatNumber(lpPoolH);
+        currentPriceSpan.innerText = formatPrice(price);
+
+        // 国库/多签/回购
+        treasuryBalSpan.innerText = formatFloat(treasury);
+        multiSigBalSpan.innerText = formatFloat(multiSig);
+        buybackCountSpan.innerText = buybackCount;
+        buybackTotalHSpan.innerText = formatNumber(totalBuybackH);
+        const dividend = treasury * 0.1;
+        dividendPoolSpan.innerText = formatFloat(dividend);
+
+        // 最近交易（根据模式微调显示）
+        if (isBuyMode) {
+            lastSpentSpan.innerText = formatFloat(lastSpent, 2);
+            lastObtainedSpan.innerText = formatNumber(lastObtained);
+        } else {
+            lastSpentSpan.innerText = formatFloat(Math.abs(lastSpent), 2);
+            lastObtainedSpan.innerText = '-' + formatNumber(Math.abs(lastObtained));
+        }
+        lastPriceSpan.innerText = formatPrice(lastTradePrice);
+        lastTaxSpan.innerText = formatFloat(lastTax, 2);
+        totalBuyUSpan.innerText = formatFloat(totalBuyUSDT, 2);
+        totalSellHSpan.innerText = formatNumber(totalSellH);
+
+        // 回购历史
+        lastBuybackHSpan.innerText = formatNumber(lastBuybackH);
+        lastBuybackPriceSpan.innerText = formatPrice(lastBuybackPrice);
+        cumBuybackHSpan.innerText = formatNumber(totalBuybackH);
+
+        // 质押相关
+        externalForStake.innerText = formatNumber(external);
+        updateStakeReward();
+
+        // 砸盘预览更新（仅显示当前外部持币和价格，不清空之前模拟结果）
+        dumpExternalDisplay.innerText = formatNumber(external);
+        dumpCurrentPriceDisplay.innerText = formatPrice(price);
+    }
+
+    // 更新质押收益预览
+    function updateStakeReward() {
+        const external = getExternalH();
+        const rate = parseFloat(stakeDuration.value) / 100;
+        const dailyH = external * rate;
+        dailyRewardSpan.innerText = formatNumber(dailyH);
+        const price = lpPoolU / lpPoolH;
+        dailyUsdtSpan.innerText = formatFloat(dailyH * price, 2);
+        const days = parseInt(stakeDays.value) || 0;
+        const cumH = dailyH * days;
+        cumulativeRewardSpan.innerText = formatNumber(cumH);
+        cumulativeValueSpan.innerText = formatFloat(cumH * price, 2);
+    }
+
+    // 砸盘模拟（基于当前外部持币，一次性卖出）
+    function simulateDump() {
+        const external = getExternalH();
+        if (external <= 0) {
+            alert('当前外部持币为0，无法模拟砸盘');
+            return;
+        }
+
+        const days = parseInt(dumpDaysInput.value);
+        if (isNaN(days) || days <= 0) {
+            alert('请输入有效的天数');
+            return;
+        }
+
+        const rate = parseFloat(stakeDuration.value) / 100;  // 日利率
+        const dailyReward = external * rate;                  // 每日收益
+        const totalReward = dailyReward * days;               // 累计收益
+        const totalH = external + totalReward;                // 总砸盘量
+
+        // 使用当前流动性池深度模拟卖出（恒定乘积）
+        const k = lpPoolU * lpPoolH;
+        const newH = lpPoolH + totalH;
+        const newU = k / newH;
+        const uObtained = lpPoolU - newU;                     // 卖出得到的USDT（税前）
+        if (uObtained <= 0) {
+            alert('模拟卖出无法获得USDT，可能池子深度不足');
+            return;
+        }
+
+        const tax = uObtained * TAX;                           // 交易税
+        const netU = uObtained - tax;                          // 实际得到U
+        const oldPrice = lpPoolU / lpPoolH;                    // 当前价格
+        const newPrice = newU / newH;                          // 卖出后价格
+        const marketValue = external * oldPrice;                // 当前外部持币市值
+
+        // 亏损计算：市值 - 净得U
+        const loss = marketValue - netU;
+
+        // 显示结果
+        dumpRewardHSpan.innerText = formatNumber(totalReward);
+        totalDumpHSpan.innerText = formatNumber(totalH);
+        dumpAfterPriceSpan.innerText = formatPrice(newPrice);
+        dumpObtainedUSpan.innerText = formatFloat(uObtained, 2);
+        dumpTaxSpan.innerText = formatFloat(tax, 2);
+        dumpNetUSpan.innerText = formatFloat(netU, 2);
+        dumpMarketValueSpan.innerText = formatFloat(marketValue, 2);
+        dumpLossUSpan.innerText = formatFloat(loss, 2);
+        const lossRate = (loss / marketValue * 100).toFixed(2);
+        dumpLossRateSpan.innerText = (loss > 0 ? lossRate : '0.00') + '%';
+    }
+
+    // ---------- 事件绑定 ----------
+    modeBuyBtn.onclick = () => {
+        isBuyMode = true;
+        modeBuyBtn.classList.add('active');
+        modeSellBtn.classList.remove('active');
+        sliderLabel.innerText = '买入金额 (USDT)';
+        actionSlider.min = 100;
+        actionSlider.max = 100000;
+        actionSlider.step = 100;
+        actionSlider.value = 1000;
+        sliderValue.innerText = '1,000';
+        sliderUnit.innerText = 'USDT';
+        refreshAll();   // 更新最近交易显示格式
+    };
+    modeSellBtn.onclick = () => {
+        isBuyMode = false;
+        modeSellBtn.classList.add('active');
+        modeBuyBtn.classList.remove('active');
+        sliderLabel.innerText = '卖出数量 (万H)';
+        actionSlider.min = 1;
+        actionSlider.max = 2000;      // 最大2000万H
+        actionSlider.step = 1;
+        actionSlider.value = 5;
+        sliderValue.innerText = '5';
+        sliderUnit.innerText = '万 H';
+        refreshAll();
+    };
+    actionSlider.oninput = () => {
+        let val = parseInt(actionSlider.value);
+        sliderValue.innerText = val.toLocaleString();
+    };
+    executeBtn.onclick = () => {
+        let v = parseFloat(actionSlider.value);
+        if (isNaN(v) || v <= 0) return;
+        if (isBuyMode) {
+            executeBuy(v);
+        } else {
+            executeSell(v * 10000);   // 万H转为H
+        }
+    };
+    resetBtn.onclick = resetToInitial;
+
+    stakeDuration.onchange = updateStakeReward;
+    stakeDays.oninput = updateStakeReward;
+
+    simulateDumpBtn.onclick = simulateDump;
+
+    // 初始化
+    resetToAll();
+})();
+</script>
 </body>
 </html>
