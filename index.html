@@ -1,259 +1,122 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>液态玻璃 · 钱包入口</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(145deg, #f2f7fd 0%, #e6eef9 100%);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            color: #1e2b3c;
-        }
-
-        /* 主卡片——极简液态玻璃 */
-        .glass-card {
-            max-width: 460px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border-radius: 56px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 30px 50px -20px rgba(0, 40, 70, 0.2), 
-                        0 0 0 1px rgba(255, 255, 255, 0.7) inset;
-            padding: 2.5rem 2rem;
-            transition: all 0.3s ease;
-        }
-
-        /* 图标/Logo区域 */
-        .logo-area {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1.8rem;
-        }
-
-        .logo-icon {
-            width: 72px;
-            height: 72px;
-            border-radius: 72px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.6rem;
-            box-shadow: 0 12px 25px -12px rgba(70, 130, 200, 0.3);
-            color: #2f557c;
-        }
-
-        h1 {
-            font-size: 2.4rem;
-            font-weight: 550;
-            letter-spacing: -0.02em;
-            text-align: center;
-            color: #102433;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 5px rgba(255,255,255,0.8);
-        }
-
-        .sub {
-            text-align: center;
-            font-size: 1rem;
-            color: #4c627b;
-            margin-bottom: 2.5rem;
-            font-weight: 350;
-            border-bottom: 1px solid rgba(140, 170, 200, 0.3);
-            padding-bottom: 1.2rem;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 1.2rem;
-            padding-right: 1.2rem;
-        }
-
-        /* 按钮组 */
-        .action-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            border-radius: 80px;
-            padding: 1.2rem 1.5rem;
-            font-size: 1.2rem;
-            font-weight: 550;
-            color: #152b3c;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 18px -8px rgba(0, 50, 80, 0.1), 
-                        0 0 0 1px rgba(255,255,255,0.8) inset;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.8rem;
-            width: 100%;
-            text-decoration: none;
-            border: none;
-            font-family: inherit;
-        }
-
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 12px 28px -12px rgba(70, 130, 220, 0.4);
-            transform: scale(1.02);
-            color: #0b1e30;
-        }
-
-        .btn-glass:active {
-            transform: scale(0.98);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid rgba(120, 150, 190, 0.5);
-            backdrop-filter: blur(5px);
-            box-shadow: none;
-            color: #2b4b70;
-        }
-
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.6);
-            border-color: rgba(100, 140, 200, 0.8);
-        }
-
-        .icon-placeholder {
-            font-size: 1.4rem;
-        }
-
-        /* 底部链接区 */
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.8rem;
-            margin-top: 2rem;
-            font-size: 0.85rem;
-            color: #6682a0;
-        }
-
-        .footer-links a {
-            color: #3b6180;
-            text-decoration: none;
-            border-bottom: 1px dotted rgba(80, 120, 170, 0.3);
-        }
-
-        .footer-links a:hover {
-            color: #1a3d60;
-            border-bottom-color: #6f9bd4;
-        }
-
-        /* 额外点缀 */
-        .note {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
-            color: #849bb5;
-        }
-
-        hr {
-            border: none;
-            height: 1px;
-            background: rgba(150, 180, 210, 0.2);
-            margin: 1.8rem 0 1.2rem;
-        }
-
-        /* 响应式 */
-        @media (max-width: 400px) {
-            .glass-card { padding: 2rem 1.5rem; }
-            h1 { font-size: 2rem; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>海豚社区经济模型动态图</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .chart-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    canvas {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
-    <div class="glass-card">
-        <!-- 简约Logo区 -->
-        <div class="logo-area">
-            <div class="logo-icon">🪙</div>
-        </div>
+  <h2>海豚社区 · 模型动态图总览</h2>
+  <div class="chart-container">
+    <!-- K线图 -->
+    <canvas id="priceChart" width="900" height="300"></canvas>
 
-        <h1>Meme·Wallet</h1>
-        <div class="sub">轻量 · 自托管 · 多链</div>
+    <!-- LP池变化图 -->
+    <canvas id="lpChart" width="900" height="200"></canvas>
 
-        <!-- 主要操作按钮 -->
-        <div class="action-group">
-            <button class="btn-glass" id="createBtn">
-                <span class="icon-placeholder">✨</span> 创建新钱包
-            </button>
-            <button class="btn-glass btn-outline" id="importBtn">
-                <span class="icon-placeholder">📂</span> 导入已有钱包
-            </button>
-        </div>
+    <!-- 国库增长图 -->
+    <canvas id="treasuryChart" width="900" height="200"></canvas>
 
-        <!-- 分隔线 & 辅助选项 -->
-        <hr>
-        <div style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 0.5rem;">
-            <button class="btn-glass btn-outline" style="padding: 0.7rem 1.5rem; font-size: 0.95rem;" id="hardwareBtn">
-                <span class="icon-placeholder">🔌</span> 硬件钱包
-            </button>
-            <button class="btn-glass btn-outline" style="padding: 0.7rem 1.5rem; font-size: 0.95rem;" id="watchBtn">
-                <span class="icon-placeholder">👀</span> 观察地址
-            </button>
-        </div>
+    <!-- 质押释放图 -->
+    <canvas id="stakingChart" width="900" height="200"></canvas>
+  </div>
 
-        <!-- 底部文字链接 -->
-        <div class="footer-links">
-            <a href="#">关于我们</a>
-            <a href="#">安全提示</a>
-            <a href="#">帮助</a>
-        </div>
-        <div class="note">
-            ⚡ 私钥仅存于本地 · 非托管
-        </div>
-    </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // 示例数据：价格波动（K线图）
+    const priceCtx = document.getElementById('priceChart').getContext('2d');
+    new Chart(priceCtx, {
+      type: 'bar',
+      data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5'],
+        datasets: [{
+          label: '价格（USDT/H）',
+          data: [0.00666, 0.00678, 0.00672, 0.00685, 0.00670],
+          backgroundColor: ['red', 'green', 'red', 'green', 'red']
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: false, min: 0.0066, max: 0.0069 }
+        }
+      }
+    });
 
-    <script>
-        (function() {
-            // 简单交互：点击按钮跳转到对应步骤（模拟，实际可链接到创建页面）
-            const createBtn = document.getElementById('createBtn');
-            const importBtn = document.getElementById('importBtn');
-            const hardwareBtn = document.getElementById('hardwareBtn');
-            const watchBtn = document.getElementById('watchBtn');
+    // 示例数据：LP池变化
+    const lpCtx = document.getElementById('lpChart').getContext('2d');
+    new Chart(lpCtx, {
+      type: 'line',
+      data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5'],
+        datasets: [
+          {
+            label: 'H数量',
+            data: [16912754, 16760000, 16820000, 16650000, 16780000],
+            borderColor: 'purple',
+            fill: false
+          },
+          {
+            label: 'U数量',
+            data: [112686, 113636, 113000, 114200, 112900],
+            borderColor: 'orange',
+            fill: false
+          }
+        ]
+      }
+    });
 
-            createBtn.addEventListener('click', () => {
-                alert('✨ 跳转至创建钱包流程 (可链接到之前的创建页面)');
-                // 实际开发中可以 location.href = 'create-wallet.html';
-            });
+    // 示例数据：国库增长
+    const treasuryCtx = document.getElementById('treasuryChart').getContext('2d');
+    new Chart(treasuryCtx, {
+      type: 'bar',
+      data: {
+        labels: ['T1', 'T2', 'T3', 'T4', 'T5'],
+        datasets: [{
+          label: '国库U',
+          data: [150, 200, 250, 300, 350],
+          backgroundColor: 'gold'
+        }]
+      }
+    });
 
-            importBtn.addEventListener('click', () => {
-                alert('📂 导入钱包功能开发中');
-            });
-
-            hardwareBtn.addEventListener('click', () => {
-                alert('🔌 连接硬件钱包');
-            });
-
-            watchBtn.addEventListener('click', () => {
-                alert('👀 观察地址 (仅查询)');
-            });
-        })();
-    </script>
+    // 示例数据：质押释放
+    const stakingCtx = document.getElementById('stakingChart').getContext('2d');
+    new Chart(stakingCtx, {
+      type: 'line',
+      data: {
+        labels: ['Day 1', 'Day 10', 'Day 20', 'Day 30'],
+        datasets: [{
+          label: '累计利息（H）',
+          data: [0, 3000, 7000, 10150],
+          borderColor: 'green',
+          fill: false
+        }]
+      }
+    });
+  </script>
 </body>
 </html>
