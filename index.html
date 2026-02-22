@@ -2,121 +2,164 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>海豚社区经济模型动态图</title>
+  <title>海豚社区经济模型 · 手机版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f8f8;
-      margin: 0;
-      padding: 20px;
-    }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-    .chart-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 40px;
-      max-width: 1000px;
-      margin: auto;
-    }
-    canvas {
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
+    body { font-family: Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 10px; }
+    h2 { text-align: center; color: #333; font-size: 1.2em; }
+    .stats-panel { display: flex; flex-wrap: wrap; justify-content: space-around; }
+    .stat { flex: 1 1 45%; background: #fff; margin: 5px; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .stat h3 { margin: 0; color: #4CAF50; font-size: 1.1em; }
+    .chart-container { margin-top: 20px; }
+    canvas { width: 100% !important; height: auto !important; background: #fff; border-radius: 8px; margin-bottom: 20px; }
+    .controls { text-align: center; margin: 15px 0; }
+    .controls input { padding: 8px; margin: 5px; width: 60%; max-width: 200px; }
+    .controls button { padding: 8px 16px; margin: 5px; border: none; background: #4CAF50; color: white; cursor: pointer; border-radius: 4px; font-size: 0.9em; }
+    .controls button:hover { background: #45a049; }
   </style>
 </head>
 <body>
-  <h2>海豚社区 · 模型动态图总览</h2>
+  <h2>海豚社区 · 模型仪表盘（手机版）</h2>
+
+  <!-- 顶部核心指标卡片 -->
+  <div class="stats-panel">
+    <div class="stat"><h3 id="latestPrice">0.00666</h3><p>价格 (USDT/H)</p></div>
+    <div class="stat"><h3 id="latestLPH">16,912,754</h3><p>LP池 H</p></div>
+    <div class="stat"><h3 id="latestLPU">112,686</h3><p>LP池 U</p></div>
+    <div class="stat"><h3 id="latestTreasury">150</h3><p>国库 U</p></div>
+    <div class="stat"><h3 id="latestStaking">300,050,000</h3><p>质押池 H</p></div>
+    <div class="stat"><h3 id="latestExternal">388,845</h3><p>外部持币 H</p></div>
+  </div>
+
+  <!-- 交互输入区 -->
+  <div class="controls">
+    <input type="number" id="buyAmount" placeholder="买入 USDT 数量" />
+    <button onclick="simulateBuy()">买入</button>
+    <input type="number" id="sellAmount" placeholder="卖出 H 数量" />
+    <button onclick="simulateSell()">卖出</button>
+  </div>
+
+  <!-- 图表区 -->
   <div class="chart-container">
-    <!-- K线图 -->
-    <canvas id="priceChart" width="900" height="300"></canvas>
-
-    <!-- LP池变化图 -->
-    <canvas id="lpChart" width="900" height="200"></canvas>
-
-    <!-- 国库增长图 -->
-    <canvas id="treasuryChart" width="900" height="200"></canvas>
-
-    <!-- 质押释放图 -->
-    <canvas id="stakingChart" width="900" height="200"></canvas>
+    <canvas id="priceChart"></canvas>
+    <canvas id="lpChart"></canvas>
+    <canvas id="treasuryChart"></canvas>
+    <canvas id="stakingChart"></canvas>
+    <canvas id="supplyPie"></canvas>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // 示例数据：价格波动（K线图）
-    const priceCtx = document.getElementById('priceChart').getContext('2d');
-    new Chart(priceCtx, {
-      type: 'bar',
-      data: {
-        labels: ['T1', 'T2', 'T3', 'T4', 'T5'],
-        datasets: [{
-          label: '价格（USDT/H）',
-          data: [0.00666, 0.00678, 0.00672, 0.00685, 0.00670],
-          backgroundColor: ['red', 'green', 'red', 'green', 'red']
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: false, min: 0.0066, max: 0.0069 }
-        }
-      }
-    });
+    // 初始数据
+    let labels = ['T1'];
+    let priceData = [0.00666];
+    let lpHData = [16912754];
+    let lpUData = [112686];
+    let treasuryData = [150];
+    let stakingPool = [300050000];
+    let externalHold = [388845];
+    let supplyData = [1000000000];
 
-    // 示例数据：LP池变化
-    const lpCtx = document.getElementById('lpChart').getContext('2d');
-    new Chart(lpCtx, {
+    // 更新面板
+    function updateStats(index) {
+      document.getElementById('latestPrice').textContent = priceData[index].toFixed(5);
+      document.getElementById('latestLPH').textContent = lpHData[index];
+      document.getElementById('latestLPU').textContent = lpUData[index];
+      document.getElementById('latestTreasury').textContent = treasuryData[index];
+      document.getElementById('latestStaking').textContent = stakingPool[index];
+      document.getElementById('latestExternal').textContent = externalHold[index];
+    }
+
+    // 图表实例
+    const priceChart = new Chart(document.getElementById('priceChart'), {
       type: 'line',
-      data: {
-        labels: ['T1', 'T2', 'T3', 'T4', 'T5'],
-        datasets: [
-          {
-            label: 'H数量',
-            data: [16912754, 16760000, 16820000, 16650000, 16780000],
-            borderColor: 'purple',
-            fill: false
-          },
-          {
-            label: 'U数量',
-            data: [112686, 113636, 113000, 114200, 112900],
-            borderColor: 'orange',
-            fill: false
-          }
-        ]
-      }
+      data: { labels, datasets:[{ label:'价格（USDT/H）', data: priceData, borderColor:'blue', fill:false }] }
     });
-
-    // 示例数据：国库增长
-    const treasuryCtx = document.getElementById('treasuryChart').getContext('2d');
-    new Chart(treasuryCtx, {
-      type: 'bar',
-      data: {
-        labels: ['T1', 'T2', 'T3', 'T4', 'T5'],
-        datasets: [{
-          label: '国库U',
-          data: [150, 200, 250, 300, 350],
-          backgroundColor: 'gold'
-        }]
-      }
-    });
-
-    // 示例数据：质押释放
-    const stakingCtx = document.getElementById('stakingChart').getContext('2d');
-    new Chart(stakingCtx, {
+    const lpChart = new Chart(document.getElementById('lpChart'), {
       type: 'line',
+      data: { labels, datasets:[
+        { label:'H数量', data: lpHData, borderColor:'purple', fill:false },
+        { label:'U数量', data: lpUData, borderColor:'orange', fill:false }
+      ]}
+    });
+    const treasuryChart = new Chart(document.getElementById('treasuryChart'), {
+      type: 'bar',
+      data: { labels, datasets:[{ label:'国库U', data: treasuryData, backgroundColor:'gold' }] }
+    });
+    const stakingChart = new Chart(document.getElementById('stakingChart'), {
+      type: 'line',
+      data: { labels, datasets:[{ label:'质押池H', data: stakingPool, borderColor:'green', fill:false }] }
+    });
+    const supplyPie = new Chart(document.getElementById('supplyPie'), {
+      type: 'pie',
       data: {
-        labels: ['Day 1', 'Day 10', 'Day 20', 'Day 30'],
+        labels: ['LP池', '质押池', '外部持币'],
         datasets: [{
-          label: '累计利息（H）',
-          data: [0, 3000, 7000, 10150],
-          borderColor: 'green',
-          fill: false
+          data: [lpHData[0], stakingPool[0], externalHold[0]],
+          backgroundColor: ['purple','green','orange']
         }]
       }
     });
+
+    // 模拟买入
+    function simulateBuy() {
+      const amount = parseFloat(document.getElementById('buyAmount').value);
+      if (!amount || amount <= 0) return;
+      const nextLabel = 'T' + (labels.length+1);
+      labels.push(nextLabel);
+
+      lpUData.push(lpUData[lpUData.length-1] + amount);
+      lpHData.push(lpHData[lpHData.length-1] - amount*1000);
+      priceData.push(priceData[priceData.length-1] + 0.00005);
+      treasuryData.push(treasuryData[treasuryData.length-1] + amount*0.05);
+      stakingPool.push(stakingPool[stakingPool.length-1]);
+      externalHold.push(externalHold[externalHold.length-1] + amount*1000);
+      supplyData.push(1000000000);
+
+      refreshCharts();
+    }
+
+    // 模拟卖出
+    function simulateSell() {
+      const amount = parseFloat(document.getElementById('sellAmount').value);
+      if (!amount || amount <= 0) return;
+      const nextLabel = 'T' + (labels.length+1);
+      labels.push(nextLabel);
+
+      lpUData.push(lpUData[lpUData.length-1] - amount/1000);
+      lpHData.push(lpHData[lpHData.length-1] + amount);
+      priceData.push(priceData[priceData.length-1] - 0.00005);
+      treasuryData.push(treasuryData[treasuryData.length-1] + amount*0.01);
+      stakingPool.push(stakingPool[stakingPool.length-1]);
+      externalHold.push(externalHold[externalHold.length-1] - amount);
+      supplyData.push(1000000000);
+
+      refreshCharts();
+    }
+
+    // 刷新图表和面板
+    function refreshCharts() {
+      priceChart.data.labels = labels;
+      priceChart.data.datasets[0].data = priceData;
+      lpChart.data.labels = labels;
+      lpChart.data.datasets[0].data = lpHData;
+      lpChart.data.datasets[1].data = lpUData;
+      treasuryChart.data.labels = labels;
+      treasuryChart.data.datasets[0].data = treasuryData;
+      stakingChart.data.labels = labels;
+      stakingChart.data.datasets[0].data = stakingPool;
+      supplyPie.data.datasets[0].data = [lpHData[lpHData.length-1], stakingPool[stakingPool.length-1], externalHold[externalHold.length-1]];
+
+      priceChart.update();
+      lpChart.update();
+      treasuryChart.update();
+      stakingChart.update();
+      supplyPie.update();
+
+      updateStats(priceData.length-1);
+    }
+
+    updateStats(0);
   </script>
 </body>
 </html>
