@@ -1,165 +1,535 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>海豚社区经济模型 · 手机版</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body { font-family: Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 10px; }
-    h2 { text-align: center; color: #333; font-size: 1.2em; }
-    .stats-panel { display: flex; flex-wrap: wrap; justify-content: space-around; }
-    .stat { flex: 1 1 45%; background: #fff; margin: 5px; padding: 10px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .stat h3 { margin: 0; color: #4CAF50; font-size: 1.1em; }
-    .chart-container { margin-top: 20px; }
-    canvas { width: 100% !important; height: auto !important; background: #fff; border-radius: 8px; margin-bottom: 20px; }
-    .controls { text-align: center; margin: 15px 0; }
-    .controls input { padding: 8px; margin: 5px; width: 60%; max-width: 200px; }
-    .controls button { padding: 8px 16px; margin: 5px; border: none; background: #4CAF50; color: white; cursor: pointer; border-radius: 4px; font-size: 0.9em; }
-    .controls button:hover { background: #45a049; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>海豚模式 · 动态推演</title>
+    <!-- Font Awesome for icons (optional but adds visual) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0b0d10;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        /* 主容器 — 模拟手机卡片流 */
+        .phone-frame {
+            max-width: 390px;
+            width: 100%;
+            background: #0f1215;
+            border-radius: 40px;
+            padding: 20px 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03) inset;
+            backdrop-filter: blur(2px);
+        }
+
+        /* 标题区 */
+        .header {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #a6c1ff, #6ad4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .badge {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 13px;
+            color: #8d96b0;
+            border: 0.5px solid rgba(255,255,255,0.1);
+        }
+
+        /* 玻璃卡片通用 */
+        .glass-card {
+            background: rgba(20, 24, 30, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 0.5px solid rgba(255, 255, 255, 0.06);
+            border-radius: 28px;
+            padding: 20px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.8);
+            transition: transform 0.1s ease;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #cbd5f0;
+            margin-bottom: 16px;
+            letter-spacing: -0.2px;
+        }
+        .card-title i {
+            color: #4c9aff;
+            font-size: 18px;
+        }
+
+        /* 核心参数网格 */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px 12px;
+        }
+        .metric-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 14px 12px;
+            border: 0.5px solid rgba(255,255,255,0.03);
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #808aa8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+        .metric-value {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        .metric-sub {
+            font-size: 12px;
+            color: #5f6b8a;
+            margin-top: 4px;
+        }
+        .trend-up { color: #2ed15e; }
+        .trend-down { color: #ff5e5e; }
+
+        /* 联合曲线模拟器 */
+        .slider-container {
+            margin: 20px 0 12px;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            color: #a0aaca;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            -webkit-appearance: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px #4c9aff;
+            border: 2px solid #4c9aff;
+            cursor: pointer;
+        }
+        .calc-result {
+            background: rgba(0,0,0,0.35);
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            padding: 8px 0;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+        }
+        .result-row:last-child { border-bottom: none; }
+        .highlight {
+            color: #ffd966;
+            font-weight: 600;
+        }
+
+        /* 解锁日历 (横向滚动模拟) */
+        .calendar-scroll {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 12px;
+            margin: 0 -4px;
+            scrollbar-width: thin;
+            scrollbar-color: #4c9aff #1e2430;
+        }
+        .calendar-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .calendar-scroll::-webkit-scrollbar-thumb {
+            background-color: #4c9aff;
+            border-radius: 20px;
+        }
+        .bar-chart {
+            display: inline-flex;
+            gap: 12px;
+            align-items: flex-end;
+            padding: 0 4px;
+        }
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 48px;
+        }
+        .bar {
+            width: 32px;
+            height: 70px;
+            background: linear-gradient(180deg, #2a3950, #14222e);
+            border-radius: 20px 20px 8px 8px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .bar.fill-team {
+            background: linear-gradient(180deg, #ff9040, #d15f00);
+            height: 45px; /* 示例高度 */
+        }
+        .bar.fill-investor {
+            background: linear-gradient(180deg, #5b8cff, #2a4bb0);
+            height: 28px;
+        }
+        .bar.fill-ecofund {
+            background: linear-gradient(180deg, #3acf9c, #0f8f5c);
+            height: 60px;
+        }
+        .bar-legend {
+            font-size: 11px;
+            color: #a1aec9;
+        }
+        .unlock-tag {
+            font-size: 10px;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 30px;
+            margin-top: 4px;
+        }
+
+        /* 流向图 (简化版) */
+        .flow-node {
+            background: rgba(40, 48, 64, 0.8);
+            border-radius: 40px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 0.5px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(4px);
+        }
+        .flow-arrow {
+            color: #4f6a9c;
+            font-size: 20px;
+            margin: 0 4px;
+            transform: rotate(0deg);
+            display: inline-block;
+        }
+        .flow-sub {
+            margin-left: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sub-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #b1c0e0;
+            border-left: 2px solid #3f5480;
+            padding-left: 16px;
+        }
+
+        /* 策略仪表盘 */
+        .strategy-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .pill {
+            background: rgba(76, 154, 255, 0.15);
+            border: 0.5px solid rgba(76, 154, 255, 0.3);
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #b8d1ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pill i {
+            color: #4c9aff;
+        }
+
+        .footnote {
+            font-size: 12px;
+            color: #5d6988;
+            text-align: center;
+            margin-top: 24px;
+        }
+        hr {
+            border: none;
+            border-top: 0.5px solid rgba(255,255,255,0.05);
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-  <h2>海豚社区 · 模型仪表盘（手机版）</h2>
+    <div class="phone-frame">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🐬 海豚模式 · 动态推演</h1>
+            <span class="badge">v1.0 模拟</span>
+        </div>
 
-  <!-- 顶部核心指标卡片 -->
-  <div class="stats-panel">
-    <div class="stat"><h3 id="latestPrice">0.00666</h3><p>价格 (USDT/H)</p></div>
-    <div class="stat"><h3 id="latestLPH">16,912,754</h3><p>LP池 H</p></div>
-    <div class="stat"><h3 id="latestLPU">112,686</h3><p>LP池 U</p></div>
-    <div class="stat"><h3 id="latestTreasury">150</h3><p>国库 U</p></div>
-    <div class="stat"><h3 id="latestStaking">300,050,000</h3><p>质押池 H</p></div>
-    <div class="stat"><h3 id="latestExternal">388,845</h3><p>外部持币 H</p></div>
-  </div>
+        <!-- 核心参数卡片 (基于提供数据) -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-chart-line"></i> 核心指标</div>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-label"><i class="fas fa-coins" style="opacity:0.6;"></i> 总供应</div>
+                    <div class="metric-value">10.0B</div>
+                    <div class="metric-sub">H 固定总量</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label"><i class="fas fa-water"></i> 流通池 H</div>
+                    <div class="metric-value" id="poolH">18.18M</div>
+                    <div class="metric-sub">Uniswap 储备</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label"><i class="fas fa-dollar-sign"></i> 池内 USDT</div>
+                    <div class="metric-value" id="poolU">110,000</div>
+                    <div class="metric-sub">流动性</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label"><i class="fas fa-tag"></i> 当前价格</div>
+                    <div class="metric-value" id="currentPrice">$0.00605</div>
+                    <div class="metric-sub trend-up" id="priceDesc">≈ 121倍涨幅</div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 12px; background: rgba(0,0,0,0.2); border-radius: 60px; padding: 10px 16px;">
+                <span><i class="fas fa-users" style="color:#6c8cd0;"></i> 社区持仓 <strong>9.82B</strong> H</span>
+                <span><i class="fas fa-piggy-bank" style="color:#ffb45e;"></i> 国库模拟 <strong>1.2M</strong> USDT</span>
+            </div>
+        </div>
 
-  <!-- 交互输入区 -->
-  <div class="controls">
-    <input type="number" id="buyAmount" placeholder="买入 USDT 数量" />
-    <button onclick="simulateBuy()">买入</button>
-    <input type="number" id="sellAmount" placeholder="卖出 H 数量" />
-    <button onclick="simulateSell()">卖出</button>
-  </div>
+        <!-- 联合曲线模拟器 (动态推演) -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-chart-scatter"></i> 联合曲线模拟 · 恒定乘积 x*y=k</div>
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>买入 USDT 量</span>
+                    <span id="buyAmountDisplay">100,000</span>
+                </div>
+                <input type="range" id="buySlider" min="1000" max="300000" value="100000" step="1000">
+            </div>
+            <div class="calc-result" id="calcResult">
+                <!-- 动态js更新 -->
+                <div class="result-row"><span>消耗 H 数量</span> <span class="highlight" id="hReceived">1,818,182</span></div>
+                <div class="result-row"><span>新池 H 储备</span> <span id="newPoolH">16.36M</span></div>
+                <div class="result-row"><span>新池 USDT</span> <span id="newPoolU">210,000</span></div>
+                <div class="result-row"><span>新价格 (per H)</span> <span class="highlight" id="newPrice">$0.01284</span></div>
+                <div class="result-row"><span>单次涨幅</span> <span id="priceJump">+112.2%</span></div>
+                <div class="result-row"><span>交易税费(5%)</span> <span id="taxAmount">5,000 USDT</span></div>
+                <div class="result-row"><span>返佣(0.34%)</span> <span id="rebateAmount">340 USDT</span></div>
+            </div>
+            <div style="font-size: 12px; color: #6b7a9e; margin-top: 12px; background: rgba(0,0,0,0.2); border-radius: 20px; padding: 8px;"><i class="fas fa-info-circle"></i> 国库收入 = 税费+返佣，可用于拉盘或支付收益</div>
+        </div>
 
-  <!-- 图表区 -->
-  <div class="chart-container">
-    <canvas id="priceChart"></canvas>
-    <canvas id="lpChart"></canvas>
-    <canvas id="treasuryChart"></canvas>
-    <canvas id="stakingChart"></canvas>
-    <canvas id="supplyPie"></canvas>
-  </div>
+        <!-- 解锁日历组件 (横向滚动) -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-calendar-alt"></i> 解锁日历 · 下次解锁倒计时 <span style="margin-left:auto; font-size:14px; color:#ffd966;">12天 04h</span></div>
+            <div class="calendar-scroll">
+                <div class="bar-chart">
+                    <div class="bar-item"><div class="bar fill-team" style="height: 70px;"></div><span class="bar-legend">团队</span><span class="unlock-tag">+2.5M</span></div>
+                    <div class="bar-item"><div class="bar fill-investor" style="height: 42px;"></div><span class="bar-legend">投资人</span><span class="unlock-tag">+1.2M</span></div>
+                    <div class="bar-item"><div class="bar fill-ecofund" style="height: 90px;"></div><span class="bar-legend">生态</span><span class="unlock-tag">+4.0M</span></div>
+                    <div class="bar-item"><div class="bar fill-team" style="height: 30px;"></div><span class="bar-legend">顾问</span><span class="unlock-tag">+0.8M</span></div>
+                    <div class="bar-item"><div class="bar fill-investor" style="height: 60px;"></div><span class="bar-legend">早期</span><span class="unlock-tag">+2.0M</span></div>
+                    <div class="bar-item"><div class="bar" style="background: #3f4870; height: 40px;"></div><span class="bar-legend">社区金库</span><span class="unlock-tag">线性</span></div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 16px; margin-top: 12px; color:#a5b3d4; font-size:13px; flex-wrap:wrap;">
+                <span><i class="fas fa-circle" style="color:#ff9040;"></i> 团队</span>
+                <span><i class="fas fa-circle" style="color:#5b8cff;"></i> 投资人</span>
+                <span><i class="fas fa-circle" style="color:#3acf9c;"></i> 生态基金</span>
+            </div>
+        </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // 初始数据
-    let labels = ['T1'];
-    let priceData = [0.00666];
-    let lpHData = [16912754];
-    let lpUData = [112686];
-    let treasuryData = [150];
-    let stakingPool = [300050000];
-    let externalHold = [388845];
-    let supplyData = [1000000000];
+        <!-- 动态流向图 (产出分配) -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-random"></i> 每日产出流向 (动态)</div>
+            <div class="flow-node">
+                <span><i class="fas fa-hard-hat" style="color:#f0b34b;"></i> 每日产出 43,103 H</span>
+                <span class="flow-arrow"><i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="flow-sub">
+                <div class="sub-item"><span><i class="fas fa-fire" style="color:#ff7b7b;"></i> 销毁 (40%)</span> <span>17,241 H</span></div>
+                <div class="sub-item"><span><i class="fas fa-medal"></i> 质押奖励 (50%)</span> <span>21,551 H</span></div>
+                <div class="sub-item"><span><i class="fas fa-landmark"></i> 国库 (10%)</span> <span>4,310 H</span></div>
+            </div>
+            <div style="margin-top:16px;">
+                <div class="flow-node" style="justify-content: flex-start; gap: 16px;">
+                    <i class="fas fa-chart-pie" style="color:#75b6ff;"></i> <span>当前价格 <strong>$0.0232</strong> 时，每日支付 1000 U 只需 43,103 H (价格越高消耗越少)</span>
+                </div>
+            </div>
+        </div>
 
-    // 更新面板
-    function updateStats(index) {
-      document.getElementById('latestPrice').textContent = priceData[index].toFixed(5);
-      document.getElementById('latestLPH').textContent = lpHData[index];
-      document.getElementById('latestLPU').textContent = lpUData[index];
-      document.getElementById('latestTreasury').textContent = treasuryData[index];
-      document.getElementById('latestStaking').textContent = stakingPool[index];
-      document.getElementById('latestExternal').textContent = externalHold[index];
-    }
+        <!-- 社区策略仪表盘 & 飞轮效应 -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-chess-queen"></i> 主动策略 · 飞轮调节</div>
+            <div style="background: rgba(0,40,60,0.5); border-radius: 24px; padding: 16px;">
+                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 16px;">
+                    <span class="pill"><i class="fas fa-rocket"></i> 今日拉盘力度: +2.3%</span>
+                    <span class="pill"><i class="fas fa-shield-alt"></i> 护城河: 8亿H储备</span>
+                </div>
+                <div class="strategy-row">
+                    <div style="flex:1; background: rgba(0,0,0,0.4); border-radius: 20px; padding: 12px;">
+                        <div style="color:#a5c0ff;">国库USDT拉盘</div>
+                        <div style="font-size:24px; font-weight:600;">+50k <span style="font-size:14px; color:#7f8aa8;">/今日</span></div>
+                    </div>
+                    <div style="flex:1; background: rgba(0,0,0,0.4); border-radius: 20px; padding: 12px;">
+                        <div style="color:#a5c0ff;">净买压</div>
+                        <div style="font-size:24px; font-weight:600; color:#2ed15e;">+32k H</div>
+                    </div>
+                </div>
+                <div style="margin-top:16px; background: #10161e; border-radius: 20px; padding:12px;">
+                    <i class="fas fa-sync-alt fa-spin" style="margin-right:8px;"></i> 飞轮状态: <span style="color:#b3ff9b;">旋转中</span> — 买盘/税费/拉盘正循环
+                </div>
+            </div>
+        </div>
 
-    // 图表实例
-    const priceChart = new Chart(document.getElementById('priceChart'), {
-      type: 'line',
-      data: { labels, datasets:[{ label:'价格（USDT/H）', data: priceData, borderColor:'blue', fill:false }] }
-    });
-    const lpChart = new Chart(document.getElementById('lpChart'), {
-      type: 'line',
-      data: { labels, datasets:[
-        { label:'H数量', data: lpHData, borderColor:'purple', fill:false },
-        { label:'U数量', data: lpUData, borderColor:'orange', fill:false }
-      ]}
-    });
-    const treasuryChart = new Chart(document.getElementById('treasuryChart'), {
-      type: 'bar',
-      data: { labels, datasets:[{ label:'国库U', data: treasuryData, backgroundColor:'gold' }] }
-    });
-    const stakingChart = new Chart(document.getElementById('stakingChart'), {
-      type: 'line',
-      data: { labels, datasets:[{ label:'质押池H', data: stakingPool, borderColor:'green', fill:false }] }
-    });
-    const supplyPie = new Chart(document.getElementById('supplyPie'), {
-      type: 'pie',
-      data: {
-        labels: ['LP池', '质押池', '外部持币'],
-        datasets: [{
-          data: [lpHData[0], stakingPool[0], externalHold[0]],
-          backgroundColor: ['purple','green','orange']
-        }]
-      }
-    });
+        <!-- 质押收益阶梯 + 额外说明 -->
+        <div class="glass-card">
+            <div class="card-title"><i class="fas fa-layer-group"></i> 质押阶梯利率 (日)</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom:16px;">
+                <span class="pill" style="background: #1a2938;">1-7d 0.5%</span>
+                <span class="pill" style="background: #1a2938;">8-15d 0.6%</span>
+                <span class="pill" style="background: #1a2938;">16-30d 0.8%</span>
+                <span class="pill" style="background: #1a2938;">31-60d 1.0%</span>
+                <span class="pill" style="background: #1a2938;">61d+ 1.2%</span>
+            </div>
+            <div style="font-size:14px; color:#b0c4f0;"><i class="fas fa-check-circle" style="color:#3acf9c;"></i> 每日20:00 等值USDT折算H发放，复投可滚雪球</div>
+            <hr>
+            <div style="font-size:13px; color:#9babc7;"><i class="fas fa-gem" style="color:#f0d87c;"></i> 分红代币 (10万枚) 永久享交易税分红 — 早期建设者权益</div>
+        </div>
 
-    // 模拟买入
-    function simulateBuy() {
-      const amount = parseFloat(document.getElementById('buyAmount').value);
-      if (!amount || amount <= 0) return;
-      const nextLabel = 'T' + (labels.length+1);
-      labels.push(nextLabel);
+        <!-- 风险提示 / 飞轮总结 (基于讨论) -->
+        <div style="background: rgba(180,140,255,0.08); border-radius: 40px; padding: 16px; border: 0.5px solid #5f4b9a; margin-top: 8px;">
+            <div style="display: flex; gap: 10px;">
+                <i class="fas fa-balance-scale" style="color:#b87cff;"></i>
+                <div style="color:#cfd6f0; font-size:13px;">社区8亿H + 国库U构成内生买盘，做空成本极高；价格越高支付H越少，通胀压力递减。飞轮核心：持续的运营刺激+策略拉盘。</div>
+            </div>
+        </div>
+        <div class="footnote">
+            ⚡ 基于恒定乘积 x*y=k 模拟 · 初始参数：2亿H/1万U · 社区二次买入后池状态(H=18.18M, U=110k) · 仅供设计推演
+        </div>
+    </div>
 
-      lpUData.push(lpUData[lpUData.length-1] + amount);
-      lpHData.push(lpHData[lpHData.length-1] - amount*1000);
-      priceData.push(priceData[priceData.length-1] + 0.00005);
-      treasuryData.push(treasuryData[treasuryData.length-1] + amount*0.05);
-      stakingPool.push(stakingPool[stakingPool.length-1]);
-      externalHold.push(externalHold[externalHold.length-1] + amount*1000);
-      supplyData.push(1000000000);
+    <!-- 动态交互 JS -->
+    <script>
+        (function() {
+            // 初始池状态 (第二阶段后: 社区用10万U买入后)
+            let poolH = 18181818.18;      // ≈ 18.18M H
+            let poolU = 110000;           // 110,000 USDT
+            const k = poolH * poolU;       // 恒定乘积 2e12 左右
 
-      refreshCharts();
-    }
+            // 获取DOM元素
+            const buySlider = document.getElementById('buySlider');
+            const buyAmountDisplay = document.getElementById('buyAmountDisplay');
+            const hReceivedSpan = document.getElementById('hReceived');
+            const newPoolHSpan = document.getElementById('newPoolH');
+            const newPoolUSpan = document.getElementById('newPoolU');
+            const newPriceSpan = document.getElementById('newPrice');
+            const priceJumpSpan = document.getElementById('priceJump');
+            const taxAmountSpan = document.getElementById('taxAmount');
+            const rebateAmountSpan = document.getElementById('rebateAmount');
 
-    // 模拟卖出
-    function simulateSell() {
-      const amount = parseFloat(document.getElementById('sellAmount').value);
-      if (!amount || amount <= 0) return;
-      const nextLabel = 'T' + (labels.length+1);
-      labels.push(nextLabel);
+            // 当前价格等显示
+            function formatNumber(num, decimals=2) {
+                if (num >= 1e6) return (num/1e6).toFixed(2) + 'M';
+                if (num >= 1e3) return (num/1e3).toFixed(1) + 'K';
+                return num.toFixed(decimals);
+            }
 
-      lpUData.push(lpUData[lpUData.length-1] - amount/1000);
-      lpHData.push(lpHData[lpHData.length-1] + amount);
-      priceData.push(priceData[priceData.length-1] - 0.00005);
-      treasuryData.push(treasuryData[treasuryData.length-1] + amount*0.01);
-      stakingPool.push(stakingPool[stakingPool.length-1]);
-      externalHold.push(externalHold[externalHold.length-1] - amount);
-      supplyData.push(1000000000);
+            function updateCalc(buyU) {
+                // buyU: 买入的USDT数量
+                buyU = parseFloat(buyU);
+                if (isNaN(buyU) || buyU <= 0) buyU = 0;
 
-      refreshCharts();
-    }
+                // 新池USDT
+                let newU = poolU + buyU;
+                // 新池H = k / newU
+                let newH = k / newU;
+                // 消耗的H
+                let hOut = poolH - newH;
 
-    // 刷新图表和面板
-    function refreshCharts() {
-      priceChart.data.labels = labels;
-      priceChart.data.datasets[0].data = priceData;
-      lpChart.data.labels = labels;
-      lpChart.data.datasets[0].data = lpHData;
-      lpChart.data.datasets[1].data = lpUData;
-      treasuryChart.data.labels = labels;
-      treasuryChart.data.datasets[0].data = treasuryData;
-      stakingChart.data.labels = labels;
-      stakingChart.data.datasets[0].data = stakingPool;
-      supplyPie.data.datasets[0].data = [lpHData[lpHData.length-1], stakingPool[stakingPool.length-1], externalHold[externalHold.length-1]];
+                // 新价格 = newU / newH
+                let newPrice = newU / newH;
+                // 当前价格 = poolU / poolH
+                let currentPrice = poolU / poolH;
+                let priceIncrease = (newPrice - currentPrice) / currentPrice * 100;
 
-      priceChart.update();
-      lpChart.update();
-      treasuryChart.update();
-      stakingChart.update();
-      supplyPie.update();
+                // 税费 5% (基于买入额)
+                let tax = buyU * 0.05;
+                // 返佣 0.34%
+                let rebate = buyU * 0.0034;
 
-      updateStats(priceData.length-1);
-    }
+                // 更新DOM
+                buyAmountDisplay.innerText = Math.round(buyU).toLocaleString();
+                hReceivedSpan.innerText = Math.round(hOut).toLocaleString();
+                newPoolHSpan.innerText = formatNumber(newH, 2) + ' H';
+                newPoolUSpan.innerText = Math.round(newU).toLocaleString();
+                newPriceSpan.innerText = '$' + newPrice.toFixed(6);
+                priceJumpSpan.innerText = (priceIncrease > 0 ? '+' : '') + priceIncrease.toFixed(2) + '%';
+                taxAmountSpan.innerText = Math.round(tax).toLocaleString() + ' USDT';
+                rebateAmountSpan.innerText = Math.round(rebate).toLocaleString() + ' USDT';
+            }
 
-    updateStats(0);
-  </script>
+            // 监听滑块
+            buySlider.addEventListener('input', function(e) {
+                updateCalc(e.target.value);
+            });
+
+            // 初始化显示
+            updateCalc(buySlider.value);
+
+            // 更新当前价格显示（其实已经固定，但加上涨幅说明）
+            let currentPrice = poolU / poolH;
+            document.getElementById('currentPrice').innerText = '$' + currentPrice.toFixed(6);
+            // 初始涨幅对比首发价 0.00005
+            let initPrice = 0.00005;
+            let totalGain = ((currentPrice - initPrice) / initPrice * 100).toFixed(0);
+            document.getElementById('priceDesc').innerText = `↑ ${totalGain}倍 (较首发)`;
+
+            // 池显示
+            document.getElementById('poolH').innerText = formatNumber(poolH,2) + ' H';
+            document.getElementById('poolU').innerText = Math.round(poolU).toLocaleString();
+        })();
+    </script>
 </body>
 </html>
