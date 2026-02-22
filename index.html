@@ -1,167 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>海豚模式 · 经济模型模拟器（红线0.006）</title>
-    <!-- Chart.js 轻量图表 -->
+    <title>海豚经济模型 · 全因果链模拟</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- 字体与基础样式 -->
     <style>
-        * { box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
-        body { background: #0a0c10; display: flex; justify-content: center; padding: 16px; }
-        .container { max-width: 420px; width: 100%; background: #11161e; border-radius: 48px; padding: 20px 16px; box-shadow: 0 20px 40px #00000080; border: 0.5px solid #2a3240; }
-        h2 { color: #d0e0ff; font-weight: 600; font-size: 24px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .sub { color: #8892b0; font-size: 14px; margin-bottom: 24px; border-left: 3px solid #4c9aff; padding-left: 12px; }
-        .card { background: #1b212b; border-radius: 28px; padding: 18px 16px; margin-bottom: 20px; border: 0.5px solid #2f3a4b; }
-        .card-title { color: #b0c8ff; font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
-        .metric-row { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
-        .metric-item { background: #10141c; border-radius: 20px; padding: 12px; flex: 1 0 40%; }
-        .metric-label { color: #8592b5; font-size: 13px; }
-        .metric-value { color: white; font-size: 22px; font-weight: 600; }
-        .metric-detail { color: #a0b0d0; font-size: 13px; }
-        .danger { color: #ff7575; }
-        .safe { color: #75d787; }
-        hr { border: none; border-top: 1px solid #29313e; margin: 16px 0; }
-        .slider-group { margin: 18px 0; }
-        .slider-label { display: flex; justify-content: space-between; color: #b4c2e0; }
-        input[type=range] { width: 100%; margin: 8px 0; background: #2a3440; height: 6px; border-radius: 20px; -webkit-appearance: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: #fff; border-radius: 50%; border: 2px solid #4c9aff; cursor: pointer; }
+        * { box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+        body { background: #0b0e14; display: flex; justify-content: center; padding: 16px; }
+        .container { max-width: 480px; width: 100%; background: #121722; border-radius: 40px; padding: 20px 16px; box-shadow: 0 20px 30px #00000080; border: 1px solid #2f3a4a; }
+        h2 { color: #dce5ff; font-weight: 600; font-size: 22px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .sub { color: #98a9c9; font-size: 14px; margin-bottom: 24px; border-left: 4px solid #4c9aff; padding-left: 12px; }
+        .card { background: #1c2532; border-radius: 28px; padding: 18px 16px; margin-bottom: 20px; border: 1px solid #2e3c50; }
+        .card-title { color: #b6ccff; font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .metric-item { background: #0f1621; border-radius: 20px; padding: 12px; }
+        .metric-label { color: #90a0c2; font-size: 12px; }
+        .metric-value { color: white; font-size: 20px; font-weight: 600; }
+        .metric-detail { color: #a0b5d8; font-size: 12px; }
+        .danger { color: #ff8a8a; }
+        .safe { color: #8affb8; }
+        hr { border: 0.5px solid #293544; margin: 16px 0; }
+        .slider-group { margin: 16px 0; }
+        .slider-label { display: flex; justify-content: space-between; color: #c0d0f0; font-size: 14px; }
+        input[type=range] { width: 100%; margin: 8px 0; background: #2e3c4e; height: 6px; border-radius: 20px; -webkit-appearance: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: white; border-radius: 50%; border: 2px solid #4c9aff; cursor: pointer; }
         .btn-group { display: flex; gap: 12px; margin: 24px 0 12px; }
-        .btn { background: #2c3b51; border: none; color: white; padding: 14px 0; border-radius: 60px; font-weight: 600; flex: 1; font-size: 16px; transition: 0.2s; border: 0.5px solid #4b5e7c; }
+        .btn { background: #2e405b; border: none; color: white; padding: 14px 0; border-radius: 40px; font-weight: 600; flex: 1; font-size: 16px; transition: 0.2s; border: 1px solid #4a6180; }
         .btn.primary { background: #4c9aff; color: black; border: none; }
-        .btn:active { opacity: 0.8; }
-        .warning-tag { background: #4a2f2f; color: #ffa5a5; border-radius: 40px; padding: 8px 16px; font-size: 14px; text-align: center; }
-        .chart-container { height: 160px; margin: 16px 0; }
-        .footnote { color: #5f6e8c; font-size: 12px; text-align: center; margin-top: 20px; }
+        .btn:active { opacity: 0.7; }
+        .log-box { background: #0b111a; border-radius: 20px; padding: 14px; max-height: 200px; overflow-y: auto; font-size: 12px; color: #b8c8ec; border: 1px solid #2f3d54; margin-top: 10px; }
+        .log-entry { border-bottom: 1px dashed #2d3848; padding: 5px 0; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .badge { background: #2f3d57; border-radius: 30px; padding: 4px 12px; font-size: 13px; }
+        .warning-badge { background: #4f2f2f; color: #ffbaba; border-radius: 30px; padding: 6px 14px; font-size: 13px; }
+        .chart-container { height: 150px; margin: 16px 0; }
+        .highlight { color: #ffd966; font-weight: 600; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>🐬 海豚经济模型 · 红线0.006</h2>
-    <div class="sub">社区多签自动回购 · 飞轮推演</div>
+    <h2>🐬 海豚模型 · 全因果链</h2>
+    <div class="sub">基于真实步骤：先买→质押→税费→收益→卖盘→回购</div>
 
-    <!-- 核心状态卡片 (动态更新) -->
+    <!-- 当前状态卡片 (所有动态变量) -->
     <div class="card">
-        <div class="card-title"><span>📊 当前状态</span> <span class="badge" id="dayDisplay">第 0 天</span></div>
-        <div class="metric-row">
+        <div class="card-title"><span>📊 实时状态</span> <span id="dayDisplay" style="margin-left:auto; font-size:14px;">第0天</span></div>
+        <div class="grid-2">
             <div class="metric-item">
-                <div class="metric-label">H 价格</div>
+                <div class="metric-label">H价格</div>
                 <div class="metric-value" id="priceDisplay">$0.02205</div>
-                <div class="metric-detail" id="priceDistance">距红线 +267%</div>
+                <div class="metric-detail" id="redlineDist">距红线 +267%</div>
             </div>
             <div class="metric-item">
-                <div class="metric-label">流动性池 H</div>
+                <div class="metric-label">流动性池 H / U</div>
                 <div class="metric-value" id="lpHDisplay">9.52M</div>
-                <div class="metric-detail">USDT: <span id="lpUDisplay">210k</span></div>
+                <div class="metric-detail">U: <span id="lpUDisplay">210k</span></div>
             </div>
-        </div>
-        <div class="metric-row">
             <div class="metric-item">
-                <div class="metric-label">质押量 (H_staked)</div>
+                <div class="metric-label">质押量 H_staked</div>
                 <div class="metric-value" id="stakedDisplay">8.66M</div>
-                <div class="metric-detail">占比池子 <span id="stakeRatio">91%</span></div>
+                <div class="metric-detail">占池子 <span id="stakeRatio">91%</span></div>
             </div>
             <div class="metric-item">
-                <div class="metric-label">收益储备</div>
-                <div class="metric-value" id="rewardDisplay">300.0M</div>
-                <div class="metric-detail">可支付 <span id="rewardDays">6615</span> 天</div>
+                <div class="metric-label">收益储备 H_reward</div>
+                <div class="metric-value" id="rewardDisplay">300M</div>
+                <div class="metric-detail">可支付 <span id="rewardDays">6615</span>天</div>
             </div>
-        </div>
-        <div class="metric-row">
             <div class="metric-item">
                 <div class="metric-label">国库 USDT</div>
                 <div class="metric-value" id="treasuryDisplay">5,340</div>
                 <div class="metric-detail">待转</div>
             </div>
             <div class="metric-item">
-                <div class="metric-label">社区钱包 USDT</div>
-                <div class="metric-value" id="communityUDisplay">20,000</div>
-                <div class="metric-detail">H: <span id="communityHDisplay">500.0M</span></div>
+                <div class="metric-label">社区钱包 U / H</div>
+                <div class="metric-value" id="communityUDisplay">20k</div>
+                <div class="metric-detail">H: <span id="communityHDisplay">500M</span></div>
             </div>
+        </div>
+        <div class="flex-between" style="margin-top:12px;">
+            <span class="warning-badge" id="warningMsg">🟢 价格安全</span>
+            <span id="triggerCount">回购触发:0次</span>
         </div>
     </div>
 
-    <!-- 参数调节面板 -->
+    <!-- 控制面板 -->
     <div class="card">
         <div class="card-title">⚙️ 每日市场参数</div>
         <div class="slider-group">
-            <div class="slider-label"><span>外部净买入 (USDT/天)</span> <span id="buyInLabel">0</span></div>
-            <input type="range" id="buyInput" min="-50000" max="100000" value="0" step="1000">
-            <div style="color:#a0b0d0; font-size:13px;">负值为净卖出</div>
+            <div class="slider-label"><span>外部净买入 (USDT/天)</span> <span id="buyLabel">0</span></div>
+            <input type="range" id="buySlider" min="-50000" max="100000" value="0" step="1000">
+            <div style="color:#a0b5d0; font-size:13px;">负值代表外部净卖出</div>
         </div>
         <div class="slider-group">
             <div class="slider-label"><span>用户解质押比例 (%)</span> <span id="unstakeLabel">0%</span></div>
-            <input type="range" id="unstakeInput" min="0" max="10" value="0" step="0.1">
-            <div style="color:#a0b0d0; font-size:13px;">每日解质押并卖出的比例 (占 H_staked)</div>
+            <input type="range" id="unstakeSlider" min="0" max="10" value="0" step="0.1">
+            <div style="color:#a0b5d0;">当日从质押池取出并卖出的比例</div>
         </div>
         <div class="btn-group">
             <button class="btn" id="stepBtn">⏩ 模拟一天</button>
             <button class="btn primary" id="resetBtn">⟲ 重置初始</button>
         </div>
-        <!-- 红线预警 & 回购信息 -->
-        <div id="warningMessage" class="warning-tag" style="margin-top:12px;">🟢 价格安全，回购未触发</div>
     </div>
 
-    <!-- 价格趋势图 (最近30天) -->
+    <!-- 事件日志 (展示每一步的因果链) -->
+    <div class="card" style="padding: 12px;">
+        <div class="flex-between">
+            <span class="card-title" style="margin-bottom:0;">📋 事件日志</span>
+            <button id="clearLog" style="background:none; border:none; color:#7f92bb; font-size:12px;">清空</button>
+        </div>
+        <div class="log-box" id="logContainer">
+            <div class="log-entry">🔄 初始状态加载完成</div>
+        </div>
+    </div>
+
+    <!-- 价格图表 -->
     <div class="card">
         <div class="card-title">📈 价格历史 (最近30步)</div>
         <div class="chart-container">
             <canvas id="priceChart"></canvas>
         </div>
-        <div class="flex-between" style="margin-top:8px;">
-            <span style="color:#b0c0e0;">红线 0.006</span>
-            <span style="color:#b0c0e0;" id="triggerCount">回购触发: 0 次</span>
-        </div>
+        <div style="color:#8d9fd0; font-size:12px; text-align:center;">红线 0.006 —— 社区回购护城河</div>
     </div>
 
-    <!-- 模型解析 -->
-    <div class="card" style="background: #1a212c;">
-        <div class="card-title">🧠 模型逻辑与红线机制</div>
-        <ul style="color:#b0c4de; font-size:14px; line-height:1.6; padding-left:20px;">
-            <li>初始状态：基于第二阶段后 (H_lp=9.52M, U_lp=210k, 价格≈0.02205)；质押池 8.66M H，收益储备 300M H。</li>
-            <li>每日收益：固定支付 1000 USDT等值 H (从收益储备支出，自动复投 → H_staked 增加)。</li>
-            <li>国库收入：交易量(外部买卖+回购)的 5% 税费 + 0.34% OKX返佣；每累积 1000 USDT 触发：300U 市价回购，700U 转入社区多签钱包。</li>
-            <li><span style="color:#ffaa66;">红线 0.006</span>：若价格 ≤ 0.006，社区多签钱包自动使用其 USDT 余额买入 H，直至价格 > 0.006 或 USDT 耗尽。</li>
-            <li>危险指标：质押量/池子H比率 > 1 时抛压极大；国库+社区U可支撑的买盘大小决定抗跌能力。</li>
-        </ul>
-    </div>
-    <div class="footnote">拖动参数，按“模拟一天”观察动态。回购次数及价格变化实时更新。</div>
+    <div style="color:#5f72a0; font-size:11px; text-align:center; padding:10px;">* 每一日严格遵循: 外部买卖→解质押卖出→国库回购→红线回购→收益发放</div>
 </div>
 
 <script>
     (function() {
-        // ---------- 初始参数 (基于讨论) ----------
-        // 流动性池
-        let H_lp = 18181818.18 * 0.5238; // 实际上第二阶段后 H_lp ≈ 9.5238M  (之前计算精确值)
-        // 更精确：k = 2e12, 初始U_lp=110k, 买入100k U后 U_lp=210k, H_lp = k/210k = 2e12/210000 = 9523809.52
-        H_lp = 9523809.52;               // 9.5238 M
-        let U_lp = 210000;                // 210,000 USDT
-        const k = H_lp * U_lp;             // 恒定乘积 2e12
+        // ---------- 固定参数 ----------
+        const REDLINE = 0.006;                // 价格红线
+        const DAILY_PAYOUT_USD = 1000;         // 每日支付等值1000U的H
+        const TREASURY_TRIGGER = 1000;          // 国库累积1000U触发分配
+        const REPO_FROM_TREASURY = 300;         // 国库每次拿300U回购
+        const TO_COMMUNITY = 700;                // 国库每次转700U给社区钱包
 
-        // 质押池
-        let H_staked = 8660000;            // 约8.66M (用户全部质押)
-        let H_reward = 300000000;           // 3亿收益储备
+        // ---------- 初始状态 (基于第二阶段后) ----------
+        let H_lp = 9523809.52;                   // 流动性池 H
+        let U_lp = 210000;                        // 流动性池 U
+        const k = H_lp * U_lp;                     // 恒定乘积 2e12
 
-        // 国库 & 社区钱包
-        let treasury = 5340;                 // 初始交易税费+返佣 (从10万U买入产生)
-        let communityU = 20000;               // 假设社区多签钱包已有 2万 USDT 用于红线回购
-        let communityH = 500000000;            // 5亿 H (战略储备)
+        let H_staked = 8660000;                    // 质押池中用户锁仓的H
+        let H_reward = 300000000;                   // 收益储备 (3亿)
 
-        // 辅助变量
+        let treasury = 5340;                         // 国库USDT (来自之前交易)
+        let communityU = 20000;                       // 社区钱包USDT (用于红线回购)
+        let communityH = 500000000;                    // 社区钱包H (战略储备)
+
         let day = 0;
-        let triggerCount = 0;                  // 回购触发次数
-        let priceHistory = [];                  // 存储最近价格用于图表
+        let triggerCount = 0;                          // 红线回购触发次数
+        let priceHistory = [];                           // 存储最近价格
 
-        // 常量
-        const PRICE_REDLINE = 0.006;
-        const DAILY_PAYOUT_USD = 1000;           // 每日支付1000U等值H
-
-        // 获取DOM元素
+        // DOM 元素
         const priceDisplay = document.getElementById('priceDisplay');
-        const priceDistance = document.getElementById('priceDistance');
+        const redlineDist = document.getElementById('redlineDist');
         const lpHDisplay = document.getElementById('lpHDisplay');
         const lpUDisplay = document.getElementById('lpUDisplay');
         const stakedDisplay = document.getElementById('stakedDisplay');
@@ -172,14 +163,16 @@
         const communityUDisplay = document.getElementById('communityUDisplay');
         const communityHDisplay = document.getElementById('communityHDisplay');
         const dayDisplay = document.getElementById('dayDisplay');
-        const warningMessage = document.getElementById('warningMessage');
+        const warningMsg = document.getElementById('warningMsg');
         const triggerCountSpan = document.getElementById('triggerCount');
-        const buyInLabel = document.getElementById('buyInLabel');
+        const buyLabel = document.getElementById('buyLabel');
         const unstakeLabel = document.getElementById('unstakeLabel');
-        const buyInput = document.getElementById('buyInput');
-        const unstakeInput = document.getElementById('unstakeInput');
+        const buySlider = document.getElementById('buySlider');
+        const unstakeSlider = document.getElementById('unstakeSlider');
         const stepBtn = document.getElementById('stepBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const logContainer = document.getElementById('logContainer');
+        const clearLog = document.getElementById('clearLog');
 
         // 图表初始化
         const ctx = document.getElementById('priceChart').getContext('2d');
@@ -188,7 +181,7 @@
             data: {
                 labels: Array(30).fill(''),
                 datasets: [{
-                    label: 'H 价格',
+                    label: 'H价格',
                     data: Array(30).fill(null),
                     borderColor: '#4c9aff',
                     backgroundColor: 'rgba(76,154,255,0.1)',
@@ -200,195 +193,159 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: { y: { min: 0, grid: { color: '#2a3340' }, ticks: { color: '#aaa' } }, x: { display: false } },
+                scales: { y: { min: 0, grid: { color: '#2d3645' }, ticks: { color: '#9aabcc' } }, x: { display: false } },
                 plugins: { legend: { display: false } }
             }
         });
 
-        // 更新所有显示
-        function updateDisplay() {
+        // 日志追加
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `⏱️ ${new Date().toLocaleTimeString('zh-CN', {hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit'})}  ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // 清空日志
+        clearLog.addEventListener('click', ()=>{
+            logContainer.innerHTML = '<div class="log-entry">📋 日志已清空</div>';
+        });
+
+        // 更新所有UI显示
+        function updateUI() {
             const price = U_lp / H_lp;
-            // 价格
             priceDisplay.innerText = '$' + price.toFixed(6);
-            const dist = ((price - PRICE_REDLINE) / PRICE_REDLINE * 100).toFixed(1);
-            priceDistance.innerText = `距红线 ${price>PRICE_REDLINE?'+':''}${dist}%`;
-            // 流动性
+            const dist = ((price - REDLINE) / REDLINE * 100).toFixed(1);
+            redlineDist.innerText = `距红线 ${price>REDLINE?'+':''}${dist}%`;
             lpHDisplay.innerText = (H_lp/1e6).toFixed(2) + 'M';
             lpUDisplay.innerText = Math.round(U_lp).toLocaleString();
-            // 质押
             stakedDisplay.innerText = (H_staked/1e6).toFixed(2) + 'M';
             const ratio = (H_staked / H_lp * 100).toFixed(1);
             stakeRatio.innerText = ratio + '%';
-            if (H_staked > H_lp) stakeRatio.style.color = '#ff7575';
-            else stakeRatio.style.color = '#a0b0d0';
-            // 收益储备
+            if (H_staked > H_lp) stakeRatio.style.color = '#ff8a8a'; else stakeRatio.style.color = '#a0b5d8';
             rewardDisplay.innerText = (H_reward/1e6).toFixed(1) + 'M';
             const payoutH = DAILY_PAYOUT_USD / price;
             const days = Math.floor(H_reward / payoutH);
             rewardDays.innerText = days.toLocaleString();
-            // 国库 & 社区
             treasuryDisplay.innerText = Math.round(treasury).toLocaleString();
             communityUDisplay.innerText = Math.round(communityU).toLocaleString();
             communityHDisplay.innerText = (communityH/1e6).toFixed(1) + 'M';
-
             dayDisplay.innerText = `第 ${day} 天`;
             triggerCountSpan.innerText = `回购触发: ${triggerCount} 次`;
 
             // 红线预警
-            if (price <= PRICE_REDLINE) {
-                warningMessage.innerHTML = '🔴 价格触及红线！社区回购已激活';
-                warningMessage.style.background = '#4f2b2b';
+            if (price <= REDLINE) {
+                warningMsg.innerHTML = '🔴 价格触及红线！社区回购激活';
+                warningMsg.style.background = '#6b2f2f';
             } else {
-                warningMessage.innerHTML = '🟢 价格安全，回购未触发';
-                warningMessage.style.background = '#2a4030';
+                warningMsg.innerHTML = '🟢 价格安全';
+                warningMsg.style.background = '#1e4a2e';
             }
 
-            // 更新图表 (追加当前价格)
+            // 更新图表
             if (priceHistory.length >= 30) priceHistory.shift();
             priceHistory.push(price);
             priceChart.data.datasets[0].data = [...priceHistory, ...Array(30-priceHistory.length).fill(null)];
             priceChart.update();
         }
 
-        // 核心: 执行一天模拟 (按顺序处理事件)
-        function simulateDay(buyAmount, unstakePct) {
-            // buyAmount: 外部净买入USDT (可为负，表示卖出)
-            // unstakePct: 用户解质押比例 (占H_staked的百分比，然后全部卖出)
+        // 核心：执行一天的所有步骤（严格按照因果顺序）
+        function simulateDay(externalBuy, unstakePct) {
+            let log = [];
+            let price = U_lp / H_lp;
+            log.push(`开始第 ${day+1} 天，当前价格 $${price.toFixed(6)}`);
 
-            // 1. 处理外部买卖 (buyAmount)
-            if (Math.abs(buyAmount) > 0.01) {
-                if (buyAmount > 0) {
-                    // 买入: 用 buyAmount U 从池子买 H
-                    let newU = U_lp + buyAmount;
+            // ---------- 1. 处理外部买卖 ----------
+            if (Math.abs(externalBuy) > 0.01) {
+                if (externalBuy > 0) {
+                    // 外部买入
+                    let buyU = externalBuy;
+                    if (buyU > U_lp * 0.9) buyU = U_lp * 0.9; // 防止耗尽
+                    let newU = U_lp + buyU;
                     let newH = k / newU;
-                    let hOut = H_lp - newH;   // 池子减少的H，即用户买入的H
-                    // 用户买入后，这些H直接进入用户钱包，他们可以选择质押。为简化，假设他们全部立即质押 (复投)
+                    let hOut = H_lp - newH;   // 用户买入的H
                     H_lp = newH;
                     U_lp = newU;
-                    // 用户获得 hOut 个H，全部质押
+                    // 用户买入后立即全部质押 (复投)
                     H_staked += hOut;
-                    // 交易量 = buyAmount
-                    let volume = buyAmount;
-                    // 税费 & 返佣
-                    let tax = volume * 0.05;
-                    let rebate = volume * 0.0034;
+                    // 税费
+                    let tax = buyU * 0.05;
+                    let rebate = buyU * 0.0034;
                     treasury += tax + rebate;
+                    log.push(`💰 外部买入 ${buyU.toLocaleString()} USDT，消耗 H ${Math.round(hOut).toLocaleString()}，全部质押。产生税费 ${Math.round(tax)} USDT，返佣 ${Math.round(rebate)} USDT`);
                 } else {
-                    // 卖出: 用户卖出 H (从池子换U) ，卖出量 = 对应USDT的负值？复杂。我们统一用卖出USDT价值量来算。
-                    // 若 buyAmount = -20000，表示用户想要卖出价值20000U的H。需要计算需要卖出多少H。
-                    let sellU = -buyAmount;  // 期望换得的USDT
-                    // 根据恒定乘积，卖出 ΔH 得到 ΔU，满足 (H_lp+ΔH)*(U_lp-ΔU)=k，且 ΔU ≈ (ΔH * U_lp / H_lp) 但精确解：
-                    // 实际上卖出ΔH，新U = k/(H_lp+ΔH)，所以得到的U = U_lp - k/(H_lp+ΔH) = 我们要求这个值 = sellU
-                    // 解方程: U_lp - k/(H_lp+ΔH) = sellU  => k/(H_lp+ΔH) = U_lp - sellU  => H_lp+ΔH = k/(U_lp - sellU)
-                    // 所以 ΔH = k/(U_lp - sellU) - H_lp
-                    if (sellU >= U_lp) sellU = U_lp * 0.999; // 防止抽干池子
+                    // 外部卖出 (负数)
+                    let sellU = -externalBuy; // 期望卖出的USDT价值
+                    if (sellU > U_lp * 0.9) sellU = U_lp * 0.9;
+                    // 计算需要卖出多少H
                     let newU = U_lp - sellU;
+                    if (newU <= 0) newU = 1;
                     let newH = k / newU;
-                    let deltaH = newH - H_lp;  // 增加的H (用户卖出的)
+                    let deltaH = newH - H_lp;   // 增加的H (用户卖出的)
                     H_lp = newH;
                     U_lp = newU;
-                    // 这些H来自用户，假设来自质押用户解质押，但此处外部卖出我们单独处理：可能是非质押用户卖出。我们统一从H_staked中扣除?
-                    // 为简单，我们假设外部卖出就是直接从H_staked中取出卖出(即解质押的一部分)。我们将在后续统一处理解质押。
-                    // 但为了避免重复，这里外部卖出我们假定来自市场投机者，不从H_staked减。我们创建一个临时变量 "market_sell" 来自外部非质押筹码? 但初期外部持币少，所以可以忽略。
-                    // 更合理：我们将外部卖出视为来自非质押用户（比如社区早期持仓卖出），但我们有社区5亿H作为战略储备，暂不卖出。所以暂定外部卖出为0。
-                    // 为了模型简洁，我们限制buyAmount不能为负（外部净卖出设为0），或者如果用户想测试卖出，可用解质押比例。
-                    // 我们重新定义：buyAmount仅表示外部新资金买入（正）。卖出完全由解质押比例控制。这样更干净。
-                    // 所以如果buyAmount为负，我们忽略（设为0）。
-                    buyAmount = 0;
+                    // 卖出通常来自非质押筹码，但初始外部持币很少，我们假设这部分卖出直接从社区战略储备中出？但社区一般不卖。为合理，我们假设外部卖出极少，这里简单处理：若卖出，减少H_staked (模拟部分质押用户解锁卖出)
+                    // 更合理：我们强制外部卖出也减少H_staked，因为外部持币主要就是质押用户
+                    let actualSellH = deltaH;
+                    if (actualSellH > H_staked) actualSellH = H_staked;
+                    H_staked -= actualSellH;
+                    // 税费
+                    let tax = sellU * 0.05;
+                    let rebate = sellU * 0.0034;
+                    treasury += tax + rebate;
+                    log.push(`📉 外部卖出 ${sellU.toLocaleString()} USDT，卖出 H ${Math.round(actualSellH).toLocaleString()} (从质押池扣除)，产生税费 ${Math.round(tax)} USDT，返佣 ${Math.round(rebate)} USDT`);
                 }
+                price = U_lp / H_lp;
             }
 
-            // 1b. 处理解质押卖出 (按比例)
-            if (unstakePct > 0 && H_staked > 0) {
+            // ---------- 2. 用户主动解质押卖出 (按比例) ----------
+            if (unstakePct > 0.001 && H_staked > 0) {
                 let sellH = H_staked * (unstakePct / 100);
                 // 这些H全部卖出
-                // 池子变化: H_lp += sellH, U_lp 减少
                 let newH = H_lp + sellH;
-                let newU = k / newH;  // 新U值
-                let receivedU = U_lp - newU; // 用户卖出得到的U (实际进入用户口袋，我们不考虑再投资)
+                let newU = k / newH;
+                let receivedU = U_lp - newU;  // 用户得到的U
                 // 更新池子
                 H_lp = newH;
                 U_lp = newU;
-                // 减少质押量
                 H_staked -= sellH;
-                // 交易量 = receivedU (用户得到的U) 近似? 实际卖出交易量以USDT计为 receivedU
-                let volume = receivedU;
-                let tax = volume * 0.05;
-                let rebate = volume * 0.0034;
+                // 税费
+                let tax = receivedU * 0.05;
+                let rebate = receivedU * 0.0034;
                 treasury += tax + rebate;
+                log.push(`🔓 用户解质押 ${(unstakePct).toFixed(1)}% → 卖出 H ${Math.round(sellH).toLocaleString()}，获得 ${Math.round(receivedU).toLocaleString()} USDT，税费 ${Math.round(tax)} USDT`);
+                price = U_lp / H_lp;
             }
 
-            // 2. 红线检查 & 社区回购
-            let price = U_lp / H_lp;
-            let回购执行次数 = 0;
-            while (price <= PRICE_REDLINE && communityU > 0.01) {
-                // 社区钱包买入，直到价格 > 0.006 或 钱花完
-                // 我们需要计算需要买入多少U才能把价格推高到 0.006 以上。设目标价格 P_target = PRICE_REDLINE + 0.0001 (略高)
-                let targetPrice = PRICE_REDLINE * 1.02; // 设目标为 0.00612，避免频繁触发
-                // 当前 k 不变，但社区买入会增加 U_lp, 减少 H_lp
-                // 我们需要找到买入 ΔU 后，新价格 = (U_lp+ΔU) / (k/(U_lp+ΔU)) = (U_lp+ΔU)^2 / k
-                // 设目标价格 P_target，则 (U_lp+ΔU)^2 / k = P_target => U_lp+ΔU = sqrt(P_target * k) => ΔU = sqrt(P_target * k) - U_lp
-                let sqrtTarget = Math.sqrt(targetPrice * k);
-                let neededU = sqrtTarget - U_lp;
-                if (neededU <= 0) break; // 价格已达标
-                // 实际可用的U
-                let buyU = Math.min(neededU, communityU);
-                if (buyU <= 0) break;
-                // 执行回购
-                let newU = U_lp + buyU;
-                let newH = k / newU;
-                let hBought = H_lp - newH; // 社区买入的H数量
-                H_lp = newH;
-                U_lp = newU;
-                communityU -= buyU;
-                communityH += hBought; // 回购的H进入社区钱包
-                // 回购本身产生交易量 buyU，但社区回购不计入税费？我们假设回购不收税（或者收税也无妨，但简化不计）
-                // 这里为了严谨，如果回购要交税，会减少U，但社区多签可以设置免税。我们暂定回购不收税。
-                triggerCount++;
-                回购执行次数++;
-                price = U_lp / H_lp; // 重新计算价格
-                if (回购执行次数 > 10) break; // 防止无限循环
-            }
-
-            // 3. 每日收益发放 (从收益储备到质押用户，自动复投)
-            price = U_lp / H_lp;
-            let payoutH = DAILY_PAYOUT_USD / price;
-            if (payoutH > H_reward) payoutH = H_reward; // 收益储备不够就全发
-            H_reward -= payoutH;
-            H_staked += payoutH;  // 复投
-
-            // 4. 国库累积到1000U自动转账/回购
-            while (treasury >= 1000) {
+            // ---------- 3. 国库自动回购及转账 (每1000U触发) ----------
+            while (treasury >= TREASURY_TRIGGER) {
                 // 300U 回购
-                let buyU = 300;
+                let buyU = REPO_FROM_TREASURY;
+                if (buyU > U_lp * 0.9) buyU = U_lp * 0.9;
                 let newU = U_lp + buyU;
                 let newH = k / newU;
                 let hBought = H_lp - newH;
                 H_lp = newH;
                 U_lp = newU;
-                // 国库减少300
-                treasury -= 300;
+                treasury -= REPO_FROM_TREASURY;
                 // 700U 转社区钱包
-                communityU += 700;
-                // 交易量 buyU，但转账部分不算交易量，回购交易量计入税费？但这里回购用国库U，如果收税会循环，我们假设国库回购也不收税。
-                // 为了简单，这次回购不产生额外税费。
-                // 但可记录触发
-                // 注意：价格可能会因此变动
+                communityU += TO_COMMUNITY;
+                log.push(`🏦 国库满1000U触发：${REPO_FROM_TREASURY}U 回购 H ${Math.round(hBought).toLocaleString()}，${TO_COMMUNITY}U 转入社区钱包`);
                 price = U_lp / H_lp;
-                // 检查红线 (如果回购后价格跌破红线，可能触发社区钱包额外回购，但我们已在步骤2处理，但步骤2在之前，顺序问题。我们重新调用红线检查？
-                // 最好在最后统一再检查一次红线。但为了简化，我们在每个改变价格的操作后重新计算，并可能触发步骤2。
             }
 
-            // 最后再次检查红线 (因为国库回购可能使价格变化)
+            // ---------- 4. 价格红线回购 (社区钱包主动干预) ----------
+            let repoCount = 0;
             price = U_lp / H_lp;
-            let loopGuard = 0;
-            while (price <= PRICE_REDLINE && communityU > 0.01 && loopGuard < 10) {
-                let targetPrice = PRICE_REDLINE * 1.02;
-                let sqrtTarget = Math.sqrt(targetPrice * k);
-                let neededU = sqrtTarget - U_lp;
+            while (price <= REDLINE && communityU > 1 && repoCount < 20) {
+                // 目标价格略高于红线，避免频繁触发
+                let targetPrice = REDLINE * 1.02; // 0.00612
+                // 计算需要多少U才能达到目标价格
+                let neededU = Math.sqrt(targetPrice * k) - U_lp;
                 if (neededU <= 0) break;
                 let buyU = Math.min(neededU, communityU);
-                if (buyU <= 0) break;
+                if (buyU < 0.001) break;
                 let newU = U_lp + buyU;
                 let newH = k / newU;
                 let hBought = H_lp - newH;
@@ -397,15 +354,55 @@
                 communityU -= buyU;
                 communityH += hBought;
                 triggerCount++;
+                repoCount++;
+                log.push(`🚨 红线回购第${repoCount}次：社区钱包花费 ${Math.round(buyU)} USDT 买入 ${Math.round(hBought).toLocaleString()} H`);
                 price = U_lp / H_lp;
-                loopGuard++;
+                if (price > REDLINE) break;
+            }
+            if (repoCount > 0) {
+                log.push(`✅ 红线回购结束，当前价格 $${price.toFixed(6)}`);
             }
 
-            // 增加天数
+            // ---------- 5. 每日收益发放 (从收益储备支出，自动复投) ----------
+            price = U_lp / H_lp;
+            let payoutH = DAILY_PAYOUT_USD / price;
+            if (payoutH > H_reward) payoutH = H_reward; // 不够就全发
+            H_reward -= payoutH;
+            H_staked += payoutH;
+            log.push(`🎁 每日收益发放：${DAILY_PAYOUT_USD} USDT 等值 → ${Math.round(payoutH).toLocaleString()} H (自动复投，质押池增加)`);
+
+            // 最后再检查一次红线 (因为收益发放可能略微拉低价格)
+            price = U_lp / H_lp;
+            if (price <= REDLINE && communityU > 1) {
+                // 再次回购一轮
+                let extra = 0;
+                while (price <= REDLINE && communityU > 1 && extra < 10) {
+                    let targetPrice = REDLINE * 1.02;
+                    let neededU = Math.sqrt(targetPrice * k) - U_lp;
+                    if (neededU <= 0) break;
+                    let buyU = Math.min(neededU, communityU);
+                    if (buyU < 0.001) break;
+                    let newU = U_lp + buyU;
+                    let newH = k / newU;
+                    let hBought = H_lp - newH;
+                    H_lp = newH;
+                    U_lp = newU;
+                    communityU -= buyU;
+                    communityH += hBought;
+                    triggerCount++;
+                    extra++;
+                    price = U_lp / H_lp;
+                }
+                log.push(`⚠️ 收益发放后再次红线回购 ${extra} 次`);
+            }
+
             day++;
+            // 输出日志到UI
+            log.forEach(msg => addLog(msg));
+            updateUI();
         }
 
-        // 重置初始状态
+        // 重置到初始
         function reset() {
             H_lp = 9523809.52;
             U_lp = 210000;
@@ -417,38 +414,32 @@
             day = 0;
             triggerCount = 0;
             priceHistory = [];
-            priceHistory.push(U_lp / H_lp);
-            updateDisplay();
+            addLog('🔁 重置至初始状态 (第二阶段后)');
+            updateUI();
         }
 
-        // 事件监听
-        stepBtn.addEventListener('click', function() {
-            let buyVal = parseFloat(buyInput.value);
-            let unstakeVal = parseFloat(unstakeInput.value);
-            buyInLabel.innerText = buyVal;
+        // 事件绑定
+        stepBtn.addEventListener('click', ()=>{
+            let buyVal = parseFloat(buySlider.value);
+            let unstakeVal = parseFloat(unstakeSlider.value);
+            buyLabel.innerText = buyVal;
             unstakeLabel.innerText = unstakeVal + '%';
             simulateDay(buyVal, unstakeVal);
-            updateDisplay();
         });
 
-        resetBtn.addEventListener('click', function() {
+        resetBtn.addEventListener('click', ()=>{
             reset();
         });
 
-        // 滑块实时显示
-        buyInput.addEventListener('input', function() {
-            buyInLabel.innerText = buyInput.value;
+        buySlider.addEventListener('input', ()=>{
+            buyLabel.innerText = buySlider.value;
         });
-        unstakeInput.addEventListener('input', function() {
-            unstakeLabel.innerText = unstakeInput.value + '%';
+        unstakeSlider.addEventListener('input', ()=>{
+            unstakeLabel.innerText = unstakeSlider.value + '%';
         });
 
         // 初始化
         reset();
-
-        // 修正初始价格历史
-        priceHistory = [U_lp / H_lp];
-        updateDisplay();
     })();
 </script>
 </body>
