@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>海豚经济模型 · 全因果链模拟</title>
+    <title>海豚模型 · 国库触发修正版</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * { box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
+        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; margin: 0; padding: 0; }
         body { background: #0b0e14; display: flex; justify-content: center; padding: 16px; }
         .container { max-width: 480px; width: 100%; background: #121722; border-radius: 40px; padding: 20px 16px; box-shadow: 0 20px 30px #00000080; border: 1px solid #2f3a4a; }
         h2 { color: #dce5ff; font-weight: 600; font-size: 22px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -39,10 +39,10 @@
 </head>
 <body>
 <div class="container">
-    <h2>🐬 海豚模型 · 全因果链</h2>
-    <div class="sub">基于真实步骤：先买→质押→税费→收益→卖盘→回购</div>
+    <h2>🐬 海豚模型 · 国库触发修正</h2>
+    <div class="sub">国库每1000U触发：300U回购(归社区H)+700U转社区U</div>
 
-    <!-- 当前状态卡片 (所有动态变量) -->
+    <!-- 当前状态卡片 -->
     <div class="card">
         <div class="card-title"><span>📊 实时状态</span> <span id="dayDisplay" style="margin-left:auto; font-size:14px;">第0天</span></div>
         <div class="grid-2">
@@ -102,7 +102,7 @@
         </div>
     </div>
 
-    <!-- 事件日志 (展示每一步的因果链) -->
+    <!-- 事件日志 -->
     <div class="card" style="padding: 12px;">
         <div class="flex-between">
             <span class="card-title" style="margin-bottom:0;">📋 事件日志</span>
@@ -122,7 +122,7 @@
         <div style="color:#8d9fd0; font-size:12px; text-align:center;">红线 0.006 —— 社区回购护城河</div>
     </div>
 
-    <div style="color:#5f72a0; font-size:11px; text-align:center; padding:10px;">* 每一日严格遵循: 外部买卖→解质押卖出→国库回购→红线回购→收益发放</div>
+    <div style="color:#5f72a0; font-size:11px; text-align:center; padding:10px;">* 国库每1000U触发：300U回购(H归社区) + 700U转社区U，国库净减1000U</div>
 </div>
 
 <script>
@@ -285,8 +285,7 @@
                     let deltaH = newH - H_lp;   // 增加的H (用户卖出的)
                     H_lp = newH;
                     U_lp = newU;
-                    // 卖出通常来自非质押筹码，但初始外部持币很少，我们假设这部分卖出直接从社区战略储备中出？但社区一般不卖。为合理，我们假设外部卖出极少，这里简单处理：若卖出，减少H_staked (模拟部分质押用户解锁卖出)
-                    // 更合理：我们强制外部卖出也减少H_staked，因为外部持币主要就是质押用户
+                    // 卖出来自质押用户（外部卖出也视作从质押池取出）
                     let actualSellH = deltaH;
                     if (actualSellH > H_staked) actualSellH = H_staked;
                     H_staked -= actualSellH;
@@ -318,21 +317,27 @@
                 price = U_lp / H_lp;
             }
 
-            // ---------- 3. 国库自动回购及转账 (每1000U触发) ----------
+            // ---------- 3. 国库自动回购及转账 (每1000U触发一次，每次净减1000U) ----------
             while (treasury >= TREASURY_TRIGGER) {
-                // 300U 回购
-                let buyU = REPO_FROM_TREASURY;
-                if (buyU > U_lp * 0.9) buyU = U_lp * 0.9;
+                // 用300U回购 (买入H，H归社区钱包)
+                let buyU = REPO_FROM_TREASURY; // 300
+                if (buyU > U_lp * 0.9) buyU = U_lp * 0.9; // 防止耗尽
                 let newU = U_lp + buyU;
                 let newH = k / newU;
                 let hBought = H_lp - newH;
                 H_lp = newH;
                 U_lp = newU;
-                treasury -= REPO_FROM_TREASURY;
-                // 700U 转社区钱包
-                communityU += TO_COMMUNITY;
-                log.push(`🏦 国库满1000U触发：${REPO_FROM_TREASURY}U 回购 H ${Math.round(hBought).toLocaleString()}，${TO_COMMUNITY}U 转入社区钱包`);
-                price = U_lp / H_lp;
+                communityH += hBought;          // 回购的H进入社区钱包
+                treasury -= buyU;                // 国库扣除300
+
+                // 转700U到社区钱包
+                communityU += TO_COMMUNITY;       // 700
+                treasury -= TO_COMMUNITY;         // 国库再扣700
+
+                log.push(`🏦 国库满1000U触发：300U回购 H ${Math.round(hBought).toLocaleString()} (归社区)，700U转入社区钱包，国库剩余 ${Math.round(treasury)} U`);
+
+                price = U_lp / H_lp; // 更新价格
+                // 继续检查，因为可能扣完1000后仍≥1000
             }
 
             // ---------- 4. 价格红线回购 (社区钱包主动干预) ----------
@@ -374,7 +379,6 @@
             // 最后再检查一次红线 (因为收益发放可能略微拉低价格)
             price = U_lp / H_lp;
             if (price <= REDLINE && communityU > 1) {
-                // 再次回购一轮
                 let extra = 0;
                 while (price <= REDLINE && communityU > 1 && extra < 10) {
                     let targetPrice = REDLINE * 1.02;
