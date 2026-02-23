@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>海豚模型 · 国库触发修正版</title>
+    <title>海豚模型 · 实时收益+高亮关键数据</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; margin: 0; padding: 0; }
@@ -14,8 +14,9 @@
         .card { background: #1c2532; border-radius: 28px; padding: 18px 16px; margin-bottom: 20px; border: 1px solid #2e3c50; }
         .card-title { color: #b6ccff; font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .metric-item { background: #0f1621; border-radius: 20px; padding: 12px; }
-        .metric-label { color: #90a0c2; font-size: 12px; }
+        .metric-item { background: #0f1621; border-radius: 20px; padding: 12px; transition: 0.2s; }
+        .metric-item.highlight { background: #1e3347; border: 1px solid #4c9aff; }
+        .metric-label { color: #90a0c2; font-size: 12px; display: flex; align-items: center; gap: 4px; }
         .metric-value { color: white; font-size: 20px; font-weight: 600; }
         .metric-detail { color: #a0b5d8; font-size: 12px; }
         .danger { color: #ff8a8a; }
@@ -30,49 +31,50 @@
         .btn.primary { background: #4c9aff; color: black; border: none; }
         .btn:active { opacity: 0.7; }
         .log-box { background: #0b111a; border-radius: 20px; padding: 14px; max-height: 200px; overflow-y: auto; font-size: 12px; color: #b8c8ec; border: 1px solid #2f3d54; margin-top: 10px; }
-        .log-entry { border-bottom: 1px dashed #2d3848; padding: 5px 0; }
+        .log-entry { border-bottom: 1px dashed #2d3848; padding: 5px 0; font-family: monospace; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         .warning-badge { background: #4f2f2f; color: #ffbaba; border-radius: 30px; padding: 6px 14px; font-size: 13px; }
         .chart-container { height: 150px; margin: 16px 0; }
-        .highlight { color: #ffd966; font-weight: 600; }
+        .highlight-value { color: #ffd966; font-weight: 700; }
+        .blink { background: #2a4055; transition: background 0.3s; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>🐬 海豚模型 · 国库触发修正</h2>
-    <div class="sub">国库每1000U触发：300U回购(归社区H)+700U转社区U</div>
+    <h2>🐬 海豚模型 · 实时收益+高亮</h2>
+    <div class="sub">每日20点根据当时持仓发放收益 · 解质押影响当日收益</div>
 
-    <!-- 当前状态卡片 -->
+    <!-- 当前状态卡片 (所有动态变量) -->
     <div class="card">
         <div class="card-title"><span>📊 实时状态</span> <span id="dayDisplay" style="margin-left:auto; font-size:14px;">第0天</span></div>
         <div class="grid-2">
-            <div class="metric-item">
-                <div class="metric-label">H价格</div>
+            <div class="metric-item highlight" id="priceBox">
+                <div class="metric-label">💰 H价格</div>
                 <div class="metric-value" id="priceDisplay">$0.02205</div>
                 <div class="metric-detail" id="redlineDist">距红线 +267%</div>
             </div>
-            <div class="metric-item">
-                <div class="metric-label">流动性池 H / U</div>
-                <div class="metric-value" id="lpHDisplay">9.52M</div>
-                <div class="metric-detail">U: <span id="lpUDisplay">210k</span></div>
+            <div class="metric-item" id="volumeBox">
+                <div class="metric-label">📊 今日交易量</div>
+                <div class="metric-value" id="volumeDisplay">0 U</div>
+                <div class="metric-detail" id="netVolume">净成交: 0 U</div>
             </div>
-            <div class="metric-item">
-                <div class="metric-label">质押量 H_staked</div>
+            <div class="metric-item highlight" id="stakedBox">
+                <div class="metric-label">🔒 质押总量 H_staked</div>
                 <div class="metric-value" id="stakedDisplay">8.66M</div>
                 <div class="metric-detail">占池子 <span id="stakeRatio">91%</span></div>
             </div>
             <div class="metric-item">
-                <div class="metric-label">收益储备 H_reward</div>
-                <div class="metric-value" id="rewardDisplay">300M</div>
-                <div class="metric-detail">可支付 <span id="rewardDays">6615</span>天</div>
+                <div class="metric-label">💧 流动性池 H / U</div>
+                <div class="metric-value" id="lpHDisplay">9.52M</div>
+                <div class="metric-detail">U: <span id="lpUDisplay">210k</span></div>
             </div>
             <div class="metric-item">
-                <div class="metric-label">国库 USDT</div>
+                <div class="metric-label">🏦 国库 USDT</div>
                 <div class="metric-value" id="treasuryDisplay">5,340</div>
                 <div class="metric-detail">待转</div>
             </div>
             <div class="metric-item">
-                <div class="metric-label">社区钱包 U / H</div>
+                <div class="metric-label">👛 社区钱包 U / H</div>
                 <div class="metric-value" id="communityUDisplay">20k</div>
                 <div class="metric-detail">H: <span id="communityHDisplay">500M</span></div>
             </div>
@@ -97,12 +99,13 @@
             <div style="color:#a0b5d0;">当日从质押池取出并卖出的比例</div>
         </div>
         <div class="btn-group">
-            <button class="btn" id="stepBtn">⏩ 模拟一天</button>
+            <button class="btn" id="stepBtn">⏩ 模拟一天 (至20点)</button>
             <button class="btn primary" id="resetBtn">⟲ 重置初始</button>
         </div>
+        <div style="font-size:12px; color:#b0c0e0; margin-top:8px;">* 顺序：先买卖/解质押 → 20点发放收益 → 国库/红线回购</div>
     </div>
 
-    <!-- 事件日志 -->
+    <!-- 事件日志 (显示关键数据变动) -->
     <div class="card" style="padding: 12px;">
         <div class="flex-between">
             <span class="card-title" style="margin-bottom:0;">📋 事件日志</span>
@@ -122,14 +125,14 @@
         <div style="color:#8d9fd0; font-size:12px; text-align:center;">红线 0.006 —— 社区回购护城河</div>
     </div>
 
-    <div style="color:#5f72a0; font-size:11px; text-align:center; padding:10px;">* 国库每1000U触发：300U回购(H归社区) + 700U转社区U，国库净减1000U</div>
+    <div style="color:#5f72a0; font-size:11px; text-align:center; padding:10px;">* 高亮框: 价格、质押总量、今日交易量实时刷新。解质押会减少当日收益。</div>
 </div>
 
 <script>
     (function() {
         // ---------- 固定参数 ----------
         const REDLINE = 0.006;                // 价格红线
-        const DAILY_PAYOUT_USD = 1000;         // 每日支付等值1000U的H
+        const DAILY_PAYOUT_USD = 1000;         // 每日支付等值1000U的H (每日20点发放)
         const TREASURY_TRIGGER = 1000;          // 国库累积1000U触发分配
         const REPO_FROM_TREASURY = 300;         // 国库每次拿300U回购
         const TO_COMMUNITY = 700;                // 国库每次转700U给社区钱包
@@ -146,6 +149,10 @@
         let communityU = 20000;                       // 社区钱包USDT (用于红线回购)
         let communityH = 500000000;                    // 社区钱包H (战略储备)
 
+        // 新增：用于记录当日交易量和净成交额 (每次交易累计)
+        let dailyVolume = 0;                           // 今日累计交易量 (USDT)
+        let dailyNetBuy = 0;                            // 今日净买入 (买入U - 卖出U)
+
         let day = 0;
         let triggerCount = 0;                          // 红线回购触发次数
         let priceHistory = [];                           // 存储最近价格
@@ -157,14 +164,15 @@
         const lpUDisplay = document.getElementById('lpUDisplay');
         const stakedDisplay = document.getElementById('stakedDisplay');
         const stakeRatio = document.getElementById('stakeRatio');
-        const rewardDisplay = document.getElementById('rewardDisplay');
-        const rewardDays = document.getElementById('rewardDays');
         const treasuryDisplay = document.getElementById('treasuryDisplay');
         const communityUDisplay = document.getElementById('communityUDisplay');
         const communityHDisplay = document.getElementById('communityHDisplay');
         const dayDisplay = document.getElementById('dayDisplay');
         const warningMsg = document.getElementById('warningMsg');
         const triggerCountSpan = document.getElementById('triggerCount');
+        const volumeDisplay = document.getElementById('volumeDisplay');
+        const netVolume = document.getElementById('netVolume');
+
         const buyLabel = document.getElementById('buyLabel');
         const unstakeLabel = document.getElementById('unstakeLabel');
         const buySlider = document.getElementById('buySlider');
@@ -199,7 +207,7 @@
         });
 
         // 日志追加
-        function addLog(message, type = 'info') {
+        function addLog(message) {
             const entry = document.createElement('div');
             entry.className = 'log-entry';
             entry.innerHTML = `⏱️ ${new Date().toLocaleTimeString('zh-CN', {hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit'})}  ${message}`;
@@ -224,15 +232,16 @@
             const ratio = (H_staked / H_lp * 100).toFixed(1);
             stakeRatio.innerText = ratio + '%';
             if (H_staked > H_lp) stakeRatio.style.color = '#ff8a8a'; else stakeRatio.style.color = '#a0b5d8';
-            rewardDisplay.innerText = (H_reward/1e6).toFixed(1) + 'M';
-            const payoutH = DAILY_PAYOUT_USD / price;
-            const days = Math.floor(H_reward / payoutH);
-            rewardDays.innerText = days.toLocaleString();
             treasuryDisplay.innerText = Math.round(treasury).toLocaleString();
             communityUDisplay.innerText = Math.round(communityU).toLocaleString();
             communityHDisplay.innerText = (communityH/1e6).toFixed(1) + 'M';
             dayDisplay.innerText = `第 ${day} 天`;
             triggerCountSpan.innerText = `回购触发: ${triggerCount} 次`;
+
+            // 交易量显示
+            volumeDisplay.innerText = Math.round(dailyVolume).toLocaleString() + ' U';
+            netVolume.innerText = `净成交: ${dailyNetBuy > 0 ? '+' : ''}${Math.round(dailyNetBuy).toLocaleString()} U`;
+            if (dailyNetBuy > 0) netVolume.style.color = '#8affb8'; else if (dailyNetBuy < 0) netVolume.style.color = '#ff8a8a'; else netVolume.style.color = '#a0b5d8';
 
             // 红线预警
             if (price <= REDLINE) {
@@ -250,11 +259,20 @@
             priceChart.update();
         }
 
-        // 核心：执行一天的所有步骤（严格按照因果顺序）
+        // 重置每日交易量 (每天开始前重置)
+        function resetDailyVolume() {
+            dailyVolume = 0;
+            dailyNetBuy = 0;
+        }
+
+        // 核心：执行一天的所有步骤 (顺序：白天操作 -> 20点收益发放 -> 国库/红线回购)
         function simulateDay(externalBuy, unstakePct) {
             let log = [];
             let price = U_lp / H_lp;
-            log.push(`开始第 ${day+1} 天，当前价格 $${price.toFixed(6)}`);
+            log.push(`========== 开始第 ${day+1} 天 (白天) ==========`);
+
+            // ---------- 重置每日交易量 ----------
+            resetDailyVolume();
 
             // ---------- 1. 处理外部买卖 ----------
             if (Math.abs(externalBuy) > 0.01) {
@@ -273,6 +291,9 @@
                     let tax = buyU * 0.05;
                     let rebate = buyU * 0.0034;
                     treasury += tax + rebate;
+                    // 更新交易量
+                    dailyVolume += buyU;
+                    dailyNetBuy += buyU;
                     log.push(`💰 外部买入 ${buyU.toLocaleString()} USDT，消耗 H ${Math.round(hOut).toLocaleString()}，全部质押。产生税费 ${Math.round(tax)} USDT，返佣 ${Math.round(rebate)} USDT`);
                 } else {
                     // 外部卖出 (负数)
@@ -293,6 +314,9 @@
                     let tax = sellU * 0.05;
                     let rebate = sellU * 0.0034;
                     treasury += tax + rebate;
+                    // 更新交易量
+                    dailyVolume += sellU;
+                    dailyNetBuy -= sellU;
                     log.push(`📉 外部卖出 ${sellU.toLocaleString()} USDT，卖出 H ${Math.round(actualSellH).toLocaleString()} (从质押池扣除)，产生税费 ${Math.round(tax)} USDT，返佣 ${Math.round(rebate)} USDT`);
                 }
                 price = U_lp / H_lp;
@@ -313,11 +337,22 @@
                 let tax = receivedU * 0.05;
                 let rebate = receivedU * 0.0034;
                 treasury += tax + rebate;
+                // 更新交易量
+                dailyVolume += receivedU;
+                dailyNetBuy -= receivedU; // 卖出减少净买入
                 log.push(`🔓 用户解质押 ${(unstakePct).toFixed(1)}% → 卖出 H ${Math.round(sellH).toLocaleString()}，获得 ${Math.round(receivedU).toLocaleString()} USDT，税费 ${Math.round(tax)} USDT`);
                 price = U_lp / H_lp;
             }
 
-            // ---------- 3. 国库自动回购及转账 (每1000U触发一次，每次净减1000U) ----------
+            // ---------- 3. 20点：根据当前 H_staked 发放收益 ----------
+            price = U_lp / H_lp;
+            let payoutH = DAILY_PAYOUT_USD / price;
+            if (payoutH > H_reward) payoutH = H_reward; // 不够就全发
+            H_reward -= payoutH;
+            H_staked += payoutH; // 收益自动复投
+            log.push(`🕒 20点收益发放：${DAILY_PAYOUT_USD} USDT 等值 → ${Math.round(payoutH).toLocaleString()} H (自动复投，质押池增加)`);
+
+            // ---------- 4. 国库自动回购及转账 (每1000U触发一次，每次净减1000U) ----------
             while (treasury >= TREASURY_TRIGGER) {
                 // 用300U回购 (买入H，H归社区钱包)
                 let buyU = REPO_FROM_TREASURY; // 300
@@ -334,13 +369,14 @@
                 communityU += TO_COMMUNITY;       // 700
                 treasury -= TO_COMMUNITY;         // 国库再扣700
 
+                // 国库回购本身不计入每日交易量 (因为是协议操作，不视为市场交易)
                 log.push(`🏦 国库满1000U触发：300U回购 H ${Math.round(hBought).toLocaleString()} (归社区)，700U转入社区钱包，国库剩余 ${Math.round(treasury)} U`);
 
                 price = U_lp / H_lp; // 更新价格
                 // 继续检查，因为可能扣完1000后仍≥1000
             }
 
-            // ---------- 4. 价格红线回购 (社区钱包主动干预) ----------
+            // ---------- 5. 价格红线回购 (社区钱包主动干预) ----------
             let repoCount = 0;
             price = U_lp / H_lp;
             while (price <= REDLINE && communityU > 1 && repoCount < 20) {
@@ -360,44 +396,13 @@
                 communityH += hBought;
                 triggerCount++;
                 repoCount++;
+                // 红线回购也不计入每日交易量 (协议操作)
                 log.push(`🚨 红线回购第${repoCount}次：社区钱包花费 ${Math.round(buyU)} USDT 买入 ${Math.round(hBought).toLocaleString()} H`);
                 price = U_lp / H_lp;
                 if (price > REDLINE) break;
             }
             if (repoCount > 0) {
                 log.push(`✅ 红线回购结束，当前价格 $${price.toFixed(6)}`);
-            }
-
-            // ---------- 5. 每日收益发放 (从收益储备支出，自动复投) ----------
-            price = U_lp / H_lp;
-            let payoutH = DAILY_PAYOUT_USD / price;
-            if (payoutH > H_reward) payoutH = H_reward; // 不够就全发
-            H_reward -= payoutH;
-            H_staked += payoutH;
-            log.push(`🎁 每日收益发放：${DAILY_PAYOUT_USD} USDT 等值 → ${Math.round(payoutH).toLocaleString()} H (自动复投，质押池增加)`);
-
-            // 最后再检查一次红线 (因为收益发放可能略微拉低价格)
-            price = U_lp / H_lp;
-            if (price <= REDLINE && communityU > 1) {
-                let extra = 0;
-                while (price <= REDLINE && communityU > 1 && extra < 10) {
-                    let targetPrice = REDLINE * 1.02;
-                    let neededU = Math.sqrt(targetPrice * k) - U_lp;
-                    if (neededU <= 0) break;
-                    let buyU = Math.min(neededU, communityU);
-                    if (buyU < 0.001) break;
-                    let newU = U_lp + buyU;
-                    let newH = k / newU;
-                    let hBought = H_lp - newH;
-                    H_lp = newH;
-                    U_lp = newU;
-                    communityU -= buyU;
-                    communityH += hBought;
-                    triggerCount++;
-                    extra++;
-                    price = U_lp / H_lp;
-                }
-                log.push(`⚠️ 收益发放后再次红线回购 ${extra} 次`);
             }
 
             day++;
@@ -418,6 +423,7 @@
             day = 0;
             triggerCount = 0;
             priceHistory = [];
+            resetDailyVolume();
             addLog('🔁 重置至初始状态 (第二阶段后)');
             updateUI();
         }
